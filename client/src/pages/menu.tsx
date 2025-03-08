@@ -10,13 +10,15 @@ import { Link } from "wouter";
 import type { MenuItem, Allergen, Category, OrderType } from "@shared/schema";
 import { categories } from "@shared/schema";
 import { Plus, MapPin } from "lucide-react";
+import { usePhone } from '@/contexts/PhoneContext';
+import { CustomerLayout } from "@/components/layouts/CustomerLayout";
 
 export default function Menu() {
+  const { phoneNumber, setPhoneNumber } = usePhone();
   const [selectedAllergens, setSelectedAllergens] = useState<Allergen[]>([]);
   const [orderType, setOrderType] = useState<OrderType | null>(null);
   const [tableNumber, setTableNumber] = useState("");
   const [customerName, setCustomerName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState(""); 
   const [selectedItems, setSelectedItems] = useState<
     Map<string, { item: MenuItem; quantity: number }>
   >(new Map());
@@ -75,82 +77,84 @@ export default function Menu() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold">Our Menu</h1>
-        <Link href="/track">
-          <Button variant="outline" className="flex items-center gap-2">
-            <MapPin className="h-4 w-4" />
-            Track Your Order
-          </Button>
-        </Link>
-      </div>
-
-      <div className="grid gap-8 lg:grid-cols-[300px,1fr,300px]">
-        <div className="space-y-8">
-          <OrderTypeSelector
-            selectedType={orderType}
-            onSelectType={setOrderType}
-            tableNumber={tableNumber}
-            onTableNumberChange={setTableNumber}
-            customerName={customerName}
-            onCustomerNameChange={setCustomerName}
-            phoneNumber={phoneNumber} 
-            onPhoneNumberChange={setPhoneNumber} 
-          />
-          <AllergenFilter
-            selectedAllergens={selectedAllergens}
-            onToggleAllergen={toggleAllergen}
-          />
+    <CustomerLayout>
+      <div className="container mx-auto py-8 px-4">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-bold">Our Menu</h1>
+          <Link href="/track">
+            <Button variant="outline" className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              Track Your Order
+            </Button>
+          </Link>
         </div>
 
-        <Tabs defaultValue={categories[0]} className="space-y-6">
-          <TabsList>
+        <div className="grid gap-8 lg:grid-cols-[300px,1fr,300px]">
+          <div className="space-y-8">
+            <OrderTypeSelector
+              selectedType={orderType}
+              onSelectType={setOrderType}
+              tableNumber={tableNumber}
+              onTableNumberChange={setTableNumber}
+              customerName={customerName}
+              onCustomerNameChange={setCustomerName}
+              phoneNumber={phoneNumber}
+              onPhoneNumberChange={setPhoneNumber}
+            />
+            <AllergenFilter
+              selectedAllergens={selectedAllergens}
+              onToggleAllergen={toggleAllergen}
+            />
+          </div>
+
+          <Tabs defaultValue={categories[0]} className="space-y-6">
+            <TabsList>
+              {categories.map((category) => (
+                <TabsTrigger
+                  key={category}
+                  value={category}
+                  className="capitalize"
+                >
+                  {category}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+
             {categories.map((category) => (
-              <TabsTrigger
-                key={category}
-                value={category}
-                className="capitalize"
-              >
-                {category}
-              </TabsTrigger>
+              <TabsContent key={category} value={category}>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {filteredItems
+                    ?.filter((item) => item.category === category)
+                    .map((item) => (
+                      <div key={item.id} className="relative">
+                        <MenuCard item={item} />
+                        <Button
+                          className="absolute bottom-4 right-4"
+                          onClick={() => addToOrder(item)}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add to Order
+                        </Button>
+                      </div>
+                    ))}
+                </div>
+              </TabsContent>
             ))}
-          </TabsList>
+          </Tabs>
 
-          {categories.map((category) => (
-            <TabsContent key={category} value={category}>
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {filteredItems
-                  ?.filter((item) => item.category === category)
-                  .map((item) => (
-                    <div key={item.id} className="relative">
-                      <MenuCard item={item} />
-                      <Button
-                        className="absolute bottom-4 right-4"
-                        onClick={() => addToOrder(item)}
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add to Order
-                      </Button>
-                    </div>
-                  ))}
-              </div>
-            </TabsContent>
-          ))}
-        </Tabs>
-
-        <div className="space-y-8">
-          <OrderSummary
-            selectedItems={selectedItems}
-            updateQuantity={updateQuantity}
-            removeItem={removeItem}
-            orderType={orderType}
-            tableNumber={tableNumber}
-            customerName={customerName}
-            phoneNumber={phoneNumber} 
-          />
+          <div className="space-y-8">
+            <OrderSummary
+              selectedItems={selectedItems}
+              updateQuantity={updateQuantity}
+              removeItem={removeItem}
+              orderType={orderType}
+              tableNumber={tableNumber}
+              customerName={customerName}
+              phoneNumber={phoneNumber}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </CustomerLayout>
   );
 }

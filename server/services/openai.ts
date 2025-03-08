@@ -93,17 +93,26 @@ export async function suggestDietaryModifications(
       messages: [
         {
           role: "system",
-          content: "You are a culinary expert specializing in dietary modifications. Suggest realistic modifications to accommodate dietary preferences while maintaining the dish's essence. Return suggestions in JSON format with modifications array and nutritionalImpact description.",
+          content: "You are a culinary expert specializing in dietary modifications. Suggest realistic modifications to accommodate dietary preferences while maintaining the dish's essence. Return suggestions in JSON format with 'modifications' array of strings and 'nutritionalImpact' string description.",
         },
         {
           role: "user",
-          content: `Suggest modifications for "${menuItem.name}" to accommodate these dietary preferences: ${dietaryPreferences.join(", ")}.\n\nCurrent ingredients: ${menuItem.ingredients.join(", ")}\nCurrent allergens: ${menuItem.allergens.join(", ")}\n\nProvide practical modifications and explain their nutritional impact. Return in JSON format.`,
+          content: `Suggest modifications for "${menuItem.name}" to accommodate these dietary preferences: ${dietaryPreferences.join(", ")}.\n\nCurrent ingredients: ${menuItem.ingredients.join(", ")}\nCurrent allergens: ${menuItem.allergens.join(", ")}\n\nProvide practical modifications and explain their nutritional impact. Return in JSON format with 'modifications' array and 'nutritionalImpact' string.`,
         },
       ],
       response_format: { type: "json_object" },
     });
 
     const result = JSON.parse(response.choices[0].message.content || "{}");
+    
+    // Transform the response if it's in the wrong format
+    if (result.originalIngredient || result.substituteWith) {
+      return {
+        modifications: [`Replace ${result.originalIngredient} with ${result.substituteWith}`],
+        nutritionalImpact: result.description || "No significant nutritional impact",
+      };
+    }
+
     return {
       modifications: result.modifications || [],
       nutritionalImpact: result.nutritionalImpact || "No significant nutritional impact",

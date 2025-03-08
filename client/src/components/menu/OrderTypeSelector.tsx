@@ -53,10 +53,18 @@ export function OrderTypeSelector({
             <Label htmlFor="phone-number">Phone Number</Label>
             <Input
               id="phone-number"
-              value={phoneNumber}
-              onChange={(e) => onPhoneNumberChange(e.target.value)}
-              placeholder="Enter phone number"
               type="tel"
+              value={phoneNumber}
+              onChange={(e) => {
+                // Only allow numbers and format the input
+                const cleaned = e.target.value.replace(/\D/g, '');
+                if (cleaned.length <= 10) {
+                  onPhoneNumberChange(cleaned);
+                }
+              }}
+              placeholder="(XXX) XXX-XXXX"
+              required
+              pattern="[0-9]{10}"
             />
           </div>
 

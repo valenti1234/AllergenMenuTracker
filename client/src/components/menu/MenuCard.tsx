@@ -217,9 +217,9 @@ export function MenuCard({ item }: MenuCardProps) {
                                 <Checkbox
                                   id={preference}
                                   checked={selectedPreferences.includes(preference)}
-                                  onCheckedChange={(checked) => {
+                                  onCheckedChange={(checked: boolean | 'indeterminate') => {
                                     setSelectedPreferences(
-                                      checked
+                                      checked === true
                                         ? [...selectedPreferences, preference]
                                         : selectedPreferences.filter((p) => p !== preference)
                                     );

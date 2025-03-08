@@ -17,6 +17,8 @@ import Database from "@/pages/admin/database";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
+import { PhoneProvider } from "./contexts/PhoneContext";
+import SignIn from "@/pages/signin";
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const [location, navigate] = useLocation();
@@ -38,8 +40,10 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Menu} />
+      <Route path="/signin" component={SignIn} />
+      <Route path="/menu" component={Menu} />
       <Route path="/track" component={TrackOrder} />
+      <Route path="/" component={SignIn} />
       <Route path="/admin" component={AdminIndex} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin/dashboard">
@@ -72,8 +76,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Router />
-        <Toaster />
+        <PhoneProvider>
+          <Router />
+          <Toaster />
+        </PhoneProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );
