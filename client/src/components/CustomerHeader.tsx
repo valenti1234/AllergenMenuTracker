@@ -26,7 +26,7 @@ export function CustomerHeader() {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
           {/* You can add a logo or site name here */}
-          <h1 className="text-xl font-semibold">Allergen Menu Tracker</h1>
+          <h1 className="text-xl font-semibold">MangiaSano</h1>
         </div>
 
         <DropdownMenu>

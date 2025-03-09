@@ -135,7 +135,7 @@ export async function analyzeDietaryInfo(
       messages: [
         {
           role: "system",
-          content: `You are a dietary specialist analyzing menu items. Based on ingredients and preparation methods, determine which dietary categories apply from: [vegan, vegetarian, gluten-free, dairy-free, keto, paleo]. Return ONLY an array of applicable categories in JSON format.`,
+          content: `You are a dietary specialist analyzing menu items. Based on ingredients and preparation methods, determine which dietary categories apply from: [vegan, vegetarian, gluten-free, dairy-free, keto, paleo]. Return a JSON object with a "dietary_categories" array containing the applicable categories.`,
         },
         {
           role: "user",
@@ -144,7 +144,7 @@ export async function analyzeDietaryInfo(
           Ingredients: ${ingredients.join(", ")}
           Description: ${description}
           
-          Return a JSON array containing ONLY applicable dietary categories from: [vegan, vegetarian, gluten-free, dairy-free, keto, paleo].`,
+          Return a JSON object with a "dietary_categories" array containing ONLY applicable dietary categories from: [vegan, vegetarian, gluten-free, dairy-free, keto, paleo].`,
         },
       ],
       response_format: { type: "json_object" },

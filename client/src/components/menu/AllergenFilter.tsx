@@ -4,12 +4,12 @@ import type { Allergen } from "@shared/schema";
 
 interface AllergenFilterProps {
   selectedAllergens: Allergen[];
-  onToggleAllergen: (allergen: Allergen) => void;
+  onToggle: (allergen: Allergen) => void;
 }
 
 export function AllergenFilter({
   selectedAllergens,
-  onToggleAllergen,
+  onToggle,
 }: AllergenFilterProps) {
   return (
     <div className="flex flex-col gap-4">
@@ -20,7 +20,7 @@ export function AllergenFilter({
             key={allergen}
             variant={selectedAllergens.includes(allergen) ? "default" : "outline"}
             className="cursor-pointer capitalize"
-            onClick={() => onToggleAllergen(allergen)}
+            onClick={() => onToggle(allergen)}
           >
             {allergen}
           </Badge>

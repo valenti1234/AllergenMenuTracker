@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { MenuCard } from "@/components/menu/MenuCard";
 import { AllergenFilter } from "@/components/menu/AllergenFilter";
+import { DietaryFilter } from "@/components/menu/DietaryFilter";
 import { OrderTypeSelector } from "@/components/menu/OrderTypeSelector";
 import { OrderSummary } from "@/components/menu/OrderSummary";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,6 +17,7 @@ import { CustomerLayout } from "@/components/layouts/CustomerLayout";
 export default function Menu() {
   const { phoneNumber, setPhoneNumber } = usePhone();
   const [selectedAllergens, setSelectedAllergens] = useState<Allergen[]>([]);
+  const [selectedDiets, setSelectedDiets] = useState<string[]>([]);
   const [orderType, setOrderType] = useState<OrderType | null>(null);
   const [tableNumber, setTableNumber] = useState("");
   const [customerName, setCustomerName] = useState("");
@@ -28,8 +30,17 @@ export default function Menu() {
   });
 
   const filteredItems = menuItems?.filter((item) => {
-    if (selectedAllergens.length === 0) return true;
-    return !item.allergens.some((allergen) => selectedAllergens.includes(allergen));
+    // Filter by allergens
+    if (selectedAllergens.length > 0 && item.allergens.some((allergen) => selectedAllergens.includes(allergen))) {
+      return false;
+    }
+    
+    // Filter by dietary preferences
+    if (selectedDiets.length > 0 && !selectedDiets.every(diet => item.dietaryInfo?.includes(diet))) {
+      return false;
+    }
+
+    return true;
   });
 
   const toggleAllergen = (allergen: Allergen) => {
@@ -37,6 +48,14 @@ export default function Menu() {
       current.includes(allergen)
         ? current.filter((a) => a !== allergen)
         : [...current, allergen]
+    );
+  };
+
+  const toggleDiet = (diet: string) => {
+    setSelectedDiets((current) =>
+      current.includes(diet)
+        ? current.filter((d) => d !== diet)
+        : [...current, diet]
     );
   };
 
@@ -103,7 +122,11 @@ export default function Menu() {
             />
             <AllergenFilter
               selectedAllergens={selectedAllergens}
-              onToggleAllergen={toggleAllergen}
+              onToggle={toggleAllergen}
+            />
+            <DietaryFilter
+              selectedDiets={selectedDiets}
+              onToggle={toggleDiet}
             />
           </div>
 

@@ -47,6 +47,7 @@ export class MongoStorage implements IStorage {
       protein: item.protein,
       carbs: item.carbs,
       fat: item.fat,
+      dietaryInfo: item.dietaryInfo || [],
     }));
   }
 
@@ -69,6 +70,7 @@ export class MongoStorage implements IStorage {
       protein: item.protein,
       carbs: item.carbs,
       fat: item.fat,
+      dietaryInfo: item.dietaryInfo || [],
     };
   }
 
@@ -118,6 +120,7 @@ export class MongoStorage implements IStorage {
       protein: updatedItem.protein,
       carbs: updatedItem.carbs,
       fat: updatedItem.fat,
+      dietaryInfo: updatedItem.dietaryInfo || [],
     };
   }
 

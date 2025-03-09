@@ -309,35 +309,110 @@ export default function MenuItems() {
 
               <FormField
                 control={form.control}
+                name="dietaryInfo"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex justify-between items-center mb-2">
+                      <FormLabel>Dietary Information</FormLabel>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-7"
+                        disabled={!form.watch("ingredients") || !form.watch("description") || !form.watch("name")}
+                        onClick={async () => {
+                          try {
+                            const ingredients = form.getValues("ingredients");
+                            
+                            // Make sure ingredients is an array
+                            if (!Array.isArray(ingredients)) {
+                              throw new Error("Ingredients must be an array");
+                            }
+
+                            const response = await apiRequest("POST", "/api/menu/analyze-dietary", {
+                              name: form.getValues("name"),
+                              ingredients: ingredients,
+                              description: form.getValues("description")
+                            });
+
+                            if (response.dietaryCategories) {
+                              // Update the form's dietaryInfo field with the analyzed categories
+                              form.setValue("dietaryInfo", response.dietaryCategories);
+                              field.onChange(response.dietaryCategories);
+                              toast({
+                                title: "Success",
+                                description: "Dietary information analyzed and updated",
+                              });
+                            } else {
+                              throw new Error("No dietary categories received");
+                            }
+                          } catch (error) {
+                            console.error('Failed to analyze dietary information:', error);
+                            toast({
+                              variant: "destructive",
+                              title: "Error",
+                              description: error instanceof Error ? error.message : "Failed to analyze dietary information",
+                            });
+                          }
+                        }}
+                      >
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Analyze with AI
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      {dietaryPreferences.map((preference) => (
+                        <div key={preference} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={preference}
+                            checked={field.value?.includes(preference)}
+                            onCheckedChange={(checked) => {
+                              const updatedValue = checked
+                                ? [...(field.value || []), preference]
+                                : (field.value || []).filter((p) => p !== preference);
+                              field.onChange(updatedValue);
+                            }}
+                          />
+                          <label
+                            htmlFor={preference}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 capitalize"
+                          >
+                            {preference}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="allergens"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Allergens</FormLabel>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-4">
                       {allergens.map((allergen) => (
-                        <FormField
-                          key={allergen}
-                          control={form.control}
-                          name="allergens"
-                          render={({ field: allergenField }) => (
-                            <FormItem className="flex items-center space-x-2">
-                              <FormControl>
-                                <Checkbox
-                                  checked={allergenField.value?.includes(allergen)}
-                                  onCheckedChange={(checked) => {
-                                    const allergenList = checked
-                                      ? [...(allergenField.value || []), allergen]
-                                      : allergenField.value?.filter((a) => a !== allergen) || [];
-                                    allergenField.onChange(allergenList);
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="capitalize">
-                                {allergen}
-                              </FormLabel>
-                            </FormItem>
-                          )}
-                        />
+                        <div key={allergen} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={allergen}
+                            checked={field.value?.includes(allergen)}
+                            onCheckedChange={(checked) => {
+                              const updatedValue = checked
+                                ? [...(field.value || []), allergen]
+                                : (field.value || []).filter((a) => a !== allergen);
+                              field.onChange(updatedValue);
+                            }}
+                          />
+                          <label
+                            htmlFor={allergen}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 capitalize"
+                          >
+                            {allergen}
+                          </label>
+                        </div>
                       ))}
                     </div>
                     <FormMessage />
@@ -370,93 +445,6 @@ export default function MenuItems() {
                   </FormItem>
                 )}
               />
-
-              {/* Added Dietary Information FormField with AI analysis button */}
-              <FormField
-                control={form.control}
-                name="dietaryInfo"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex justify-between items-center">
-                      <FormLabel>Dietary Information</FormLabel>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-7"
-                        onClick={async () => {
-                          const currentIngredients = form.getValues("ingredients");
-                          const description = form.getValues("description");
-                          const name = form.getValues("name");
-
-                          if (!currentIngredients.length || !description || !name) {
-                            toast({
-                              title: "Missing Information",
-                              description: "Please fill in the name, description, and ingredients first.",
-                              variant: "destructive",
-                            });
-                            return;
-                          }
-
-                          try {
-                            const response = await apiRequest("POST", "/api/menu/analyze-dietary", {
-                              name,
-                              ingredients: currentIngredients,
-                              description,
-                            });
-
-                            if (response.dietaryCategories) {
-                              form.setValue("dietaryInfo", response.dietaryCategories);
-                              toast({
-                                title: "Success",
-                                description: "Dietary information updated based on AI analysis",
-                              });
-                            }
-                          } catch (error) {
-                            toast({
-                              title: "Error",
-                              description: "Failed to analyze dietary information",
-                              variant: "destructive",
-                            });
-                          }
-                        }}
-                      >
-                        <RefreshCw className="h-4 w-4 mr-2" />
-                        Analyze with AI
-                      </Button>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      {dietaryPreferences.map((preference) => (
-                        <FormField
-                          key={preference}
-                          control={form.control}
-                          name="dietaryInfo"
-                          render={({ field: dietaryField }) => (
-                            <FormItem className="flex items-center space-x-2">
-                              <FormControl>
-                                <Checkbox
-                                  checked={dietaryField.value?.includes(preference)}
-                                  onCheckedChange={(checked) => {
-                                    const preferenceList = checked
-                                      ? [...(dietaryField.value || []), preference]
-                                      : dietaryField.value?.filter((p) => p !== preference) || [];
-                                    dietaryField.onChange(preferenceList);
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="capitalize">
-                                {preference}
-                              </FormLabel>
-                            </FormItem>
-                          )}
-                        />
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
 
               <FormField
                 control={form.control}
@@ -565,10 +553,12 @@ export default function MenuItems() {
                 )}
               />
 
-
-
-              <Button type="submit" className="w-full">
-                {editingId ? "Update" : "Create"} Menu Item
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={createMutation.isPending || updateMutation.isPending}
+              >
+                {editingId ? "Update Menu Item" : "Create Menu Item"}
               </Button>
             </form>
           </Form>
