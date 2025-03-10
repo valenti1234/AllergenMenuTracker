@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { allergens } from "@shared/schema";
 import type { Allergen } from "@shared/schema";
+import { useTranslation } from "react-i18next";
 
 interface AllergenFilterProps {
   selectedAllergens: Allergen[];
@@ -11,9 +12,11 @@ export function AllergenFilter({
   selectedAllergens,
   onToggle,
 }: AllergenFilterProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col gap-4">
-      <h3 className="font-medium">Filter by Allergens</h3>
+      <h3 className="font-medium">{t('menu.filters.allergens')}</h3>
       <div className="flex flex-wrap gap-2">
         {allergens.map((allergen) => (
           <Badge
@@ -22,7 +25,7 @@ export function AllergenFilter({
             className="cursor-pointer capitalize"
             onClick={() => onToggle(allergen)}
           >
-            {allergen}
+            {t(`allergens.${allergen.toLowerCase()}`)}
           </Badge>
         ))}
       </div>

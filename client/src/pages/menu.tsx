@@ -13,6 +13,7 @@ import { categories } from "@shared/schema";
 import { Plus, MapPin } from "lucide-react";
 import { usePhone } from '@/contexts/PhoneContext';
 import { CustomerLayout } from "@/components/layouts/CustomerLayout";
+import { useTranslation } from "react-i18next";
 
 export default function Menu() {
   const { phoneNumber, setPhoneNumber } = usePhone();
@@ -24,6 +25,7 @@ export default function Menu() {
   const [selectedItems, setSelectedItems] = useState<
     Map<string, { item: MenuItem; quantity: number }>
   >(new Map());
+  const { t } = useTranslation();
 
   const { data: menuItems, isLoading } = useQuery<MenuItem[]>({
     queryKey: ["/api/menu"],
@@ -92,18 +94,18 @@ export default function Menu() {
   };
 
   if (isLoading) {
-    return <div>Loading menu...</div>;
+    return <div>{t('common.loading')}</div>;
   }
 
   return (
     <CustomerLayout>
       <div className="container mx-auto py-8 px-4">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold">Our Menu</h1>
+          <h1 className="text-4xl font-bold">{t('menu.title')}</h1>
           <Link href="/track">
             <Button variant="outline" className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
-              Track Your Order
+              {t('nav.trackOrder')}
             </Button>
           </Link>
         </div>
@@ -138,7 +140,7 @@ export default function Menu() {
                   value={category}
                   className="capitalize"
                 >
-                  {category}
+                  {t(`menu.categories.${category.toLowerCase()}`)}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -156,7 +158,7 @@ export default function Menu() {
                           onClick={() => addToOrder(item)}
                         >
                           <Plus className="h-4 w-4 mr-2" />
-                          Add to Order
+                          {t('menu.addToOrder')}
                         </Button>
                       </div>
                     ))}

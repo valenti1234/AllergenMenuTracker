@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import type { MenuItem } from "@shared/schema";
+import { useTranslation } from "react-i18next";
 
 interface MenuCardProps {
   item: MenuItem;
@@ -33,6 +34,7 @@ interface MenuCardProps {
 export function MenuCard({ item }: MenuCardProps) {
   const [showDetails, setShowDetails] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const { t } = useTranslation();
 
   // Calculate health score (simple version)
   const healthScore = Math.min(100, Math.max(0, 
@@ -87,7 +89,7 @@ export function MenuCard({ item }: MenuCardProps) {
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Health Score: {healthScore}/100</p>
+                <p>{t('common.healthScore')}: {healthScore}/100</p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -101,7 +103,7 @@ export function MenuCard({ item }: MenuCardProps) {
             </h3>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Clock className="h-4 w-4" />
-              <span>{item.prepTime} mins</span>
+              <span>{item.prepTime} {t('common.minutes')}</span>
             </div>
           </div>
 
@@ -121,7 +123,7 @@ export function MenuCard({ item }: MenuCardProps) {
                 {(item.dietaryInfo ?? []).map((diet) => (
                   <Badge key={diet} variant="secondary" className="capitalize text-xs">
                     <LeafyGreen className="h-3 w-3 mr-1" />
-                    {diet}
+                    {t(`dietary.${diet.toLowerCase().replace(/-(.)/g, (_, c) => c.toUpperCase())}`)}
                   </Badge>
                 ))}
               </div>
@@ -139,7 +141,7 @@ export function MenuCard({ item }: MenuCardProps) {
                       </Badge>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Contains {allergen}</p>
+                      <p>{t('menu.contains')} {allergen}</p>
                     </TooltipContent>
                   </Tooltip>
                 ))}
@@ -151,11 +153,11 @@ export function MenuCard({ item }: MenuCardProps) {
           <div className="mt-4 pt-3 border-t grid grid-cols-2 gap-2 text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
               <Flame className="h-3 w-3" />
-              {formatNutritionalValue(item.calories)} cal
+              {formatNutritionalValue(item.calories)} {t('common.calories')}
             </div>
             <div className="flex items-center gap-1">
               <ChefHat className="h-3 w-3" />
-              {formatNutritionalValue(item.protein)}g protein
+              {formatNutritionalValue(item.protein)}{t('common.grams')} {t('common.protein')}
             </div>
           </div>
         </CardContent>
@@ -173,7 +175,7 @@ export function MenuCard({ item }: MenuCardProps) {
                     <Sparkles className="h-5 w-5 text-yellow-500" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Healthy Choice!</p>
+                    <p>{t('menu.healthyChoice')}</p>
                   </TooltipContent>
                 </Tooltip>
               )}
@@ -196,7 +198,7 @@ export function MenuCard({ item }: MenuCardProps) {
                   </span>
                   <div className="flex items-center gap-2">
                     <Clock className="h-5 w-5" />
-                    <span>{item.prepTime} mins prep time</span>
+                    <span>{item.prepTime} {t('common.minutes')} {t('menu.prepTime')}</span>
                   </div>
                 </div>
               </div>
@@ -216,12 +218,12 @@ export function MenuCard({ item }: MenuCardProps) {
                     <div className="space-y-2">
                       <h4 className="font-medium flex items-center gap-2">
                         <LeafyGreen className="h-4 w-4" />
-                        Dietary Information
+                        {t('menu.dietaryInfo')}
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {(item.dietaryInfo ?? []).map((diet) => (
                           <Badge key={diet} variant="secondary" className="capitalize">
-                            {diet}
+                            {t(`dietary.${diet.toLowerCase().replace(/-(.)/g, (_, c) => c.toUpperCase())}`)}
                           </Badge>
                         ))}
                       </div>
@@ -233,7 +235,7 @@ export function MenuCard({ item }: MenuCardProps) {
                     <div className="space-y-2">
                       <h4 className="font-medium flex items-center gap-2">
                         <AlertCircle className="h-4 w-4" />
-                        Allergen Warnings
+                        {t('menu.allergens')}
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {item.allergens.map((allergen) => (
@@ -252,7 +254,7 @@ export function MenuCard({ item }: MenuCardProps) {
                   <div className="space-y-2">
                     <h4 className="font-medium flex items-center gap-2">
                       <Utensils className="h-4 w-4" />
-                      Ingredients
+                      {t('menu.ingredients')}
                     </h4>
                     <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
                       {item.ingredients.map((ingredient, index) => (
@@ -265,12 +267,12 @@ export function MenuCard({ item }: MenuCardProps) {
                   <div className="space-y-4">
                     <h4 className="font-medium flex items-center gap-2">
                       <Flame className="h-4 w-4" />
-                      Nutritional Information
+                      {t('menu.nutritionalInfo')}
                     </h4>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <div className="text-sm text-muted-foreground flex justify-between items-center">
-                          <span>Calories</span>
+                          <span>{t('common.calories')}</span>
                           <span className="font-medium">{item.calories}</span>
                         </div>
                         <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -282,37 +284,37 @@ export function MenuCard({ item }: MenuCardProps) {
                       </div>
                       <div className="space-y-2">
                         <div className="text-sm text-muted-foreground flex justify-between items-center">
-                          <span>Protein</span>
-                          <span className="font-medium">{item.protein}g</span>
+                          <span>{t('common.protein')}</span>
+                          <span className="font-medium">{item.protein}{t('common.grams')}</span>
                         </div>
                         <div className="h-2 bg-muted rounded-full overflow-hidden">
                           <div 
                             className="h-full bg-green-500 transition-all" 
-                            style={{ width: `${Math.min(100, (item.protein / 50) * 100)}%` }}
+                            style={{ width: `${Math.min(100, (item.protein ?? 0 / 50) * 100)}%` }}
                           />
                         </div>
                       </div>
                       <div className="space-y-2">
                         <div className="text-sm text-muted-foreground flex justify-between items-center">
-                          <span>Carbs</span>
-                          <span className="font-medium">{item.carbs}g</span>
+                          <span>{t('common.carbs')}</span>
+                          <span className="font-medium">{item.carbs}{t('common.grams')}</span>
                         </div>
                         <div className="h-2 bg-muted rounded-full overflow-hidden">
                           <div 
                             className="h-full bg-yellow-500 transition-all" 
-                            style={{ width: `${Math.min(100, (item.carbs / 300) * 100)}%` }}
+                            style={{ width: `${Math.min(100, (item.carbs ?? 0 / 300) * 100)}%` }}
                           />
                         </div>
                       </div>
                       <div className="space-y-2">
                         <div className="text-sm text-muted-foreground flex justify-between items-center">
-                          <span>Fat</span>
-                          <span className="font-medium">{item.fat}g</span>
+                          <span>{t('common.fat')}</span>
+                          <span className="font-medium">{item.fat}{t('common.grams')}</span>
                         </div>
                         <div className="h-2 bg-muted rounded-full overflow-hidden">
                           <div 
                             className="h-full bg-orange-500 transition-all" 
-                            style={{ width: `${Math.min(100, (item.fat / 65) * 100)}%` }}
+                            style={{ width: `${Math.min(100, (item.fat ?? 0 / 65) * 100)}%` }}
                           />
                         </div>
                       </div>
@@ -325,10 +327,9 @@ export function MenuCard({ item }: MenuCardProps) {
                   <div className="flex items-start gap-3">
                     <Info className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
                     <div className="space-y-1">
-                      <h4 className="font-medium">Health Score: {healthScore}/100</h4>
+                      <h4 className="font-medium">{t('common.healthScore')}: {healthScore}/100</h4>
                       <p className="text-sm text-muted-foreground">
-                        This score is calculated based on protein content, calories, fat content, 
-                        and special dietary attributes. A higher score indicates a healthier option.
+                        {t('menu.healthScoreExplanation')}
                       </p>
                     </div>
                   </div>

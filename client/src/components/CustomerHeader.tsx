@@ -1,4 +1,4 @@
-import { Phone, LogOut } from "lucide-react";
+import { Phone, LogOut, ShoppingCart } from "lucide-react";
 import { usePhone } from "@/contexts/PhoneContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,9 +7,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export function CustomerHeader() {
   const { phoneNumber, signOut } = usePhone();
+  const { language, setLanguage } = useLanguage();
+  const { t } = useTranslation();
 
   const formatPhoneNumber = (phone: string) => {
     // Format phone number as (XXX) XXX-XXXX
@@ -22,28 +28,36 @@ export function CustomerHeader() {
   };
 
   return (
-    <div className="border-b">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {/* You can add a logo or site name here */}
-          <h1 className="text-xl font-semibold">MangiaSano</h1>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 items-center">
+        <div className="mr-4 hidden md:flex">
+          <Link href="/" className="mr-6 flex items-center space-x-2">
+            <span className="hidden font-bold sm:inline-block">
+              MangiaSano
+            </span>
+          </Link>
         </div>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-2">
-              <Phone className="h-4 w-4" />
-              <span>{formatPhoneNumber(phoneNumber)}</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={signOut} className="text-red-600">
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+          <div className="w-full flex-1 md:w-auto md:flex-none">
+            <nav className="flex items-center">
+              <Link href="/track">
+                <Button variant="ghost">{t('nav.trackOrder')}</Button>
+              </Link>
+            </nav>
+          </div>
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher
+              currentLanguage={language}
+              onLanguageChange={setLanguage}
+            />
+            <Link href="/cart">
+              <Button variant="ghost" size="icon" className="w-9 px-0" aria-label={t('nav.cart')}>
+                <ShoppingCart className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        </div>
       </div>
-    </div>
+    </header>
   );
 } 

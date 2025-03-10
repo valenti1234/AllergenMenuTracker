@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { dietaryPreferences } from "@shared/schema";
+import { useTranslation } from "react-i18next";
 
 interface DietaryFilterProps {
   selectedDiets: string[];
@@ -7,9 +8,11 @@ interface DietaryFilterProps {
 }
 
 export function DietaryFilter({ selectedDiets, onToggle }: DietaryFilterProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-2">
-      <h3 className="font-medium">Dietary Preferences</h3>
+      <h3 className="font-medium">{t('menu.filters.dietary')}</h3>
       <div className="flex flex-wrap gap-2">
         {dietaryPreferences.map((diet) => (
           <Badge
@@ -18,7 +21,7 @@ export function DietaryFilter({ selectedDiets, onToggle }: DietaryFilterProps) {
             className="cursor-pointer capitalize"
             onClick={() => onToggle(diet)}
           >
-            {diet}
+            {t(`dietary.${diet.toLowerCase().replace(/-(.)/g, (_, c) => c.toUpperCase())}`)}
           </Badge>
         ))}
       </div>

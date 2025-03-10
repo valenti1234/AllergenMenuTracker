@@ -1,0 +1,45 @@
+{
+  "common": {
+    "minutes": "mins",
+    "calories": "cal",
+    "protein": "protein",
+    "carbs": "carbs",
+    "fat": "fat",
+    "grams": "g",
+    "healthScore": "Health Score",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "menu": {
+    "ingredients": "Ingredients",
+    "allergens": "Allergen Warnings",
+    "contains": "Contains",
+    "dietaryInfo": "Dietary Information",
+    "nutritionalInfo": "Nutritional Information",
+    "prepTime": "Preparation Time",
+    "healthyChoice": "Healthy Choice!",
+    "healthScoreExplanation": "This score is calculated based on protein content, calories, fat content, and special dietary attributes. A higher score indicates a healthier option."
+  },
+  "nav": {
+    "home": "Home",
+    "menu": "Menu",
+    "trackOrder": "Track Your Order",
+    "cart": "Cart",
+    "signOut": "Sign Out"
+  },
+  "dietary": {
+    "vegan": "Vegan",
+    "vegetarian": "Vegetarian",
+    "glutenFree": "Gluten-Free",
+    "dairyFree": "Dairy-Free",
+    "keto": "Keto",
+    "paleo": "Paleo"
+  },
+  "errors": {
+    "generic": "Something went wrong",
+    "loading": "Error loading data",
+    "network": "Network error",
+    "required": "This field is required"
+  }
+} 

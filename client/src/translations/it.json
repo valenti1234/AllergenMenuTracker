@@ -1,0 +1,78 @@
+{
+  "common": {
+    "minutes": "min",
+    "calories": "cal",
+    "protein": "proteine",
+    "carbs": "carboidrati",
+    "fat": "grassi",
+    "grams": "g",
+    "healthScore": "Punteggio Salute",
+    "loading": "Caricamento...",
+    "error": "Errore",
+    "success": "Successo"
+  },
+  "menu": {
+    "title": "Il Nostro Menu",
+    "categories": {
+      "starters": "Antipasti",
+      "mains": "Secondi",
+      "desserts": "Dolci",
+      "drinks": "Bevande",
+      "sides": "Contorni"
+    },
+    "orderType": {
+      "title": "Seleziona Tipo di Ordine",
+      "dineIn": "Al Tavolo",
+      "takeaway": "Da Asporto",
+      "phoneNumber": "Numero di Telefono",
+      "tableNumber": "Numero del Tavolo",
+      "customerName": "Nome Cliente",
+      "enterTableNumber": "Inserisci il numero del tavolo",
+      "enterName": "Inserisci il tuo nome"
+    },
+    "filters": {
+      "allergens": "Filtra per Allergeni",
+      "dietary": "Preferenze Alimentari"
+    },
+    "addToOrder": "Aggiungi all'Ordine",
+    "ingredients": "Ingredienti",
+    "allergens": "Avvisi Allergeni",
+    "contains": "Contiene",
+    "dietaryInfo": "Informazioni Dietetiche",
+    "nutritionalInfo": "Informazioni Nutrizionali",
+    "prepTime": "Tempo di Preparazione",
+    "healthyChoice": "Scelta Salutare!",
+    "healthScoreExplanation": "Questo punteggio è calcolato in base al contenuto di proteine, calorie, grassi e attributi dietetici speciali. Un punteggio più alto indica un'opzione più salutare."
+  },
+  "nav": {
+    "home": "Home",
+    "menu": "Menu",
+    "trackOrder": "Traccia Ordine",
+    "cart": "Carrello",
+    "signOut": "Esci"
+  },
+  "dietary": {
+    "vegan": "Vegano",
+    "vegetarian": "Vegetariano",
+    "glutenFree": "Senza Glutine",
+    "dairyFree": "Senza Lattosio",
+    "keto": "Chetogenico",
+    "paleo": "Paleo"
+  },
+  "allergens": {
+    "gluten": "Glutine",
+    "dairy": "Lattosio",
+    "nuts": "Frutta Secca",
+    "eggs": "Uova",
+    "soy": "Soia",
+    "shellfish": "Crostacei",
+    "fish": "Pesce",
+    "peanuts": "Arachidi"
+  },
+  "errors": {
+    "generic": "Qualcosa è andato storto",
+    "loading": "Errore durante il caricamento dei dati",
+    "network": "Errore di rete",
+    "required": "Questo campo è obbligatorio"
+  }
+} 

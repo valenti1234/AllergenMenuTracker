@@ -4,6 +4,7 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Menu from "@/pages/menu";
+import Cart from "@/pages/cart";
 import TrackOrder from "@/pages/track";
 import AdminIndex from "@/pages/admin";
 import AdminLogin from "@/pages/admin/login";
@@ -19,6 +20,8 @@ import { useEffect } from "react";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { PhoneProvider } from "./contexts/PhoneContext";
 import SignIn from "@/pages/signin";
+import { ThemeProvider } from "@/components/theme-provider";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const [location, navigate] = useLocation();
@@ -42,6 +45,7 @@ function Router() {
     <Switch>
       <Route path="/signin" component={SignIn} />
       <Route path="/menu" component={Menu} />
+      <Route path="/cart" component={Cart} />
       <Route path="/track" component={TrackOrder} />
       <Route path="/" component={SignIn} />
       <Route path="/admin" component={AdminIndex} />
@@ -72,16 +76,20 @@ function Router() {
   );
 }
 
-function App() {
+export function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <PhoneProvider>
-          <Router />
-          <Toaster />
-        </PhoneProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <LanguageProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <PhoneProvider>
+              <Router />
+              <Toaster />
+            </PhoneProvider>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }
 

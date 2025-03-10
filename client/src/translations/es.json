@@ -1,0 +1,78 @@
+{
+  "common": {
+    "minutes": "min",
+    "calories": "cal",
+    "protein": "proteínas",
+    "carbs": "carbohidratos",
+    "fat": "grasas",
+    "grams": "g",
+    "healthScore": "Puntuación de Salud",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito"
+  },
+  "menu": {
+    "title": "Nuestro Menú",
+    "categories": {
+      "starters": "Entrantes",
+      "mains": "Principales",
+      "desserts": "Postres",
+      "drinks": "Bebidas",
+      "sides": "Guarniciones"
+    },
+    "orderType": {
+      "title": "Seleccionar Tipo de Pedido",
+      "dineIn": "Para Mesa",
+      "takeaway": "Para Llevar",
+      "phoneNumber": "Número de Teléfono",
+      "tableNumber": "Número de Mesa",
+      "customerName": "Nombre del Cliente",
+      "enterTableNumber": "Ingrese el número de mesa",
+      "enterName": "Ingrese su nombre"
+    },
+    "filters": {
+      "allergens": "Filtrar por Alérgenos",
+      "dietary": "Preferencias Dietéticas"
+    },
+    "addToOrder": "Agregar al Pedido",
+    "ingredients": "Ingredientes",
+    "allergens": "Advertencias de Alérgenos",
+    "contains": "Contiene",
+    "dietaryInfo": "Información Dietética",
+    "nutritionalInfo": "Información Nutricional",
+    "prepTime": "Tiempo de Preparación",
+    "healthyChoice": "¡Opción Saludable!",
+    "healthScoreExplanation": "Esta puntuación se calcula según el contenido de proteínas, calorías, grasas y atributos dietéticos especiales. Una puntuación más alta indica una opción más saludable."
+  },
+  "nav": {
+    "home": "Inicio",
+    "menu": "Menú",
+    "trackOrder": "Seguir Pedido",
+    "cart": "Carrito",
+    "signOut": "Cerrar Sesión"
+  },
+  "dietary": {
+    "vegan": "Vegano",
+    "vegetarian": "Vegetariano",
+    "glutenFree": "Sin Gluten",
+    "dairyFree": "Sin Lácteos",
+    "keto": "Cetogénico",
+    "paleo": "Paleo"
+  },
+  "allergens": {
+    "gluten": "Gluten",
+    "dairy": "Lácteos",
+    "nuts": "Frutos Secos",
+    "eggs": "Huevos",
+    "soy": "Soja",
+    "shellfish": "Mariscos",
+    "fish": "Pescado",
+    "peanuts": "Cacahuetes"
+  },
+  "errors": {
+    "generic": "Algo salió mal",
+    "loading": "Error al cargar los datos",
+    "network": "Error de red",
+    "required": "Este campo es obligatorio"
+  }
+} 
