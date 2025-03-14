@@ -15,6 +15,9 @@ import {
   getCachedDietaryMetrics,
   startMetricsCacheService
 } from "./services/metricsCache";
+import { getRestaurantSettings, createOrUpdateRestaurantSettings, initializeDefaultSettings } from "./storage";
+import { insertRestaurantSettingsSchema } from "@shared/schema";
+import { z } from "zod";
 
 export async function registerRoutes(app: Express) {
   // Serve uploaded files statically
@@ -439,6 +442,38 @@ export async function registerRoutes(app: Express) {
       }
     });
   }
+
+  // Restaurant Settings Routes - Public endpoint for reading settings
+  app.get("/api/settings", async (req, res) => {
+    try {
+      const settings = await getRestaurantSettings();
+      if (!settings) {
+        // If no settings exist, initialize with defaults and return them
+        await initializeDefaultSettings();
+        const newSettings = await getRestaurantSettings();
+        return res.json(newSettings);
+      }
+      res.json(settings);
+    } catch (error) {
+      console.error("Error getting restaurant settings:", error);
+      res.status(500).json({ message: "Failed to get restaurant settings" });
+    }
+  });
+
+  // Admin settings routes - Protected endpoint for updating settings
+  app.post("/api/admin/settings", requireRole(["admin"]), async (req, res) => {
+    try {
+      const validatedData = insertRestaurantSettingsSchema.parse(req.body);
+      const settings = await createOrUpdateRestaurantSettings(validatedData);
+      res.json(settings);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid settings data", errors: error.errors });
+      }
+      console.error("Error updating restaurant settings:", error);
+      res.status(500).json({ message: "Failed to update restaurant settings" });
+    }
+  });
 
   return createServer(app);
 }

@@ -166,3 +166,41 @@ export type User = z.infer<typeof insertUserSchema> & {
 };
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
+
+// Restaurant settings
+export const currencies = ["USD", "EUR", "GBP", "JPY", "CAD", "AUD", "INR"] as const;
+export type Currency = typeof currencies[number];
+
+export const insertRestaurantSettingsSchema = z.object({
+  name: multilingualStringSchema,
+  address: multilingualStringSchema.optional(),
+  phone: z.string().min(10, "Phone number is required").max(15, "Phone number is too long").optional(),
+  email: z.string().email("Invalid email address").optional(),
+  website: z.string().url("Invalid website URL").optional(),
+  logo: z.string().optional(),
+  currency: z.enum(currencies).default("USD"),
+  taxRate: z.number().min(0, "Tax rate must be positive").max(100, "Tax rate must be less than 100").default(0),
+  serviceCharge: z.number().min(0, "Service charge must be positive").max(100, "Service charge must be less than 100").default(0),
+  openingHours: z.string().optional(),
+  defaultLanguage: z.enum(languages).default("en"),
+  theme: z.enum(["light", "dark", "system"]).default("system"),
+  enableOnlineOrdering: z.boolean().default(true),
+  enableReservations: z.boolean().default(false),
+  enableDelivery: z.boolean().default(false),
+  deliveryRadius: z.number().min(0, "Delivery radius must be positive").optional(),
+  deliveryFee: z.number().min(0, "Delivery fee must be positive").optional(),
+  minimumOrderAmount: z.number().min(0, "Minimum order amount must be positive").optional(),
+  socialMedia: z.object({
+    facebook: z.string().optional(),
+    instagram: z.string().optional(),
+    twitter: z.string().optional(),
+    yelp: z.string().optional(),
+  }).optional(),
+});
+
+export type RestaurantSettings = z.infer<typeof insertRestaurantSettingsSchema> & {
+  id: string;
+  updatedAt: Date;
+};
+
+export type InsertRestaurantSettings = z.infer<typeof insertRestaurantSettingsSchema>;

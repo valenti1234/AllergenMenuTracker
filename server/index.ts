@@ -8,6 +8,8 @@ import { setupAuth } from "./auth";
 import { swaggerUi, swaggerSpec } from './swagger';
 // Import metrics cache service
 import { startMetricsCacheService, stopMetricsCacheService } from './services/metricsCache';
+// Import initialize default settings
+import { initializeDefaultSettings } from './storage';
 
 const app = express();
 app.use(express.json());
@@ -71,6 +73,9 @@ app.use((req, res, next) => {
       serveStatic(app);
     }
 
+    // Initialize default settings if none exist
+    await initializeDefaultSettings();
+    
     // Start the metrics cache service
     startMetricsCacheService();
     log("Started metrics cache service with improved popular items calculation");

@@ -11,6 +11,8 @@ import { Clock, Phone, User } from "lucide-react";
 import type { Order, OrderItem, Language, OrderStatus } from "@shared/schema";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useSettings } from "@/contexts/SettingsContext";
 
 interface OrderListItemProps {
   order: Order;
@@ -19,6 +21,8 @@ interface OrderListItemProps {
 
 export function OrderListItem({ order, onStatusChange }: OrderListItemProps) {
   const { t, i18n } = useTranslation();
+  const { language } = useLanguage();
+  const { formatPrice } = useSettings();
   const currentLanguage = i18n.language as Language;
 
   const getItemName = (item: OrderItem) => {
@@ -89,7 +93,7 @@ export function OrderListItem({ order, onStatusChange }: OrderListItemProps) {
                   <span className="font-medium">{item.quantity}x</span>
                   <span>{getItemName(item)}</span>
                 </div>
-                <span className="text-muted-foreground">${item.price.toFixed(2)}</span>
+                <span className="text-muted-foreground">{formatPrice(item.price)}</span>
               </div>
             ))}
           </div>
@@ -103,7 +107,7 @@ export function OrderListItem({ order, onStatusChange }: OrderListItemProps) {
         </div>
 
         <div className="text-right">
-          <div className="font-semibold">${order.total.toFixed(2)}</div>
+          <div className="font-semibold">{formatPrice(order.total)}</div>
           <div className="text-sm text-muted-foreground">Total</div>
         </div>
       </div>

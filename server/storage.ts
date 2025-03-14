@@ -1,5 +1,5 @@
-import { MenuItem, InsertMenuItem, User, InsertUser, Order, InsertOrder, OrderStatus } from "@shared/schema";
-import { MenuItemModel, UserModel, OrderModel } from "./db";
+import { MenuItem, InsertMenuItem, User, InsertUser, Order, InsertOrder, OrderStatus, RestaurantSettings, InsertRestaurantSettings } from "@shared/schema";
+import { MenuItemModel, UserModel, OrderModel, RestaurantSettingsModel } from "./db";
 import bcrypt from "bcryptjs";
 
 export interface IStorage {
@@ -887,3 +887,104 @@ async function initializeDefaultAdmin(storage: MongoStorage) {
 
 initializeDefaultMenu(storage).catch(console.error);
 initializeDefaultAdmin(storage).catch(console.error);
+
+// Restaurant Settings Functions
+export async function getRestaurantSettings(): Promise<RestaurantSettings | null> {
+  try {
+    // Always get the first settings document (there should only be one)
+    const settings = await RestaurantSettingsModel.findOne().lean();
+    
+    if (!settings) {
+      return null;
+    }
+    
+    return {
+      id: settings._id.toString(),
+      name: settings.name,
+      address: settings.address,
+      phone: settings.phone,
+      email: settings.email,
+      website: settings.website,
+      logo: settings.logo,
+      currency: settings.currency,
+      taxRate: settings.taxRate,
+      serviceCharge: settings.serviceCharge,
+      openingHours: settings.openingHours,
+      defaultLanguage: settings.defaultLanguage,
+      theme: settings.theme,
+      enableOnlineOrdering: settings.enableOnlineOrdering,
+      enableReservations: settings.enableReservations,
+      enableDelivery: settings.enableDelivery,
+      deliveryRadius: settings.deliveryRadius,
+      deliveryFee: settings.deliveryFee,
+      minimumOrderAmount: settings.minimumOrderAmount,
+      socialMedia: settings.socialMedia,
+      updatedAt: settings.updatedAt
+    };
+  } catch (error) {
+    console.error("Error getting restaurant settings:", error);
+    throw error;
+  }
+}
+
+export async function createOrUpdateRestaurantSettings(settings: InsertRestaurantSettings): Promise<RestaurantSettings> {
+  try {
+    // Check if settings already exist
+    const existingSettings = await RestaurantSettingsModel.findOne();
+    
+    if (existingSettings) {
+      // Update existing settings
+      Object.assign(existingSettings, settings);
+      await existingSettings.save();
+      
+      return {
+        id: existingSettings._id.toString(),
+        ...settings,
+        updatedAt: existingSettings.updatedAt
+      };
+    } else {
+      // Create new settings
+      const newSettings = new RestaurantSettingsModel(settings);
+      await newSettings.save();
+      
+      return {
+        id: newSettings._id.toString(),
+        ...settings,
+        updatedAt: newSettings.updatedAt
+      };
+    }
+  } catch (error) {
+    console.error("Error creating/updating restaurant settings:", error);
+    throw error;
+  }
+}
+
+// Initialize default settings if none exist
+export async function initializeDefaultSettings(): Promise<void> {
+  try {
+    const existingSettings = await RestaurantSettingsModel.findOne();
+    
+    if (!existingSettings) {
+      const defaultSettings: InsertRestaurantSettings = {
+        name: {
+          en: "AllergenMenuTracker Restaurant",
+          it: "Ristorante AllergenMenuTracker",
+          es: "Restaurante AllergenMenuTracker"
+        },
+        currency: "USD",
+        taxRate: 8.5,
+        serviceCharge: 0,
+        defaultLanguage: "en",
+        theme: "system",
+        enableOnlineOrdering: true,
+        enableReservations: false,
+        enableDelivery: false
+      };
+      
+      await createOrUpdateRestaurantSettings(defaultSettings);
+      console.log("Default restaurant settings initialized");
+    }
+  } catch (error) {
+    console.error("Error initializing default settings:", error);
+  }
+}

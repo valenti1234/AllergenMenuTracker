@@ -16,6 +16,7 @@ import KDS from "@/pages/admin/kds";
 import Users from "@/pages/admin/users";
 import Database from "@/pages/admin/database";
 import ApiDocs from "@/pages/admin/api-docs";
+import Settings from "@/pages/admin/settings";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
@@ -23,6 +24,7 @@ import { PhoneProvider } from "./contexts/PhoneContext";
 import SignIn from "@/pages/signin";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { SettingsProvider } from "@/contexts/SettingsContext";
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const [location, navigate] = useLocation();
@@ -75,6 +77,9 @@ function Router() {
       <Route path="/admin/api-docs">
         <ProtectedRoute component={ApiDocs} />
       </Route>
+      <Route path="/admin/settings">
+        <ProtectedRoute component={Settings} />
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );
@@ -84,14 +89,16 @@ export function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <LanguageProvider>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <PhoneProvider>
-              <Router />
-              <Toaster />
-            </PhoneProvider>
-          </TooltipProvider>
-        </QueryClientProvider>
+        <SettingsProvider>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <PhoneProvider>
+                <Router />
+                <Toaster />
+              </PhoneProvider>
+            </TooltipProvider>
+          </QueryClientProvider>
+        </SettingsProvider>
       </LanguageProvider>
     </ThemeProvider>
   );

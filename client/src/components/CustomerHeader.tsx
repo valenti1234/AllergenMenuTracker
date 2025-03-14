@@ -11,11 +11,13 @@ import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { useSettings } from "@/contexts/SettingsContext";
 
 export function CustomerHeader() {
   const { phoneNumber, signOut } = usePhone();
   const { language, setLanguage } = useLanguage();
   const { t } = useTranslation();
+  const { getLocalizedName } = useSettings();
 
   const formatPhoneNumber = (phone: string) => {
     // Format phone number as (XXX) XXX-XXXX
@@ -33,7 +35,7 @@ export function CustomerHeader() {
         <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <span className="hidden font-bold sm:inline-block">
-              MangiaSano
+              {getLocalizedName()}
             </span>
           </Link>
         </div>

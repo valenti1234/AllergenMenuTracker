@@ -29,6 +29,8 @@ import type { MenuItem, Language } from "@shared/schema";
 import { insertMenuItemSchema, categories, allergens, dietaryPreferences, languages } from "@shared/schema";
 import { z } from "zod";
 import { RefreshCw } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { useSettings } from "@/contexts/SettingsContext";
 
 type FormValues = z.infer<typeof insertMenuItemSchema>;
 
@@ -37,6 +39,8 @@ export default function MenuItems() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string>("");
   const [currentLanguage, setCurrentLanguage] = useState<Language>("en");
+  const { t, i18n } = useTranslation();
+  const { formatPrice } = useSettings();
 
   const { data: menuItems, isLoading } = useQuery<MenuItem[]>({
     queryKey: ["/api/menu"],
@@ -605,7 +609,7 @@ export default function MenuItems() {
                     {typeof item.name === 'string' ? item.name : item.name?.en || 'Unnamed Item'}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    {item.category} - ${(item.price / 100).toFixed(2)}
+                    {item.category} - {formatPrice(item.price)}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     Ingredients: {Array.isArray(item.ingredients) 

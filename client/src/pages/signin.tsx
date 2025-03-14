@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { usePhone } from "@/contexts/PhoneContext";
 import { useLocation } from "wouter";
+import { useSettings } from "@/contexts/SettingsContext";
 
 export default function SignIn() {
   const { phoneNumber, setPhoneNumber, isAuthenticated } = usePhone();
   const [, setLocation] = useLocation();
+  const { getLocalizedName } = useSettings();
 
   // Redirect to menu if already authenticated
   useEffect(() => {
@@ -32,7 +34,7 @@ export default function SignIn() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
-            Welcome to MangiaSano
+            Welcome to {getLocalizedName()}
           </CardTitle>
         </CardHeader>
         <CardContent>

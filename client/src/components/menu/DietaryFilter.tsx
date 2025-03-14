@@ -1,10 +1,10 @@
 import { Badge } from "@/components/ui/badge";
-import { dietaryPreferences } from "@shared/schema";
+import { dietaryPreferences, DietaryPreference } from "@shared/schema";
 import { useTranslation } from "react-i18next";
 
 interface DietaryFilterProps {
-  selectedDiets: string[];
-  onToggle: (diet: string) => void;
+  selectedDiets: DietaryPreference[];
+  onToggle: (diet: DietaryPreference) => void;
 }
 
 export function DietaryFilter({ selectedDiets, onToggle }: DietaryFilterProps) {

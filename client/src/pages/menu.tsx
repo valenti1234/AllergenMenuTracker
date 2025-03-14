@@ -9,22 +9,24 @@ import { NewsletterDialog } from "@/components/menu/NewsletterDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import type { MenuItem, Allergen, Category, OrderType } from "@shared/schema";
+import type { MenuItem, Allergen, Category, OrderType, OrderItem, DietaryPreference } from "@shared/schema";
 import { categories } from "@shared/schema";
 import { Plus, MapPin } from "lucide-react";
 import { usePhone } from '@/contexts/PhoneContext';
 import { CustomerLayout } from "@/components/layouts/CustomerLayout";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function Menu() {
   const { phoneNumber, setPhoneNumber } = usePhone();
   const [selectedAllergens, setSelectedAllergens] = useState<Allergen[]>([]);
-  const [selectedDiets, setSelectedDiets] = useState<string[]>([]);
+  const [selectedDiets, setSelectedDiets] = useState<DietaryPreference[]>([]);
   const [orderType, setOrderType] = useState<OrderType | null>(null);
   const [tableNumber, setTableNumber] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [showNewsletter, setShowNewsletter] = useState(false);
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
   const [selectedItems, setSelectedItems] = useState<
     Map<string, { item: MenuItem; quantity: number }>
   >(new Map());
@@ -57,7 +59,7 @@ export default function Menu() {
     );
   };
 
-  const toggleDiet = (diet: string) => {
+  const toggleDiet = (diet: DietaryPreference) => {
     setSelectedDiets((current) =>
       current.includes(diet)
         ? current.filter((d) => d !== diet)
@@ -115,6 +117,41 @@ export default function Menu() {
       });
     } finally {
       setShowNewsletter(false);
+    }
+  };
+
+  const handleSubmitOrder = async (orderItems: OrderItem[]) => {
+    try {
+      setIsSubmittingOrder(true);
+      
+      // Format phone number to remove any non-digit characters
+      const formattedPhoneNumber = phoneNumber.replace(/\D/g, "");
+
+      await apiRequest("POST", "/api/orders", {
+        type: orderType,
+        customerName: orderType === "takeaway" ? customerName : undefined,
+        tableNumber: orderType === "dine-in" ? tableNumber : undefined,
+        phoneNumber: formattedPhoneNumber,
+        items: orderItems,
+        specialInstructions: "",
+      });
+
+      toast({
+        title: "Success",
+        description: "Your order has been placed successfully",
+      });
+
+      // Clear the order
+      selectedItems.forEach((_, id) => removeItem(id));
+    } catch (error) {
+      console.error("Order creation error:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to place order. Please try again.",
+      });
+    } finally {
+      setIsSubmittingOrder(false);
     }
   };
 
@@ -198,6 +235,8 @@ export default function Menu() {
               tableNumber={tableNumber}
               customerName={customerName}
               phoneNumber={phoneNumber}
+              onSubmitOrder={handleSubmitOrder}
+              isSubmitting={isSubmittingOrder}
             />
           </div>
         </div>

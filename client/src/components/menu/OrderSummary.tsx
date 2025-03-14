@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,6 +8,8 @@ import { apiRequest } from "@/lib/queryClient";
 import type { MenuItem, OrderType, OrderItem } from "@shared/schema";
 import { ShoppingCart, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useSettings } from "@/contexts/SettingsContext";
 
 interface OrderSummaryProps {
   selectedItems: Map<string, { item: MenuItem; quantity: number }>;
@@ -17,6 +19,8 @@ interface OrderSummaryProps {
   tableNumber: string;
   customerName: string;
   phoneNumber: string;
+  onSubmitOrder?: (orderItems: OrderItem[]) => void;
+  isSubmitting?: boolean;
 }
 
 export function OrderSummary({
@@ -27,13 +31,20 @@ export function OrderSummary({
   tableNumber,
   customerName,
   phoneNumber,
+  onSubmitOrder,
+  isSubmitting: externalIsSubmitting,
 }: OrderSummaryProps) {
+  const { language } = useLanguage();
+  const { t } = useTranslation();
+  const { formatPrice } = useSettings();
   const { toast } = useToast();
-  const { t, i18n } = useTranslation();
   const [specialInstructions, setSpecialInstructions] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [internalIsSubmitting, setInternalIsSubmitting] = useState(false);
+  
+  // Use external isSubmitting if provided, otherwise use internal state
+  const isSubmitting = externalIsSubmitting !== undefined ? externalIsSubmitting : internalIsSubmitting;
 
-  const currentLanguage = i18n.language as "en" | "it" | "es";
+  const currentLanguage = language as "en" | "it" | "es";
 
   const getItemName = (item: MenuItem) => {
     if (typeof item.name === 'string') return item.name;
@@ -83,7 +94,7 @@ export function OrderSummary({
     }
 
     try {
-      setIsSubmitting(true);
+      setInternalIsSubmitting(true);
       const orderItems: OrderItem[] = Array.from(selectedItems.entries()).map(
         ([id, { item, quantity }]) => ({
           menuItemId: id,
@@ -94,26 +105,32 @@ export function OrderSummary({
         })
       );
 
-      // Format phone number to remove any non-digit characters
-      const formattedPhoneNumber = phoneNumber.replace(/\D/g, "");
+      // If onSubmitOrder prop is provided, use it
+      if (onSubmitOrder) {
+        onSubmitOrder(orderItems);
+      } else {
+        // Otherwise, handle submission internally
+        // Format phone number to remove any non-digit characters
+        const formattedPhoneNumber = phoneNumber.replace(/\D/g, "");
 
-      await apiRequest("POST", "/api/orders", {
-        type: orderType,
-        customerName: orderType === "takeaway" ? customerName : undefined,
-        tableNumber: orderType === "dine-in" ? tableNumber : undefined,
-        phoneNumber: formattedPhoneNumber,
-        items: orderItems,
-        specialInstructions: specialInstructions || undefined,
-      });
+        await apiRequest("POST", "/api/orders", {
+          type: orderType,
+          customerName: orderType === "takeaway" ? customerName : undefined,
+          tableNumber: orderType === "dine-in" ? tableNumber : undefined,
+          phoneNumber: formattedPhoneNumber,
+          items: orderItems,
+          specialInstructions: specialInstructions || undefined,
+        });
 
-      toast({
-        title: "Success",
-        description: "Your order has been placed successfully",
-      });
+        toast({
+          title: "Success",
+          description: "Your order has been placed successfully",
+        });
 
-      // Clear the order
-      selectedItems.forEach((_, id) => removeItem(id));
-      setSpecialInstructions("");
+        // Clear the order
+        selectedItems.forEach((_, id) => removeItem(id));
+        setSpecialInstructions("");
+      }
     } catch (error) {
       console.error("Order creation error:", error);
       toast({
@@ -122,7 +139,7 @@ export function OrderSummary({
         description: "Failed to place order. Please try again.",
       });
     } finally {
-      setIsSubmitting(false);
+      setInternalIsSubmitting(false);
     }
   };
 
@@ -146,7 +163,7 @@ export function OrderSummary({
             <div className="flex-1">
               <h4 className="font-medium">{getItemName(item)}</h4>
               <p className="text-sm text-muted-foreground">
-                ${(item.price / 100).toFixed(2)} each
+                {formatPrice(item.price)} {t('menu.each')}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -174,7 +191,7 @@ export function OrderSummary({
       <div className="space-y-4 pt-4 border-t">
         <div className="flex justify-between">
           <span className="font-medium">{t('menu.total')}</span>
-          <span className="font-medium">${(total / 100).toFixed(2)}</span>
+          <span className="font-medium">{formatPrice(total)}</span>
         </div>
 
         <div className="space-y-2">

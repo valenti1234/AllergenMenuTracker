@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { log } from './vite';
-import { userRoles, orderTypes, orderStatuses } from '@shared/schema';
+import { userRoles, orderTypes, orderStatuses, currencies, languages } from '@shared/schema';
 
 // Ensure MONGODB_URI is properly encoded
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -151,6 +151,79 @@ const OrderSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
+// Restaurant Settings schema
+const RestaurantSettingsSchema = new mongoose.Schema({
+  name: {
+    type: {
+      en: { type: String, required: true },
+      it: { type: String },
+      es: { type: String }
+    },
+    required: true
+  },
+  address: {
+    type: {
+      en: { type: String },
+      it: { type: String },
+      es: { type: String }
+    }
+  },
+  phone: { type: String },
+  email: { type: String },
+  website: { type: String },
+  logo: { type: String },
+  currency: { 
+    type: String, 
+    enum: currencies,
+    default: 'USD'
+  },
+  taxRate: { 
+    type: Number, 
+    min: 0, 
+    max: 100, 
+    default: 0 
+  },
+  serviceCharge: { 
+    type: Number, 
+    min: 0, 
+    max: 100, 
+    default: 0 
+  },
+  openingHours: { type: String },
+  defaultLanguage: { 
+    type: String, 
+    enum: languages,
+    default: 'en'
+  },
+  theme: { 
+    type: String, 
+    enum: ['light', 'dark', 'system'],
+    default: 'system'
+  },
+  enableOnlineOrdering: { 
+    type: Boolean, 
+    default: true 
+  },
+  enableReservations: { 
+    type: Boolean, 
+    default: false 
+  },
+  enableDelivery: { 
+    type: Boolean, 
+    default: false 
+  },
+  deliveryRadius: { type: Number, min: 0 },
+  deliveryFee: { type: Number, min: 0 },
+  minimumOrderAmount: { type: Number, min: 0 },
+  socialMedia: {
+    facebook: { type: String },
+    instagram: { type: String },
+    twitter: { type: String },
+    yelp: { type: String }
+  },
+  updatedAt: { type: Date, default: Date.now }
+});
+
 // Update timestamp on save
 UserSchema.pre('save', function(next) {
   this.updatedAt = new Date();
@@ -162,6 +235,12 @@ OrderSchema.pre('save', function(next) {
   next();
 });
 
+RestaurantSettingsSchema.pre('save', function(next) {
+  this.updatedAt = new Date();
+  next();
+});
+
 export const MenuItemModel = mongoose.model('MenuItem', MenuItemSchema);
 export const UserModel = mongoose.model('User', UserSchema);
 export const OrderModel = mongoose.model('Order', OrderSchema);
+export const RestaurantSettingsModel = mongoose.model('RestaurantSettings', RestaurantSettingsSchema);

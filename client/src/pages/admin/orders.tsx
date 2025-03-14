@@ -23,10 +23,12 @@ import type { Order, OrderStatus } from "@shared/schema";
 import { orderStatuses } from "@shared/schema";
 import { Clock, ClipboardList, Phone } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useSettings } from "@/contexts/SettingsContext";
 
 export default function Orders() {
   const { toast } = useToast();
   const { t, i18n } = useTranslation();
+  const { formatPrice } = useSettings();
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus | "all">("all");
 
   const { data: orders, isLoading } = useQuery<Order[]>({
@@ -234,7 +236,7 @@ export default function Orders() {
                           )}
                         </div>
                         <span>
-                          ${((item.price * item.quantity) / 100).toFixed(2)}
+                          {formatPrice((item.price * item.quantity))}
                         </span>
                       </div>
                     ))}
@@ -255,7 +257,7 @@ export default function Orders() {
                       {new Date(order.createdAt).toLocaleString(i18n.language)}
                     </div>
                     <div className="font-medium">
-                      {t("menu.total", "Total")}: ${(order.total / 100).toFixed(2)}
+                      {t("menu.total", "Total")}: {formatPrice(order.total)}
                     </div>
                   </div>
                 </div>

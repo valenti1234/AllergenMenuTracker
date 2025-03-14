@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import {
@@ -19,9 +19,11 @@ import { Badge } from "@/components/ui/badge";
 import { Phone, Clock, ClipboardList } from "lucide-react";
 import type { Order, OrderStatus } from "@shared/schema";
 import { useTranslation } from "react-i18next";
+import { useSettings } from "@/contexts/SettingsContext";
 
 export default function Archive() {
   const { t, i18n } = useTranslation();
+  const { formatPrice } = useSettings();
   const [filterStatus, setFilterStatus] = useState<"completed" | "cancelled" | "all">("all");
 
   const { data: orders, isLoading } = useQuery<Order[]>({
@@ -179,7 +181,7 @@ export default function Archive() {
                           )}
                         </div>
                         <span>
-                          ${((item.price * item.quantity) / 100).toFixed(2)}
+                          {formatPrice((item.price * item.quantity))}
                         </span>
                       </div>
                     ))}
@@ -200,7 +202,7 @@ export default function Archive() {
                       {new Date(order.createdAt).toLocaleString(i18n.language)}
                     </div>
                     <div className="font-medium">
-                      {t("menu.total", "Total")}: ${(order.total / 100).toFixed(2)}
+                      {t("menu.total", "Total")}: {formatPrice(order.total)}
                     </div>
                   </div>
                 </div>

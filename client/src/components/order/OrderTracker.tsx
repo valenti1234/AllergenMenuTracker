@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { orderStatuses } from "@shared/schema";
 import type { Order, OrderStatus } from "@shared/schema";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import {
   Clock,
   ChefHat,
@@ -13,6 +14,8 @@ import {
   Utensils,
   type LucideIcon,
 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useSettings } from "@/contexts/SettingsContext";
 
 interface OrderTrackerProps {
   order: Order;
@@ -30,6 +33,9 @@ type StatusInfoMap = {
 };
 
 export function OrderTracker({ order }: OrderTrackerProps) {
+  const { t } = useTranslation();
+  const { language } = useLanguage();
+  const { formatPrice } = useSettings();
   const [progress, setProgress] = useState(0);
 
   const statusInfo: StatusInfoMap = {
@@ -190,7 +196,7 @@ export function OrderTracker({ order }: OrderTrackerProps) {
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Total:</span>
             <span className="font-medium">
-              ${(order.total / 100).toFixed(2)}
+              {formatPrice(order.total)}
             </span>
           </div>
         </div>

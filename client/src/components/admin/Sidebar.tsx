@@ -10,7 +10,8 @@ import {
   Archive as ArchiveIcon,
   Database,
   Globe,
-  FileText
+  FileText,
+  Settings as SettingsIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/queryClient";
@@ -102,6 +103,12 @@ export function Sidebar() {
       icon: FileText,
       href: "/admin/api-docs",
       roles: ["admin", "manager"]
+    },
+    {
+      title: t("nav.settings", "Settings"),
+      icon: SettingsIcon,
+      href: "/admin/settings",
+      roles: ["admin"]
     }
   ];
 

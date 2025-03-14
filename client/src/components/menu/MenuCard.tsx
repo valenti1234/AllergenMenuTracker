@@ -10,7 +10,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
+  DialogDescription
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -28,6 +29,17 @@ import {
 import React, { useState } from "react";
 import type { MenuItem } from "@shared/schema";
 import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useSettings } from "@/contexts/SettingsContext";
+import { Progress } from "@/components/ui/progress";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Separator } from "@/components/ui/separator";
+import { ShoppingCart } from "lucide-react";
 
 interface MenuCardProps {
   item: MenuItem;
@@ -38,6 +50,8 @@ export function MenuCard({ item, onAddToOrder }: MenuCardProps) {
   const { t, i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const { language } = useLanguage();
+  const { formatPrice } = useSettings();
 
   const currentLanguage = i18n.language as "en" | "it" | "es";
 
@@ -85,7 +99,7 @@ export function MenuCard({ item, onAddToOrder }: MenuCardProps) {
             <div className="relative">
               <div className="absolute top-2 right-2 z-10">
                 <Badge variant="secondary" className="bg-black/50 backdrop-blur-sm text-white border-0">
-                  ${(item.price / 100).toFixed(2)}
+                  {formatPrice(item.price)}
                 </Badge>
               </div>
               <div className="relative h-48 overflow-hidden">
@@ -140,9 +154,13 @@ export function MenuCard({ item, onAddToOrder }: MenuCardProps) {
           </Card>
         </DialogTrigger>
 
-        <DialogContent className="max-w-3xl">
-          <div className="grid gap-4 py-4">
-            <ScrollArea className="h-[calc(100vh-8rem)] pr-4">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>{getName()}</DialogTitle>
+            <DialogDescription>{getDescription()}</DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full pr-4">
               <div className="space-y-6">
                 {/* Header with image */}
                 <div className="relative aspect-video overflow-hidden rounded-lg">
@@ -158,7 +176,7 @@ export function MenuCard({ item, onAddToOrder }: MenuCardProps) {
                   <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-semibold">{getName()}</h2>
                     <p className="text-lg font-semibold">
-                      ${(item.price / 100).toFixed(2)}
+                      {formatPrice(item.price)}
                     </p>
                   </div>
                   <p className="text-muted-foreground">
