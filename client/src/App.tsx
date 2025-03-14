@@ -15,6 +15,7 @@ import Archive from "@/pages/admin/archive";
 import KDS from "@/pages/admin/kds";
 import Users from "@/pages/admin/users";
 import Database from "@/pages/admin/database";
+import ApiDocs from "@/pages/admin/api-docs";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
@@ -70,6 +71,9 @@ function Router() {
       </Route>
       <Route path="/admin/database">
         <ProtectedRoute component={Database} />
+      </Route>
+      <Route path="/admin/api-docs">
+        <ProtectedRoute component={ApiDocs} />
       </Route>
       <Route component={NotFound} />
     </Switch>

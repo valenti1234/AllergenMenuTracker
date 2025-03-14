@@ -9,7 +9,8 @@ import {
   Utensils,
   Archive as ArchiveIcon,
   Database,
-  Globe
+  Globe,
+  FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/queryClient";
@@ -95,6 +96,12 @@ export function Sidebar() {
       icon: Database,
       href: "/admin/database",
       roles: ["admin"]
+    },
+    {
+      title: t("nav.apiDocs", "API Documentation"),
+      icon: FileText,
+      href: "/admin/api-docs",
+      roles: ["admin", "manager"]
     }
   ];
 

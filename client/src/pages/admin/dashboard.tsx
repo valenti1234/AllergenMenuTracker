@@ -1,9 +1,10 @@
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useTranslation } from "react-i18next";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
+import { it, es } from "date-fns/locale";
 import { 
   Card, 
   CardContent, 
@@ -36,12 +37,14 @@ import {
   CheckCircle,
   DollarSign,
   Calendar,
-  PieChart as PieChartIcon
+  PieChart as PieChartIcon,
+  RefreshCw
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { orderStatuses } from "@shared/schema";
+import { Button } from "@/components/ui/button";
 
 // Colors for charts
 const COLORS = [
@@ -103,23 +106,35 @@ const getLocalizedText = (text: any, language: string) => {
   }
   
   // Handle objects with language keys
-  if (typeof text === "object") {
+  if (typeof text === "object" && text !== null) {
     // If it's a direct language object (e.g., {en: "text", it: "testo"})
     if (text[language] || text.en) {
       return text[language] || text.en || "";
     }
     
     // If it's an object but not in the expected format, try to extract a meaningful value
-    return Object.values(text)[0] || "";
+    if (Object.keys(text).length > 0) {
+      // Try to find any key that might contain language data
+      for (const key of Object.keys(text)) {
+        const value = text[key];
+        if (typeof value === "object" && value !== null && (value[language] || value.en)) {
+          return value[language] || value.en || "";
+        }
+      }
+      
+      // If no language-specific data found, return the first value
+      return Object.values(text)[0] || "";
+    }
   }
   
   // For any other type, convert to string
-  return String(text);
+  return String(text || "");
 };
 
 export default function Dashboard() {
   const { t, i18n } = useTranslation();
   const currentLanguage = i18n.language;
+  const queryClient = useQueryClient();
   
   // Helper function to format currency
   const formatCurrency = (value: number) => {
@@ -139,6 +154,24 @@ export default function Dashboard() {
         minimumFractionDigits: 2
       }
     ).format(dollars);
+  };
+
+  // Helper function to format the last updated time
+  const formatLastUpdated = (lastUpdated: string | Date) => {
+    if (!lastUpdated) return "";
+    
+    const date = typeof lastUpdated === 'string' ? new Date(lastUpdated) : lastUpdated;
+    
+    // Get the appropriate locale
+    const locale = 
+      currentLanguage === 'it' ? it :
+      currentLanguage === 'es' ? es :
+      undefined;
+    
+    return formatDistanceToNow(date, { 
+      addSuffix: true,
+      locale
+    });
   };
   
   // Fetch overview metrics
@@ -160,10 +193,13 @@ export default function Dashboard() {
   });
   
   // Fetch dietary distribution
-  const { data: dietaryData, isLoading: isLoadingDietary } = useQuery({
+  const { data: dietaryResponse, isLoading: isLoadingDietary } = useQuery({
     queryKey: ["/api/admin/metrics/dietary"],
     queryFn: () => apiRequest("GET", "/api/admin/metrics/dietary"),
   });
+
+  // Extract the actual dietary data from the response
+  const dietaryData = Array.isArray(dietaryResponse) ? dietaryResponse : [];
   
   // Format order status distribution data for the pie chart
   const orderStatusData = overviewData?.orderStatusDistribution?.map((item: any) => ({
@@ -173,8 +209,16 @@ export default function Dashboard() {
   
   // Format popular items data
   const popularItemsData = overviewData?.popularItems?.map((item: any) => {
+    // Enhanced name extraction
+    let itemName = getLocalizedText(item.name, currentLanguage);
+    
+    // If the name is still an object after getLocalizedText, try to extract it directly
+    if (typeof itemName === 'object' && itemName !== null) {
+      itemName = itemName[currentLanguage] || itemName.en || JSON.stringify(itemName);
+    }
+    
     return {
-      name: getLocalizedText(item.name, currentLanguage),
+      name: itemName,
       count: item.count
     };
   }) || [];
@@ -192,10 +236,46 @@ export default function Dashboard() {
   // Use the helper function for dietary data
   const localizedDietaryData = dietaryData ? ensureLocalizedLabels(dietaryData, 'preference') : [];
 
+  // Function to manually refresh metrics
+  const refreshMetrics = async () => {
+    try {
+      await apiRequest("POST", "/api/admin/metrics/refresh");
+      // Refetch all metrics
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["/api/admin/metrics/overview"] }),
+        queryClient.invalidateQueries({ queryKey: ["/api/admin/metrics/orders"] }),
+        queryClient.invalidateQueries({ queryKey: ["/api/admin/metrics/revenue"] }),
+        queryClient.invalidateQueries({ queryKey: ["/api/admin/metrics/dietary"] })
+      ]);
+    } catch (error) {
+      console.error("Failed to refresh metrics:", error);
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="container mx-auto py-8 px-4">
-        <h1 className="text-4xl font-bold mb-8">{t("admin.dashboard.title", "Dashboard")}</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-bold">{t("admin.dashboard.title", "Dashboard")}</h1>
+          
+          {/* Last updated info and refresh button */}
+          <div className="flex items-center space-x-4">
+            {overviewData?.lastUpdated && (
+              <p className="text-sm text-muted-foreground">
+                {t("admin.dashboard.lastUpdated", "Last updated")}: {formatLastUpdated(overviewData.lastUpdated)}
+              </p>
+            )}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={refreshMetrics}
+              className="flex items-center space-x-1"
+            >
+              <RefreshCw className="h-4 w-4 mr-1" />
+              {t("admin.dashboard.refresh", "Refresh")}
+            </Button>
+          </div>
+        </div>
         
         {/* Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

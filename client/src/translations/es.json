@@ -57,7 +57,8 @@
     "archive": "Archivo",
     "kitchenDisplay": "Pantalla de Cocina",
     "userManagement": "Gestión de Usuarios",
-    "database": "Base de Datos"
+    "database": "Base de Datos",
+    "apiDocs": "Documentación de API"
   },
   "dietary": {
     "vegan": "Vegano",
@@ -172,17 +173,40 @@
       "popularItemsDescription": "Platos más pedidos",
       "revenueTab": "Ingresos",
       "ordersTab": "Pedidos",
-      "dietaryTab": "Preferencias Dietéticas",
+      "dietaryTab": "Preferencias Alimentarias",
       "revenueOverTime": "Evolución de Ingresos",
       "revenueDescription": "Ingresos diarios de la última semana",
       "ordersOverTime": "Evolución de Pedidos",
       "ordersDescription": "Recuento diario de pedidos de la última semana",
-      "dietaryDistribution": "Preferencias Dietéticas",
-      "dietaryDescription": "Distribución de platos por preferencias dietéticas",
-      "revenue": "Ingresos",
+      "dietaryDistribution": "Preferencias Alimentarias",
+      "dietaryDescription": "Distribución de elementos del menú por preferencias alimentarias",
       "orders": "Pedidos",
+      "revenue": "Ingresos",
       "orderCount": "Número de Pedidos",
-      "menuItemCount": "Número de Platos"
+      "menuItemCount": "Número de Elementos del Menú",
+      "noData": "No hay datos disponibles",
+      "lastUpdated": "Última actualización",
+      "refresh": "Actualizar",
+      "metricsRefreshed": "Métricas actualizadas con éxito",
+      "metricsRefreshError": "Error al actualizar las métricas"
+    },
+    "apiDocs": {
+      "title": "Documentación de API",
+      "swagger": "Documentación de API Swagger",
+      "swaggerDescription": "Documentación interactiva para la API de AllergenMenuTracker",
+      "swaggerInfo": "La interfaz de Swagger proporciona una interfaz completa para explorar y probar los endpoints de la API. Puedes ver los parámetros de solicitud, los esquemas de respuesta e incluso probar llamadas a la API directamente desde el navegador.",
+      "openSwagger": "Abrir Swagger UI",
+      "endpoints": "Endpoints de API",
+      "endpointsDescription": "Descripción general de los endpoints de API disponibles",
+      "menuEndpoint": "Operaciones de elementos del menú",
+      "ordersEndpoint": "Gestión de pedidos",
+      "metricsEndpoint": "Métricas del panel",
+      "usersEndpoint": "Gestión de usuarios",
+      "viewDetails": "Ver documentación detallada",
+      "authentication": "Autenticación",
+      "authDescription": "Cómo autenticarse con la API",
+      "authInfo": "La API utiliza autenticación basada en cookies. La mayoría de los endpoints requieren autenticación con roles de usuario apropiados.",
+      "authDocs": "Documentación de autenticación"
     }
   }
 } 

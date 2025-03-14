@@ -57,7 +57,8 @@
     "archive": "Archivio",
     "kitchenDisplay": "Display Cucina",
     "userManagement": "Gestione Utenti",
-    "database": "Database"
+    "database": "Database",
+    "apiDocs": "Documentazione API"
   },
   "dietary": {
     "vegan": "Vegano",
@@ -159,7 +160,7 @@
     "logoutError": "Impossibile disconnettersi",
     "dashboard": {
       "title": "Dashboard",
-      "menuItems": "Voci Menu",
+      "menuItems": "Elementi del Menu",
       "activeOrders": "Ordini Attivi",
       "completedOrders": "Ordini Completati",
       "users": "Utenti",
@@ -172,17 +173,40 @@
       "popularItemsDescription": "Piatti più ordinati",
       "revenueTab": "Incassi",
       "ordersTab": "Ordini",
-      "dietaryTab": "Preferenze Dietetiche",
+      "dietaryTab": "Preferenze Alimentari",
       "revenueOverTime": "Andamento Incassi",
-      "revenueDescription": "Incassi giornalieri dell'ultima settimana",
+      "revenueDescription": "Incasso giornaliero dell'ultima settimana",
       "ordersOverTime": "Andamento Ordini",
-      "ordersDescription": "Conteggio ordini giornalieri dell'ultima settimana",
-      "dietaryDistribution": "Preferenze Dietetiche",
-      "dietaryDescription": "Distribuzione dei piatti per preferenze dietetiche",
-      "revenue": "Incasso",
+      "ordersDescription": "Conteggio giornaliero ordini dell'ultima settimana",
+      "dietaryDistribution": "Preferenze Alimentari",
+      "dietaryDescription": "Distribuzione degli elementi del menu per preferenze alimentari",
       "orders": "Ordini",
+      "revenue": "Incasso",
       "orderCount": "Numero Ordini",
-      "menuItemCount": "Numero Piatti"
+      "menuItemCount": "Numero Elementi Menu",
+      "noData": "Nessun dato disponibile",
+      "lastUpdated": "Ultimo aggiornamento",
+      "refresh": "Aggiorna",
+      "metricsRefreshed": "Metriche aggiornate con successo",
+      "metricsRefreshError": "Impossibile aggiornare le metriche"
+    },
+    "apiDocs": {
+      "title": "Documentazione API",
+      "swagger": "Documentazione API Swagger",
+      "swaggerDescription": "Documentazione interattiva per l'API di AllergenMenuTracker",
+      "swaggerInfo": "L'interfaccia Swagger fornisce un'interfaccia completa per esplorare e testare gli endpoint API. Puoi visualizzare i parametri di richiesta, gli schemi di risposta e persino provare le chiamate API direttamente dal browser.",
+      "openSwagger": "Apri Swagger UI",
+      "endpoints": "Endpoint API",
+      "endpointsDescription": "Panoramica degli endpoint API disponibili",
+      "menuEndpoint": "Operazioni sugli elementi del menu",
+      "ordersEndpoint": "Gestione degli ordini",
+      "metricsEndpoint": "Metriche della dashboard",
+      "usersEndpoint": "Gestione degli utenti",
+      "viewDetails": "Visualizza documentazione dettagliata",
+      "authentication": "Autenticazione",
+      "authDescription": "Come autenticarsi con l'API",
+      "authInfo": "L'API utilizza l'autenticazione basata su cookie. La maggior parte degli endpoint richiede l'autenticazione con ruoli utente appropriati.",
+      "authDocs": "Documentazione sull'autenticazione"
     }
   }
 } 

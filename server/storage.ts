@@ -24,7 +24,7 @@ export interface IStorage {
   createOrder(order: InsertOrder): Promise<Order>;
   updateOrder(id: string, order: Partial<Order>): Promise<Order>;
   deleteOrder(id: string): Promise<void>;
-  getOrdersByStatus(status: OrderStatus): Promise<Order[]>;
+  getOrdersByStatus(status: OrderStatus | OrderStatus[]): Promise<Order[]>;
   getOrdersByPhoneNumber(phoneNumber: string): Promise<Order[]>;
   
   // Dashboard Metrics
@@ -401,8 +401,11 @@ export class MongoStorage implements IStorage {
     }
   }
 
-  async getOrdersByStatus(status: OrderStatus): Promise<Order[]> {
-    const orders = await OrderModel.find({ status }).sort({ createdAt: -1 });
+  async getOrdersByStatus(status: OrderStatus | OrderStatus[]): Promise<Order[]> {
+    // Handle both single status and array of statuses
+    const statusCondition = Array.isArray(status) ? { $in: status } : status;
+    
+    const orders = await OrderModel.find({ status: statusCondition }).sort({ createdAt: -1 });
     return orders.map(order => ({
       id: order._id.toString(),
       type: order.type,
@@ -545,13 +548,14 @@ export class MongoStorage implements IStorage {
   }
 
   async getPopularMenuItems(limit: number): Promise<{id: string, name: any, count: number}[]> {
+    // First approach: Count by quantity and use menuItemId for more accurate grouping
     const result = await OrderModel.aggregate([
       { $unwind: "$items" },
       {
         $group: {
-          _id: "$items.id",
+          _id: "$items.menuItemId",  // Group by menuItemId instead of items.id
           name: { $first: "$items.name" },
-          count: { $sum: 1 }
+          count: { $sum: "$items.quantity" }  // Sum the quantities instead of counting orders
         }
       },
       { $sort: { count: -1 } },
@@ -566,7 +570,35 @@ export class MongoStorage implements IStorage {
       }
     ]);
     
-    return result;
+    // If we have results, return them
+    if (result.length > 0) {
+      return result;
+    }
+    
+    // Fallback approach: If the above doesn't work (possibly due to data structure),
+    // try with the original items.id approach but still count quantities
+    const fallbackResult = await OrderModel.aggregate([
+      { $unwind: "$items" },
+      {
+        $group: {
+          _id: "$items.id",
+          name: { $first: "$items.name" },
+          count: { $sum: "$items.quantity" }  // Sum the quantities
+        }
+      },
+      { $sort: { count: -1 } },
+      { $limit: limit },
+      {
+        $project: {
+          _id: 0,
+          id: "$_id",
+          name: 1,
+          count: 1
+        }
+      }
+    ]);
+    
+    return fallbackResult;
   }
 
   async getOrderStatusDistribution(): Promise<{status: OrderStatus, count: number}[]> {

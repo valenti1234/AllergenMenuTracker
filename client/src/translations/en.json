@@ -130,7 +130,8 @@
     "archive": "Archive",
     "kitchenDisplay": "Kitchen Display",
     "userManagement": "User Management",
-    "database": "Database"
+    "database": "Database",
+    "apiDocs": "API Documentation"
   },
   "newsletter": {
     "title": "Stay Updated!",
@@ -197,10 +198,33 @@
       "ordersDescription": "Daily order count for the past week",
       "dietaryDistribution": "Dietary Preferences",
       "dietaryDescription": "Distribution of menu items by dietary preferences",
-      "revenue": "Revenue",
       "orders": "Orders",
+      "revenue": "Revenue",
       "orderCount": "Order Count",
-      "menuItemCount": "Menu Item Count"
+      "menuItemCount": "Menu Item Count",
+      "noData": "No data available",
+      "lastUpdated": "Last updated",
+      "refresh": "Refresh",
+      "metricsRefreshed": "Metrics refreshed successfully",
+      "metricsRefreshError": "Failed to refresh metrics"
+    },
+    "apiDocs": {
+      "title": "API Documentation",
+      "swagger": "Swagger API Documentation",
+      "swaggerDescription": "Interactive documentation for the AllergenMenuTracker API",
+      "swaggerInfo": "The Swagger UI provides a comprehensive interface to explore and test the API endpoints. You can view request parameters, response schemas, and even try out API calls directly from the browser.",
+      "openSwagger": "Open Swagger UI",
+      "endpoints": "API Endpoints",
+      "endpointsDescription": "Overview of available API endpoints",
+      "menuEndpoint": "Menu item operations",
+      "ordersEndpoint": "Order management",
+      "metricsEndpoint": "Dashboard metrics",
+      "usersEndpoint": "User management",
+      "viewDetails": "View Detailed Documentation",
+      "authentication": "Authentication",
+      "authDescription": "How to authenticate with the API",
+      "authInfo": "The API uses cookie-based authentication. Most endpoints require authentication with appropriate user roles.",
+      "authDocs": "Authentication Documentation"
     }
   }
 } 
