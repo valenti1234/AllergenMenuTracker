@@ -26,6 +26,22 @@ export interface IStorage {
   deleteOrder(id: string): Promise<void>;
   getOrdersByStatus(status: OrderStatus): Promise<Order[]>;
   getOrdersByPhoneNumber(phoneNumber: string): Promise<Order[]>;
+  
+  // Dashboard Metrics
+  getMenuItemCount(): Promise<number>;
+  getUserCount(): Promise<number>;
+  getActiveOrderCount(): Promise<number>;
+  getCompletedOrderCount(): Promise<number>;
+  getTodayRevenue(): Promise<number>;
+  getWeekRevenue(): Promise<number>;
+  getMonthRevenue(): Promise<number>;
+  getPopularMenuItems(limit: number): Promise<{id: string, name: any, count: number}[]>;
+  getOrderStatusDistribution(): Promise<{status: OrderStatus, count: number}[]>;
+  getDailyOrderCounts(days: number): Promise<{date: string, count: number}[]>;
+  getHourlyOrderCounts(hours: number): Promise<{hour: string, count: number}[]>;
+  getDailyRevenue(days: number): Promise<{date: string, revenue: number}[]>;
+  getMonthlyRevenue(months: number): Promise<{month: string, revenue: number}[]>;
+  getDietaryDistribution(): Promise<{preference: string, count: number}[]>;
 }
 
 export class MongoStorage implements IStorage {
@@ -439,6 +455,343 @@ export class MongoStorage implements IStorage {
       createdAt: order.createdAt,
       updatedAt: order.updatedAt
     }));
+  }
+
+  // Dashboard Metrics
+  async getMenuItemCount(): Promise<number> {
+    return await MenuItemModel.countDocuments();
+  }
+
+  async getUserCount(): Promise<number> {
+    return await UserModel.countDocuments();
+  }
+
+  async getActiveOrderCount(): Promise<number> {
+    return await OrderModel.countDocuments({ 
+      status: { $in: ['pending', 'preparing', 'delayed', 'ready'] } 
+    });
+  }
+
+  async getCompletedOrderCount(): Promise<number> {
+    return await OrderModel.countDocuments({ 
+      status: { $in: ['served', 'completed'] } 
+    });
+  }
+
+  async getTodayRevenue(): Promise<number> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const result = await OrderModel.aggregate([
+      { 
+        $match: { 
+          createdAt: { $gte: today },
+          status: { $nin: ['cancelled'] }
+        } 
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$total" }
+        }
+      }
+    ]);
+    
+    return result.length > 0 ? result[0].total : 0;
+  }
+
+  async getWeekRevenue(): Promise<number> {
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    
+    const result = await OrderModel.aggregate([
+      { 
+        $match: { 
+          createdAt: { $gte: weekAgo },
+          status: { $nin: ['cancelled'] }
+        } 
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$total" }
+        }
+      }
+    ]);
+    
+    return result.length > 0 ? result[0].total : 0;
+  }
+
+  async getMonthRevenue(): Promise<number> {
+    const monthAgo = new Date();
+    monthAgo.setMonth(monthAgo.getMonth() - 1);
+    
+    const result = await OrderModel.aggregate([
+      { 
+        $match: { 
+          createdAt: { $gte: monthAgo },
+          status: { $nin: ['cancelled'] }
+        } 
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$total" }
+        }
+      }
+    ]);
+    
+    return result.length > 0 ? result[0].total : 0;
+  }
+
+  async getPopularMenuItems(limit: number): Promise<{id: string, name: any, count: number}[]> {
+    const result = await OrderModel.aggregate([
+      { $unwind: "$items" },
+      {
+        $group: {
+          _id: "$items.id",
+          name: { $first: "$items.name" },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { count: -1 } },
+      { $limit: limit },
+      {
+        $project: {
+          _id: 0,
+          id: "$_id",
+          name: 1,
+          count: 1
+        }
+      }
+    ]);
+    
+    return result;
+  }
+
+  async getOrderStatusDistribution(): Promise<{status: OrderStatus, count: number}[]> {
+    const result = await OrderModel.aggregate([
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          status: "$_id",
+          count: 1
+        }
+      }
+    ]);
+    
+    return result;
+  }
+
+  async getDailyOrderCounts(days: number): Promise<{date: string, count: number}[]> {
+    const daysAgo = new Date();
+    daysAgo.setDate(daysAgo.getDate() - days);
+    daysAgo.setHours(0, 0, 0, 0);
+    
+    const result = await OrderModel.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: daysAgo }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+            day: { $dayOfMonth: "$createdAt" }
+          },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          date: {
+            $dateToString: {
+              format: "%Y-%m-%d",
+              date: {
+                $dateFromParts: {
+                  year: "$_id.year",
+                  month: "$_id.month",
+                  day: "$_id.day"
+                }
+              }
+            }
+          },
+          count: 1
+        }
+      },
+      { $sort: { date: 1 } }
+    ]);
+    
+    return result;
+  }
+
+  async getHourlyOrderCounts(hours: number): Promise<{hour: string, count: number}[]> {
+    const hoursAgo = new Date();
+    hoursAgo.setHours(hoursAgo.getHours() - hours);
+    
+    const result = await OrderModel.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: hoursAgo }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+            day: { $dayOfMonth: "$createdAt" },
+            hour: { $hour: "$createdAt" }
+          },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          hour: {
+            $dateToString: {
+              format: "%Y-%m-%d %H:00",
+              date: {
+                $dateFromParts: {
+                  year: "$_id.year",
+                  month: "$_id.month",
+                  day: "$_id.day",
+                  hour: "$_id.hour"
+                }
+              }
+            }
+          },
+          count: 1
+        }
+      },
+      { $sort: { hour: 1 } }
+    ]);
+    
+    return result;
+  }
+
+  async getDailyRevenue(days: number): Promise<{date: string, revenue: number}[]> {
+    const daysAgo = new Date();
+    daysAgo.setDate(daysAgo.getDate() - days);
+    daysAgo.setHours(0, 0, 0, 0);
+    
+    const result = await OrderModel.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: daysAgo },
+          status: { $nin: ['cancelled'] }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+            day: { $dayOfMonth: "$createdAt" }
+          },
+          revenue: { $sum: "$total" }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          date: {
+            $dateToString: {
+              format: "%Y-%m-%d",
+              date: {
+                $dateFromParts: {
+                  year: "$_id.year",
+                  month: "$_id.month",
+                  day: "$_id.day"
+                }
+              }
+            }
+          },
+          revenue: 1
+        }
+      },
+      { $sort: { date: 1 } }
+    ]);
+    
+    return result;
+  }
+
+  async getMonthlyRevenue(months: number): Promise<{month: string, revenue: number}[]> {
+    const monthsAgo = new Date();
+    monthsAgo.setMonth(monthsAgo.getMonth() - months);
+    monthsAgo.setDate(1);
+    monthsAgo.setHours(0, 0, 0, 0);
+    
+    const result = await OrderModel.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: monthsAgo },
+          status: { $nin: ['cancelled'] }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" }
+          },
+          revenue: { $sum: "$total" }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          month: {
+            $dateToString: {
+              format: "%Y-%m",
+              date: {
+                $dateFromParts: {
+                  year: "$_id.year",
+                  month: "$_id.month",
+                  day: 1
+                }
+              }
+            }
+          },
+          revenue: 1
+        }
+      },
+      { $sort: { month: 1 } }
+    ]);
+    
+    return result;
+  }
+
+  async getDietaryDistribution(): Promise<{preference: string, count: number}[]> {
+    const result = await MenuItemModel.aggregate([
+      { $unwind: "$dietaryInfo" },
+      {
+        $group: {
+          _id: "$dietaryInfo",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          preference: "$_id",
+          count: 1
+        }
+      },
+      { $sort: { count: -1 } }
+    ]);
+    
+    return result;
   }
 }
 

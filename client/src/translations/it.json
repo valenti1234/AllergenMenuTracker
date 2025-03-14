@@ -156,6 +156,33 @@
       "es": "Spagnolo"
     },
     "logout": "Disconnetti",
-    "logoutError": "Impossibile disconnettersi"
+    "logoutError": "Impossibile disconnettersi",
+    "dashboard": {
+      "title": "Dashboard",
+      "menuItems": "Voci Menu",
+      "activeOrders": "Ordini Attivi",
+      "completedOrders": "Ordini Completati",
+      "users": "Utenti",
+      "todayRevenue": "Incasso Giornaliero",
+      "weekRevenue": "Incasso Settimanale",
+      "monthRevenue": "Incasso Mensile",
+      "orderStatusDistribution": "Distribuzione Stato Ordini",
+      "orderStatusDescription": "Distribuzione degli ordini per stato",
+      "popularItems": "Piatti Popolari",
+      "popularItemsDescription": "Piatti più ordinati",
+      "revenueTab": "Incassi",
+      "ordersTab": "Ordini",
+      "dietaryTab": "Preferenze Dietetiche",
+      "revenueOverTime": "Andamento Incassi",
+      "revenueDescription": "Incassi giornalieri dell'ultima settimana",
+      "ordersOverTime": "Andamento Ordini",
+      "ordersDescription": "Conteggio ordini giornalieri dell'ultima settimana",
+      "dietaryDistribution": "Preferenze Dietetiche",
+      "dietaryDescription": "Distribuzione dei piatti per preferenze dietetiche",
+      "revenue": "Incasso",
+      "orders": "Ordini",
+      "orderCount": "Numero Ordini",
+      "menuItemCount": "Numero Piatti"
+    }
   }
 } 

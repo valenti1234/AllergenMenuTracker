@@ -347,5 +347,90 @@ export async function registerRoutes(app: Express) {
     }
   });
 
+  // Dashboard metrics endpoints
+  app.get("/api/admin/metrics/overview", requireAuth, async (_req, res) => {
+    try {
+      // Get counts for various entities
+      const menuItemCount = await storage.getMenuItemCount();
+      const activeOrderCount = await storage.getActiveOrderCount();
+      const completedOrderCount = await storage.getCompletedOrderCount();
+      const userCount = await storage.getUserCount();
+      
+      // Get revenue metrics
+      const todayRevenue = await storage.getTodayRevenue();
+      const weekRevenue = await storage.getWeekRevenue();
+      const monthRevenue = await storage.getMonthRevenue();
+      
+      // Get popular items
+      const popularItems = await storage.getPopularMenuItems(5);
+      
+      // Get order status distribution
+      const orderStatusDistribution = await storage.getOrderStatusDistribution();
+      
+      res.json({
+        counts: {
+          menuItems: menuItemCount,
+          activeOrders: activeOrderCount,
+          completedOrders: completedOrderCount,
+          users: userCount
+        },
+        revenue: {
+          today: todayRevenue,
+          week: weekRevenue,
+          month: monthRevenue
+        },
+        popularItems,
+        orderStatusDistribution
+      });
+    } catch (error) {
+      console.error('Dashboard metrics error:', error);
+      res.status(500).json({ message: "Failed to fetch dashboard metrics" });
+    }
+  });
+
+  // Order metrics by time period
+  app.get("/api/admin/metrics/orders", requireAuth, async (_req, res) => {
+    try {
+      const dailyOrders = await storage.getDailyOrderCounts(7); // Last 7 days
+      const hourlyOrders = await storage.getHourlyOrderCounts(24); // Last 24 hours
+      
+      res.json({
+        daily: dailyOrders,
+        hourly: hourlyOrders
+      });
+    } catch (error) {
+      console.error('Order metrics error:', error);
+      res.status(500).json({ message: "Failed to fetch order metrics" });
+    }
+  });
+
+  // Revenue metrics by time period
+  app.get("/api/admin/metrics/revenue", requireAuth, async (_req, res) => {
+    try {
+      const dailyRevenue = await storage.getDailyRevenue(7); // Last 7 days
+      const monthlyRevenue = await storage.getMonthlyRevenue(6); // Last 6 months
+      
+      res.json({
+        daily: dailyRevenue,
+        monthly: monthlyRevenue
+      });
+    } catch (error) {
+      console.error('Revenue metrics error:', error);
+      res.status(500).json({ message: "Failed to fetch revenue metrics" });
+    }
+  });
+
+  // Dietary preferences distribution
+  app.get("/api/admin/metrics/dietary", requireAuth, async (_req, res) => {
+    try {
+      const dietaryDistribution = await storage.getDietaryDistribution();
+      
+      res.json(dietaryDistribution);
+    } catch (error) {
+      console.error('Dietary metrics error:', error);
+      res.status(500).json({ message: "Failed to fetch dietary metrics" });
+    }
+  });
+
   return createServer(app);
 }

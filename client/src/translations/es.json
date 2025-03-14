@@ -156,6 +156,33 @@
       "es": "Español"
     },
     "logout": "Cerrar Sesión",
-    "logoutError": "Error al cerrar sesión"
+    "logoutError": "Error al cerrar sesión",
+    "dashboard": {
+      "title": "Panel de Control",
+      "menuItems": "Elementos del Menú",
+      "activeOrders": "Pedidos Activos",
+      "completedOrders": "Pedidos Completados",
+      "users": "Usuarios",
+      "todayRevenue": "Ingresos de Hoy",
+      "weekRevenue": "Ingresos Semanales",
+      "monthRevenue": "Ingresos Mensuales",
+      "orderStatusDistribution": "Distribución de Estados de Pedidos",
+      "orderStatusDescription": "Distribución de pedidos por estado",
+      "popularItems": "Platos Populares",
+      "popularItemsDescription": "Platos más pedidos",
+      "revenueTab": "Ingresos",
+      "ordersTab": "Pedidos",
+      "dietaryTab": "Preferencias Dietéticas",
+      "revenueOverTime": "Evolución de Ingresos",
+      "revenueDescription": "Ingresos diarios de la última semana",
+      "ordersOverTime": "Evolución de Pedidos",
+      "ordersDescription": "Recuento diario de pedidos de la última semana",
+      "dietaryDistribution": "Preferencias Dietéticas",
+      "dietaryDescription": "Distribución de platos por preferencias dietéticas",
+      "revenue": "Ingresos",
+      "orders": "Pedidos",
+      "orderCount": "Número de Pedidos",
+      "menuItemCount": "Número de Platos"
+    }
   }
 } 
