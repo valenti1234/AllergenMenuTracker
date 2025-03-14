@@ -1,6 +1,8 @@
-import { text, integer, boolean } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+
+// Supported languages
+export const languages = ["en", "it", "es"] as const;
+export type Language = typeof languages[number];
 
 // Existing allergens and categories...
 export const allergens = [
@@ -45,17 +47,30 @@ export type OrderStatus = typeof orderStatuses[number];
 export const orderTypes = ["dine-in", "takeaway"] as const;
 export type OrderType = typeof orderTypes[number];
 
+// Define multilingual content schema
+const multilingualStringSchema = z.object({
+  en: z.string().min(1, "English name is required"),
+  it: z.string().default(""),
+  es: z.string().default("")
+});
+
+const multilingualStringArraySchema = z.object({
+  en: z.array(z.string()).min(1, "At least one ingredient in English is required"),
+  it: z.array(z.string()).default([]),
+  es: z.array(z.string()).default([])
+});
+
 // Rest of the order and user schemas remain unchanged...
 export const insertOrderItemSchema = z.object({
   menuItemId: z.string(),
   quantity: z.number().min(1),
   specialInstructions: z.string().optional(),
+  name: multilingualStringSchema,
 });
 
 export type OrderItem = z.infer<typeof insertOrderItemSchema> & {
   id: string;
   price: number;
-  name: string;
 };
 
 export const insertOrderSchema = z.object({
@@ -95,17 +110,17 @@ export type Order = {
   updatedAt: Date;
 };
 
-// Update MenuItem schema to include dietary info
+// Update MenuItem schema to include dietary info and multilingual content
 export const insertMenuItemSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  description: z.string().min(1, "Description is required"),
+  name: multilingualStringSchema,
+  description: multilingualStringSchema,
   price: z.number().min(0, "Price must be positive"),
   category: z.enum(categories),
   imageUrl: z.string(),
   allergens: z.array(z.enum(allergens)),
   prepTime: z.number().min(1, "Prep time must be at least 1 minute"),
   available: z.boolean().default(true),
-  ingredients: z.array(z.string()).min(1, "At least one ingredient is required"),
+  ingredients: multilingualStringArraySchema,
   calories: z.number().min(0, "Calories must be positive").optional(),
   protein: z.number().min(0, "Protein must be positive").optional(),
   carbs: z.number().min(0, "Carbs must be positive").optional(),
@@ -115,15 +130,15 @@ export const insertMenuItemSchema = z.object({
 
 export type MenuItem = {
   id: string;
-  name: string;
-  description: string;
+  name: Record<Language, string>;
+  description: Record<Language, string>;
   price: number;
   category: Category;
   imageUrl: string;
   allergens: Allergen[];
   prepTime: number;
   available: boolean;
-  ingredients: string[];
+  ingredients: Record<Language, string[]>;
   calories?: number;
   protein?: number;
   carbs?: number;

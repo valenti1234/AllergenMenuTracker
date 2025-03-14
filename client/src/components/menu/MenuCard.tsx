@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -21,7 +22,8 @@ import {
   LeafyGreen, 
   ChefHat,
   Sparkles,
-  Info
+  Info,
+  Plus
 } from "lucide-react";
 import React, { useState } from "react";
 import type { MenuItem } from "@shared/schema";
@@ -29,12 +31,15 @@ import { useTranslation } from "react-i18next";
 
 interface MenuCardProps {
   item: MenuItem;
+  onAddToOrder: () => void;
 }
 
-export function MenuCard({ item }: MenuCardProps) {
-  const [showDetails, setShowDetails] = useState(false);
+export function MenuCard({ item, onAddToOrder }: MenuCardProps) {
+  const { t, i18n } = useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const { t } = useTranslation();
+
+  const currentLanguage = i18n.language as "en" | "it" | "es";
 
   // Calculate health score (simple version)
   const healthScore = Math.min(100, Math.max(0, 
@@ -47,205 +52,135 @@ export function MenuCard({ item }: MenuCardProps) {
 
   // Helper function to format nutritional values
   const formatNutritionalValue = (value: number | undefined | null): string => {
-    return value?.toString() ?? '0';
+    if (value === undefined || value === null) return "N/A";
+    return value.toString();
   };
 
   // Helper function to calculate percentage for progress bars
   const calculatePercentage = (value: number | undefined | null, max: number): number => {
-    return Math.min(100, ((value ?? 0) / max) * 100);
+    if (value === undefined || value === null) return 0;
+    return Math.min(100, (value / max) * 100);
+  };
+
+  const getName = () => {
+    if (typeof item.name === 'string') return item.name;
+    return item.name?.[currentLanguage] || item.name?.en || 'Unnamed Item';
+  };
+
+  const getDescription = () => {
+    if (typeof item.description === 'string') return item.description;
+    return item.description?.[currentLanguage] || item.description?.en || '';
+  };
+
+  const getIngredients = () => {
+    if (Array.isArray(item.ingredients)) return item.ingredients;
+    return item.ingredients?.[currentLanguage] || item.ingredients?.en || [];
   };
 
   return (
     <>
-      <Card
-        className="group overflow-hidden h-full flex flex-col cursor-pointer transition-all hover:shadow-xl relative"
-        onClick={() => setShowDetails(true)}
-      >
-        {/* Image container with overlay */}
-        <div className="relative h-48 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
-          <img
-            src={item.imageUrl}
-            alt={item.name}
-            className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 ${
-              imageLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
-            onLoad={() => setImageLoaded(true)}
-          />
-          {/* Price tag */}
-          <div className="absolute top-4 right-4 z-20 bg-primary text-primary-foreground px-3 py-1 rounded-full font-semibold shadow-lg">
-            ${(item.price / 100).toFixed(2)}
-          </div>
-          {/* Health score */}
-          <div className="absolute bottom-4 right-4 z-20">
-            <Tooltip>
-              <TooltipTrigger>
-                <div className={`rounded-full w-10 h-10 flex items-center justify-center ${
-                  healthScore >= 80 ? 'bg-green-500' :
-                  healthScore >= 60 ? 'bg-yellow-500' :
-                  'bg-orange-500'
-                } text-white font-semibold text-sm`}>
-                  {healthScore}
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger asChild>
+          <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer border-primary/10">
+            <div className="relative">
+              <div className="absolute top-2 right-2 z-10">
+                <Badge variant="secondary" className="bg-black/50 backdrop-blur-sm text-white border-0">
+                  ${(item.price / 100).toFixed(2)}
+                </Badge>
+              </div>
+              <div className="relative h-48 overflow-hidden">
+                <img
+                  src={item.imageUrl}
+                  alt={getName()}
+                  className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              </div>
+            </div>
+            <CardContent className="p-4">
+              <div className="space-y-3">
+                <div>
+                  <h3 className="font-semibold text-xl mb-1">{getName()}</h3>
+                  <p className="line-clamp-2 text-sm text-muted-foreground">
+                    {getDescription()}
+                  </p>
                 </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{t('common.healthScore')}: {healthScore}/100</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        </div>
-
-        <CardContent className="flex-1 pt-4">
-          {/* Title and prep time */}
-          <div className="space-y-2 mb-3">
-            <h3 className="text-lg font-semibold group-hover:text-primary transition-colors">
-              {item.name}
-            </h3>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Clock className="h-4 w-4" />
-              <span>{item.prepTime} {t('common.minutes')}</span>
-            </div>
-          </div>
-
-          {/* Description with gradient fade */}
-          <div className="relative mb-4">
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {item.description}
-            </p>
-            <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-background to-transparent" />
-          </div>
-
-          {/* Tags section */}
-          <div className="space-y-3">
-            {/* Dietary tags */}
-            {(item.dietaryInfo?.length ?? 0) > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {(item.dietaryInfo ?? []).map((diet) => (
-                  <Badge key={diet} variant="secondary" className="capitalize text-xs">
-                    <LeafyGreen className="h-3 w-3 mr-1" />
-                    {t(`dietary.${diet.toLowerCase().replace(/-(.)/g, (_, c) => c.toUpperCase())}`)}
-                  </Badge>
-                ))}
-              </div>
-            )}
-
-            {/* Allergen warnings */}
-            {item.allergens.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {item.allergens.map((allergen) => (
-                  <Tooltip key={allergen}>
-                    <TooltipTrigger>
-                      <Badge variant="destructive" className="capitalize text-xs">
-                        <AlertCircle className="h-3 w-3 mr-1" />
-                        {allergen}
-                      </Badge>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{t('menu.contains')} {allergen}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Quick nutrition facts */}
-          <div className="mt-4 pt-3 border-t grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <Flame className="h-3 w-3" />
-              {formatNutritionalValue(item.calories)} {t('common.calories')}
-            </div>
-            <div className="flex items-center gap-1">
-              <ChefHat className="h-3 w-3" />
-              {formatNutritionalValue(item.protein)}{t('common.grams')} {t('common.protein')}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Detailed view dialog */}
-      <Dialog open={showDetails} onOpenChange={setShowDetails}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-2xl">
-              {item.name}
-              {healthScore >= 80 && (
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Sparkles className="h-5 w-5 text-yellow-500" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{t('menu.healthyChoice')}</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="grid gap-6">
-            {/* Hero image with overlay */}
-            <div className="relative rounded-lg overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
-              <img
-                src={item.imageUrl}
-                alt={item.name}
-                className="w-full h-64 object-cover"
-              />
-              <div className="absolute bottom-4 left-4 right-4 z-20 text-white">
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold">
-                    ${(item.price / 100).toFixed(2)}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-5 w-5" />
-                    <span>{item.prepTime} {t('common.minutes')} {t('menu.prepTime')}</span>
-                  </div>
+                
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  <span>{item.prepTime} {t('common.minutes')}</span>
                 </div>
-              </div>
-            </div>
 
-            <ScrollArea className="h-[400px] pr-4">
+                <div className="flex flex-wrap gap-1.5">
+                  {item.dietaryInfo.slice(0, 3).map((diet) => (
+                    <Badge key={diet} variant="outline" className="text-xs">
+                      {t(`dietary.${diet}`)}
+                    </Badge>
+                  ))}
+                  {item.dietaryInfo.length > 3 && (
+                    <Badge variant="outline" className="text-xs">
+                      +{item.dietaryInfo.length - 3}
+                    </Badge>
+                  )}
+                </div>
+
+                <Button 
+                  variant="default"
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onAddToOrder();
+                  }}
+                >
+                  {t('menu.addToOrder')}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </DialogTrigger>
+
+        <DialogContent className="max-w-3xl">
+          <div className="grid gap-4 py-4">
+            <ScrollArea className="h-[calc(100vh-8rem)] pr-4">
               <div className="space-y-6">
-                {/* Description */}
-                <div className="prose max-w-none">
-                  <p className="text-muted-foreground">{item.description}</p>
+                {/* Header with image */}
+                <div className="relative aspect-video overflow-hidden rounded-lg">
+                  <img
+                    src={item.imageUrl}
+                    alt={getName()}
+                    className="object-cover"
+                  />
                 </div>
 
-                {/* Dietary and allergen info */}
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {/* Dietary tags */}
-                  {(item.dietaryInfo?.length ?? 0) > 0 && (
-                    <div className="space-y-2">
-                      <h4 className="font-medium flex items-center gap-2">
-                        <LeafyGreen className="h-4 w-4" />
-                        {t('menu.dietaryInfo')}
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {(item.dietaryInfo ?? []).map((diet) => (
-                          <Badge key={diet} variant="secondary" className="capitalize">
-                            {t(`dietary.${diet.toLowerCase().replace(/-(.)/g, (_, c) => c.toUpperCase())}`)}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                {/* Title and description */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-semibold">{getName()}</h2>
+                    <p className="text-lg font-semibold">
+                      ${(item.price / 100).toFixed(2)}
+                    </p>
+                  </div>
+                  <p className="text-muted-foreground">
+                    {getDescription()}
+                  </p>
+                </div>
 
-                  {/* Allergens */}
-                  {item.allergens.length > 0 && (
-                    <div className="space-y-2">
-                      <h4 className="font-medium flex items-center gap-2">
-                        <AlertCircle className="h-4 w-4" />
-                        {t('menu.allergens')}
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {item.allergens.map((allergen) => (
-                          <Badge key={allergen} variant="destructive" className="capitalize">
-                            {allergen}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                {/* Preparation time and dietary info */}
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">
+                      {item.prepTime} {t('common.minutes')}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {item.dietaryInfo.map((diet) => (
+                      <Badge key={diet} variant="secondary">
+                        {t(`dietary.${diet}`)}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Ingredients and nutrition */}
@@ -257,7 +192,7 @@ export function MenuCard({ item }: MenuCardProps) {
                       {t('menu.ingredients')}
                     </h4>
                     <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                      {item.ingredients.map((ingredient, index) => (
+                      {getIngredients().map((ingredient, index) => (
                         <li key={index} className="capitalize">{ingredient}</li>
                       ))}
                     </ul>

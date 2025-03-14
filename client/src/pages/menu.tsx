@@ -5,6 +5,7 @@ import { AllergenFilter } from "@/components/menu/AllergenFilter";
 import { DietaryFilter } from "@/components/menu/DietaryFilter";
 import { OrderTypeSelector } from "@/components/menu/OrderTypeSelector";
 import { OrderSummary } from "@/components/menu/OrderSummary";
+import { NewsletterDialog } from "@/components/menu/NewsletterDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -14,6 +15,7 @@ import { Plus, MapPin } from "lucide-react";
 import { usePhone } from '@/contexts/PhoneContext';
 import { CustomerLayout } from "@/components/layouts/CustomerLayout";
 import { useTranslation } from "react-i18next";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Menu() {
   const { phoneNumber, setPhoneNumber } = usePhone();
@@ -22,10 +24,12 @@ export default function Menu() {
   const [orderType, setOrderType] = useState<OrderType | null>(null);
   const [tableNumber, setTableNumber] = useState("");
   const [customerName, setCustomerName] = useState("");
+  const [showNewsletter, setShowNewsletter] = useState(false);
   const [selectedItems, setSelectedItems] = useState<
     Map<string, { item: MenuItem; quantity: number }>
   >(new Map());
   const { t } = useTranslation();
+  const { toast } = useToast();
 
   const { data: menuItems, isLoading } = useQuery<MenuItem[]>({
     queryKey: ["/api/menu"],
@@ -93,6 +97,27 @@ export default function Menu() {
     });
   };
 
+  const handlePhoneSubmit = () => {
+    setShowNewsletter(true);
+  };
+
+  const handleSubscribe = async () => {
+    try {
+      // Here you would typically make an API call to subscribe the user
+      // For now, we'll just show a success message
+      toast({
+        title: t('newsletter.success'),
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: t('newsletter.error'),
+      });
+    } finally {
+      setShowNewsletter(false);
+    }
+  };
+
   if (isLoading) {
     return <div>{t('common.loading')}</div>;
   }
@@ -121,6 +146,7 @@ export default function Menu() {
               onCustomerNameChange={setCustomerName}
               phoneNumber={phoneNumber}
               onPhoneNumberChange={setPhoneNumber}
+              onPhoneSubmit={handlePhoneSubmit}
             />
             <AllergenFilter
               selectedAllergens={selectedAllergens}
@@ -151,15 +177,11 @@ export default function Menu() {
                   {filteredItems
                     ?.filter((item) => item.category === category)
                     .map((item) => (
-                      <div key={item.id} className="relative">
-                        <MenuCard item={item} />
-                        <Button
-                          className="absolute bottom-4 right-4"
-                          onClick={() => addToOrder(item)}
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          {t('menu.addToOrder')}
-                        </Button>
+                      <div key={item.id}>
+                        <MenuCard 
+                          item={item} 
+                          onAddToOrder={() => addToOrder(item)}
+                        />
                       </div>
                     ))}
                 </div>
@@ -179,6 +201,12 @@ export default function Menu() {
             />
           </div>
         </div>
+        <NewsletterDialog
+          open={showNewsletter}
+          onOpenChange={setShowNewsletter}
+          onSubscribe={handleSubscribe}
+          onSkip={() => setShowNewsletter(false)}
+        />
       </div>
     </CustomerLayout>
   );

@@ -42,14 +42,22 @@
     "nutritionalInfo": "Informazioni Nutrizionali",
     "prepTime": "Tempo di Preparazione",
     "healthyChoice": "Scelta Salutare!",
-    "healthScoreExplanation": "Questo punteggio è calcolato in base al contenuto di proteine, calorie, grassi e attributi dietetici speciali. Un punteggio più alto indica un'opzione più salutare."
+    "healthScoreExplanation": "Questo punteggio è calcolato in base al contenuto di proteine, calorie, grassi e attributi dietetici speciali. Un punteggio più alto indica un'opzione più salutare.",
+    "total": "Totale"
   },
   "nav": {
     "home": "Home",
     "menu": "Menu",
     "trackOrder": "Traccia Ordine",
     "cart": "Carrello",
-    "signOut": "Esci"
+    "signOut": "Esci",
+    "dashboard": "Dashboard",
+    "menuItems": "Voci Menu",
+    "orders": "Ordini",
+    "archive": "Archivio",
+    "kitchenDisplay": "Display Cucina",
+    "userManagement": "Gestione Utenti",
+    "database": "Database"
   },
   "dietary": {
     "vegan": "Vegano",
@@ -74,5 +82,80 @@
     "loading": "Errore durante il caricamento dei dati",
     "network": "Errore di rete",
     "required": "Questo campo è obbligatorio"
+  },
+  "orders": {
+    "title": "Gestione Ordini",
+    "filterPlaceholder": "Filtra per Stato",
+    "filters": {
+      "all": "Tutti gli Ordini Attivi"
+    },
+    "orderNumber": "Ordine #",
+    "table": "Tavolo",
+    "note": "Nota",
+    "noOrders": "Nessun ordine trovato",
+    "noOrdersWithStatus": "Nessun ordine con stato: {{status}}",
+    "status": {
+      "title": "Cambia Stato",
+      "pending": "In Attesa",
+      "preparing": "In Preparazione",
+      "delayed": "In Ritardo",
+      "ready": "Pronto",
+      "served": "Servito",
+      "completed": "Completato",
+      "cancelled": "Annullato",
+      "confirmChange": "Sei sicuro di voler cambiare lo stato dell'ordine?",
+      "changeSuccess": "Stato dell'ordine aggiornato con successo",
+      "changeError": "Impossibile aggiornare lo stato dell'ordine"
+    },
+    "archive": {
+      "title": "Archivio Ordini",
+      "filters": {
+        "all": "Tutti gli Archiviati"
+      },
+      "noOrders": "Nessun ordine archiviato trovato"
+    }
+  },
+  "kitchen": {
+    "title": "Sistema di Visualizzazione Cucina",
+    "activeOrders": "Ordini Attivi",
+    "staffMembers": "Personale di Cucina",
+    "staffMembersCount": "Membri del Personale",
+    "workflowOptimizer": "Ottimizzatore del Flusso di Lavoro",
+    "suggestions": "Suggerimenti",
+    "priorityOrder": "Ordine di Priorità",
+    "estimatedTimes": "Tempi Stimati",
+    "columns": {
+      "pending": "In Attesa",
+      "preparing": "In Preparazione",
+      "delayed": "In Ritardo",
+      "ready": "Pronto",
+      "served": "Servito",
+      "completed": "Completato",
+      "cancelled": "Annullato"
+    },
+    "actions": {
+      "startPreparing": "Inizia Preparazione",
+      "markDelayed": "Segna In Ritardo",
+      "markReady": "Segna Pronto",
+      "markServed": "Segna Servito"
+    },
+    "orderInfo": {
+      "table": "Tavolo",
+      "customer": "Cliente",
+      "phone": "Telefono",
+      "specialInstructions": "Istruzioni Speciali"
+    }
+  },
+  "admin": {
+    "title": "Amministrazione Ristorante",
+    "kitchenStaff": "Personale di Cucina",
+    "language": {
+      "select": "Seleziona Lingua",
+      "en": "Inglese",
+      "it": "Italiano",
+      "es": "Spagnolo"
+    },
+    "logout": "Disconnetti",
+    "logoutError": "Impossibile disconnettersi"
   }
 } 

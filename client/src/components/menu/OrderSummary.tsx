@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { MenuItem, OrderType, OrderItem } from "@shared/schema";
 import { ShoppingCart, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface OrderSummaryProps {
   selectedItems: Map<string, { item: MenuItem; quantity: number }>;
@@ -28,8 +29,16 @@ export function OrderSummary({
   phoneNumber,
 }: OrderSummaryProps) {
   const { toast } = useToast();
+  const { t, i18n } = useTranslation();
   const [specialInstructions, setSpecialInstructions] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const currentLanguage = i18n.language as "en" | "it" | "es";
+
+  const getItemName = (item: MenuItem) => {
+    if (typeof item.name === 'string') return item.name;
+    return item.name?.[currentLanguage] || item.name?.en || 'Unnamed Item';
+  };
 
   const total = Array.from(selectedItems.values()).reduce(
     (sum, { item, quantity }) => sum + item.price * quantity,
@@ -130,12 +139,12 @@ export function OrderSummary({
 
   return (
     <Card className="p-6 space-y-6">
-      <h3 className="text-lg font-semibold">Order Summary</h3>
+      <h3 className="text-lg font-semibold">{t('menu.orderSummary')}</h3>
       <div className="space-y-4">
         {Array.from(selectedItems.entries()).map(([id, { item, quantity }]) => (
           <div key={id} className="flex items-center justify-between gap-4">
             <div className="flex-1">
-              <h4 className="font-medium">{item.name}</h4>
+              <h4 className="font-medium">{getItemName(item)}</h4>
               <p className="text-sm text-muted-foreground">
                 ${(item.price / 100).toFixed(2)} each
               </p>
@@ -164,16 +173,16 @@ export function OrderSummary({
 
       <div className="space-y-4 pt-4 border-t">
         <div className="flex justify-between">
-          <span className="font-medium">Total</span>
+          <span className="font-medium">{t('menu.total')}</span>
           <span className="font-medium">${(total / 100).toFixed(2)}</span>
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Special Instructions</label>
+          <label className="text-sm font-medium">{t('menu.specialInstructions')}</label>
           <Textarea
             value={specialInstructions}
             onChange={(e) => setSpecialInstructions(e.target.value)}
-            placeholder="Any special requests or notes?"
+            placeholder={t('menu.specialInstructionsPlaceholder')}
           />
         </div>
 
@@ -182,7 +191,7 @@ export function OrderSummary({
           onClick={handleSubmitOrder}
           disabled={isSubmitting || !orderType}
         >
-          {isSubmitting ? "Placing Order..." : "Place Order"}
+          {isSubmitting ? t('menu.placingOrder') : t('menu.placeOrder')}
         </Button>
       </div>
     </Card>

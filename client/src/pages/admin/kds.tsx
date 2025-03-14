@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 interface WorkflowAnalysis {
   suggestions: string[];
@@ -26,6 +27,7 @@ interface WorkflowAnalysis {
 
 export default function KDS() {
   const { toast } = useToast();
+  const { t, i18n } = useTranslation();
   const [draggedOrder, setDraggedOrder] = useState<string | null>(null);
   const [kitchenStaff, setKitchenStaff] = useState<number>(2);
 
@@ -38,6 +40,65 @@ export default function KDS() {
     queryKey: ["/api/admin/kds/workflow", kitchenStaff],
     refetchInterval: 30000, // Refresh every 30 seconds
   });
+
+  // Helper function to extract the correct language from multilingual content
+  const getLocalizedText = (textObj: any) => {
+    if (!textObj) return "";
+    
+    // If it's already a string, check if it's a MongoDB stringified object
+    if (typeof textObj === "string") {
+      // Check if it's a MongoDB stringified object with language keys
+      if (textObj.includes('en:') || textObj.includes('it:') || textObj.includes('es:')) {
+        // Extract the current language using regex
+        const currentLangRegex = new RegExp(`${i18n.language}:\\s*['"]([^'"]+)['"]`);
+        const enLangRegex = /en:\s*['"]([^'"]+)['"]/;
+        const itLangRegex = /it:\s*['"]([^'"]+)['"]/;
+        const esLangRegex = /es:\s*['"]([^'"]+)['"]/;
+        
+        // Try to match the current language first
+        const currentLangMatch = currentLangRegex.exec(textObj);
+        if (currentLangMatch && currentLangMatch[1]) {
+          return currentLangMatch[1];
+        }
+        
+        // Fall back to English
+        const enMatch = enLangRegex.exec(textObj);
+        if (enMatch && enMatch[1]) {
+          return enMatch[1];
+        }
+        
+        // Try other languages
+        const itMatch = itLangRegex.exec(textObj);
+        if (itMatch && itMatch[1]) {
+          return itMatch[1];
+        }
+        
+        const esMatch = esLangRegex.exec(textObj);
+        if (esMatch && esMatch[1]) {
+          return esMatch[1];
+        }
+      }
+      
+      // If it's a regular string, return it
+      return textObj;
+    }
+    
+    // If it's an object with language keys
+    if (typeof textObj === "object") {
+      // Try current language first
+      if (textObj[i18n.language]) return textObj[i18n.language];
+      
+      // Fall back to English
+      if (textObj.en) return textObj.en;
+      
+      // If no matching language, return the first available
+      const firstKey = Object.keys(textObj)[0];
+      if (firstKey) return textObj[firstKey];
+    }
+    
+    // If all else fails, stringify the object for debugging
+    return typeof textObj === "object" ? JSON.stringify(textObj) : String(textObj);
+  };
 
   // Filter out completed and cancelled orders
   const activeOrders = orders?.filter(
@@ -56,15 +117,15 @@ export default function KDS() {
       queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/kds/workflow", kitchenStaff] });
       toast({
-        title: "Success",
-        description: "Order status updated",
+        title: t("common.success", "Success"),
+        description: t("orders.status.changeSuccess", "Order status updated"),
       });
     },
     onError: () => {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to update order status",
+        title: t("common.error", "Error"),
+        description: t("orders.status.changeError", "Failed to update order status"),
       });
     },
   });
@@ -110,7 +171,7 @@ export default function KDS() {
   if (isLoading) {
     return (
       <AdminLayout>
-        <div>Loading orders...</div>
+        <div>{t("common.loading", "Loading orders...")}</div>
       </AdminLayout>
     );
   }
@@ -119,7 +180,7 @@ export default function KDS() {
     <AdminLayout>
       <div className="container mx-auto py-8 px-4">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold">Kitchen Display System</h1>
+          <h1 className="text-4xl font-bold">{t("kitchen.title", "Kitchen Display System")}</h1>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5" />
@@ -128,12 +189,12 @@ export default function KDS() {
                 onValueChange={(value) => setKitchenStaff(Number(value))}
               >
                 <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Kitchen Staff" />
+                  <SelectValue placeholder={t("kitchen.staffMembers", "Kitchen Staff")} />
                 </SelectTrigger>
                 <SelectContent>
                   {[1, 2, 3, 4, 5].map((num) => (
                     <SelectItem key={num} value={num.toString()}>
-                      {num} Staff Members
+                      {num} {t("kitchen.staffMembersCount", "Staff Members")}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -148,13 +209,13 @@ export default function KDS() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Brain className="h-5 w-5" />
-                Kitchen Workflow Optimizer
+                {t("kitchen.workflowOptimizer", "Kitchen Workflow Optimizer")}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <h3 className="font-semibold mb-2">Suggestions</h3>
+                  <h3 className="font-semibold mb-2">{t("kitchen.suggestions", "Suggestions")}</h3>
                   <ul className="space-y-2">
                     {workflowAnalysis.suggestions.map((suggestion, index) => (
                       <li key={index} className="text-sm text-muted-foreground">
@@ -164,7 +225,7 @@ export default function KDS() {
                   </ul>
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-2">Priority Order</h3>
+                  <h3 className="font-semibold mb-2">{t("kitchen.priorityOrder", "Priority Order")}</h3>
                   <ol className="space-y-2">
                     {workflowAnalysis.priorityOrder.map((item, index) => (
                       <li key={index} className="text-sm text-muted-foreground">
@@ -174,12 +235,12 @@ export default function KDS() {
                   </ol>
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-2">Estimated Times</h3>
+                  <h3 className="font-semibold mb-2">{t("kitchen.estimatedTimes", "Estimated Times")}</h3>
                   <div className="space-y-2">
                     {Object.entries(workflowAnalysis.estimatedTimes).map(([item, time]) => (
                       <div key={item} className="text-sm text-muted-foreground flex justify-between">
                         <span>{item}:</span>
-                        <span>{time} mins</span>
+                        <span>{time} {t("common.minutes", "mins")}</span>
                       </div>
                     ))}
                   </div>
@@ -200,7 +261,7 @@ export default function KDS() {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="flex justify-between items-center">
-                    <span className="capitalize">{status}</span>
+                    <span className="capitalize">{t(`kitchen.columns.${status}`, status)}</span>
                     <Badge variant="secondary">
                       {ordersByStatus?.[status]?.length || 0}
                     </Badge>
@@ -222,11 +283,11 @@ export default function KDS() {
                                 <span>
                                   #{order.id.slice(-6)}{" "}
                                   <Badge variant="outline" className="ml-2">
-                                    {order.type}
+                                    {t(`menu.orderType.${order.type === "dine-in" ? "dineIn" : "takeaway"}`, order.type)}
                                   </Badge>
                                 </span>
                                 <Badge className={getStatusColor(order.status)}>
-                                  {order.status}
+                                  {t(`kitchen.columns.${order.status}`, order.status)}
                                 </Badge>
                               </div>
                               <div className="flex items-center text-base font-normal text-muted-foreground">
@@ -236,8 +297,8 @@ export default function KDS() {
                             </CardTitle>
                             <p className="text-sm text-muted-foreground">
                               {order.type === "dine-in"
-                                ? `Table ${order.tableNumber}`
-                                : `Takeaway - ${order.customerName}`}
+                                ? `${t("kitchen.orderInfo.table", "Table")} ${order.tableNumber}`
+                                : `${t("menu.orderType.takeaway", "Takeaway")} - ${order.customerName}`}
                             </p>
                           </CardHeader>
                           <CardContent className="p-4 pt-0">
@@ -249,7 +310,8 @@ export default function KDS() {
                                 >
                                   <div>
                                     <span className="font-medium">
-                                      {item.name}
+                                      {/* Use a simple approach to display the name */}
+                                      {getLocalizedText(item.name)}
                                     </span>
                                     <span className="text-sm text-muted-foreground ml-2">
                                       × {item.quantity}
@@ -274,7 +336,11 @@ export default function KDS() {
                             )}
                             <div className="mt-2 pt-2 border-t text-sm text-muted-foreground flex items-center gap-1">
                               <Clock className="h-3 w-3" />
-                              {new Date(order.createdAt).toLocaleTimeString()}
+                              {new Date(order.createdAt).toLocaleString(i18n.language, { 
+                                hour: '2-digit', 
+                                minute: '2-digit', 
+                                second: '2-digit' 
+                              })}
                             </div>
                           </CardContent>
                         </Card>

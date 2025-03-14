@@ -1,13 +1,64 @@
 import OpenAI from "openai";
-import { MenuItem } from "@shared/schema";
+import { MenuItem, Language, languages } from "@shared/schema";
 import { downloadImage } from "./image-utils";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+async function generateTranslations(text: string, targetLanguage: Language): Promise<string> {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are a professional translator specializing in culinary translations. 
+          Translate the given text to ${targetLanguage === 'it' ? 'Italian' : 'Spanish'}, 
+          maintaining the culinary context and local terminology. 
+          Ensure the translation sounds natural and appetizing.`,
+        },
+        {
+          role: "user",
+          content: `Translate this culinary text to ${targetLanguage === 'it' ? 'Italian' : 'Spanish'}:
+          "${text}"`,
+        },
+      ],
+    });
+
+    return response.choices[0].message.content || text;
+  } catch (error) {
+    console.error('Translation error:', error);
+    return text;
+  }
+}
+
+async function generateMultilingualString(content: string): Promise<Record<Language, string>> {
+  const result: Partial<Record<Language, string>> = { en: content };
+  
+  for (const lang of languages) {
+    if (lang !== 'en') {
+      result[lang] = await generateTranslations(content, lang);
+    }
+  }
+  
+  return result as Record<Language, string>;
+}
+
+async function generateMultilingualArray(content: string[]): Promise<Record<Language, string[]>> {
+  const result: Partial<Record<Language, string[]>> = { en: content };
+  
+  for (const lang of languages) {
+    if (lang !== 'en') {
+      result[lang] = await Promise.all(content.map(item => generateTranslations(item, lang)));
+    }
+  }
+  
+  return result as Record<Language, string[]>;
+}
+
 export async function generateMenuItem(name: string): Promise<Partial<MenuItem>> {
   try {
-    // Generate menu item details
+    // Generate menu item details in English first
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -42,6 +93,13 @@ export async function generateMenuItem(name: string): Promise<Partial<MenuItem>>
     const result = JSON.parse(response.choices[0].message.content || "{}");
     console.log('OpenAI API Response:', result);
 
+    // Generate translations for name, description, and ingredients
+    const [translatedName, translatedDescription, translatedIngredients] = await Promise.all([
+      generateMultilingualString(name),
+      generateMultilingualString(result.description),
+      generateMultilingualArray(result.ingredients),
+    ]);
+
     // Generate image using DALL-E
     console.log('Generating image for:', name);
     const imageResponse = await openai.images.generate({
@@ -62,14 +120,14 @@ export async function generateMenuItem(name: string): Promise<Partial<MenuItem>>
     console.log('Image stored locally at:', localImageUrl);
 
     return {
-      name,
-      description: result.description,
+      name: translatedName,
+      description: translatedDescription,
       price: result.price,
       category: result.category,
       imageUrl: localImageUrl,
       allergens: result.allergens,
       prepTime: result.prepTime || result.preparation_time || result.preparation_time_minutes,
-      ingredients: result.ingredients,
+      ingredients: translatedIngredients,
       calories: result.calories || result.nutritional_information?.calories,
       protein: result.protein || result.nutritional_information?.protein,
       carbs: result.carbs || result.nutritional_information?.carbs,
@@ -86,8 +144,9 @@ export async function generateMenuItem(name: string): Promise<Partial<MenuItem>>
 export async function suggestDietaryModifications(
   menuItem: MenuItem,
   dietaryPreferences: string[]
-): Promise<{ modifications: string[]; nutritionalImpact: string }> {
+): Promise<{ modifications: Record<Language, string[]>; nutritionalImpact: Record<Language, string> }> {
   try {
+    // Generate suggestions in English first
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -97,7 +156,7 @@ export async function suggestDietaryModifications(
         },
         {
           role: "user",
-          content: `Suggest modifications for "${menuItem.name}" to accommodate these dietary preferences: ${dietaryPreferences.join(", ")}.\n\nCurrent ingredients: ${menuItem.ingredients.join(", ")}\nCurrent allergens: ${menuItem.allergens.join(", ")}\n\nProvide practical modifications and explain their nutritional impact. Return in JSON format with 'modifications' array and 'nutritionalImpact' string.`,
+          content: `Suggest modifications for "${menuItem.name.en}" to accommodate these dietary preferences: ${dietaryPreferences.join(", ")}.\n\nCurrent ingredients: ${menuItem.ingredients.en.join(", ")}\nCurrent allergens: ${menuItem.allergens.join(", ")}\n\nProvide practical modifications and explain their nutritional impact. Return in JSON format with 'modifications' array and 'nutritionalImpact' string.`,
         },
       ],
       response_format: { type: "json_object" },
@@ -106,16 +165,21 @@ export async function suggestDietaryModifications(
     const result = JSON.parse(response.choices[0].message.content || "{}");
     
     // Transform the response if it's in the wrong format
-    if (result.originalIngredient || result.substituteWith) {
-      return {
-        modifications: [`Replace ${result.originalIngredient} with ${result.substituteWith}`],
-        nutritionalImpact: result.description || "No significant nutritional impact",
-      };
-    }
+    const englishModifications = result.modifications || 
+      (result.originalIngredient ? [`Replace ${result.originalIngredient} with ${result.substituteWith}`] : []);
+    const englishNutritionalImpact = result.nutritionalImpact || 
+      result.description || 
+      "No significant nutritional impact";
+
+    // Generate translations for modifications and nutritional impact
+    const [translatedModifications, translatedNutritionalImpact] = await Promise.all([
+      generateMultilingualArray(englishModifications),
+      generateMultilingualString(englishNutritionalImpact),
+    ]);
 
     return {
-      modifications: result.modifications || [],
-      nutritionalImpact: result.nutritionalImpact || "No significant nutritional impact",
+      modifications: translatedModifications,
+      nutritionalImpact: translatedNutritionalImpact,
     };
   } catch (error) {
     console.error('OpenAI API Error:', error);

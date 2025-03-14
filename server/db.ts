@@ -50,8 +50,22 @@ export async function connectToDatabase() {
 
 // MongoDB Schemas
 const MenuItemSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  description: { type: String, required: true },
+  name: {
+    type: {
+      en: { type: String, required: true },
+      it: { type: String, required: true },
+      es: { type: String, required: true }
+    },
+    required: true
+  },
+  description: {
+    type: {
+      en: { type: String, required: true },
+      it: { type: String, required: true },
+      es: { type: String, required: true }
+    },
+    required: true
+  },
   price: { type: Number, required: true },
   category: { 
     type: String, 
@@ -66,7 +80,14 @@ const MenuItemSchema = new mongoose.Schema({
   },
   prepTime: { type: Number, required: true },
   available: { type: Boolean, required: true, default: true },
-  ingredients: { type: [String], required: true },
+  ingredients: {
+    type: {
+      en: { type: [String], required: true },
+      it: { type: [String], required: true },
+      es: { type: [String], required: true }
+    },
+    required: true
+  },
   calories: { type: Number },
   protein: { type: Number },
   carbs: { type: Number },

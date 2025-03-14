@@ -8,18 +8,34 @@ import {
   ClipboardList,
   Utensils,
   Archive as ArchiveIcon,
-  Database
+  Database,
+  Globe
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
+import { useTranslation } from "react-i18next";
+import { languages } from "@shared/schema";
 
 export function Sidebar() {
   const [location, navigate] = useLocation();
   const { toast } = useToast();
   const { user } = useAdminAuth();
+  const { t, i18n } = useTranslation();
+  
+  // Flag emoji mapping
+  const flagEmoji: Record<string, string> = {
+    en: "🇬🇧",
+    it: "🇮🇹",
+    es: "🇪🇸"
+  };
+  
+  const handleLanguageChange = (language: string) => {
+    i18n.changeLanguage(language);
+    localStorage.setItem("preferredLanguage", language);
+  };
 
   const handleLogout = async () => {
     try {
@@ -30,8 +46,8 @@ export function Sidebar() {
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to logout"
+        title: t("common.error", "Error"),
+        description: t("admin.logoutError", "Failed to logout")
       });
     }
   };
@@ -39,43 +55,43 @@ export function Sidebar() {
   // Define all menu items
   const allMenuItems = [
     {
-      title: "Dashboard",
+      title: t("nav.dashboard", "Dashboard"),
       icon: LayoutDashboard,
       href: "/admin/dashboard",
       roles: ["admin", "manager"]
     },
     {
-      title: "Menu Items",
+      title: t("nav.menuItems", "Menu Items"),
       icon: MenuIcon,
       href: "/admin/menu-items",
       roles: ["admin", "manager"]
     },
     {
-      title: "Orders",
+      title: t("nav.orders", "Orders"),
       icon: ClipboardList,
       href: "/admin/orders",
       roles: ["admin", "manager"]
     },
     {
-      title: "Archive",
+      title: t("nav.archive", "Archive"),
       icon: ArchiveIcon,
       href: "/admin/archive",
       roles: ["admin", "manager"]
     },
     {
-      title: "Kitchen Display",
+      title: t("nav.kitchenDisplay", "Kitchen Display"),
       icon: Utensils,
       href: "/admin/kds",
       roles: ["admin", "manager", "kitchen"]
     },
     {
-      title: "User Management",
+      title: t("nav.userManagement", "User Management"),
       icon: Users,
       href: "/admin/users",
       roles: ["admin"]
     },
     {
-      title: "Database",
+      title: t("nav.database", "Database"),
       icon: Database,
       href: "/admin/database",
       roles: ["admin"]
@@ -90,9 +106,35 @@ export function Sidebar() {
   return (
     <div className="min-h-screen w-64 bg-sidebar border-r border-sidebar-border">
       <div className="p-6">
-        <h2 className="text-lg font-semibold text-sidebar-foreground">
-          {user?.role === "kitchen" ? "Kitchen Staff" : "Restaurant Admin"}
+        <h2 className="text-lg font-semibold text-sidebar-foreground mb-4">
+          {user?.role === "kitchen" 
+            ? t("admin.kitchenStaff", "Kitchen Staff") 
+            : t("admin.title", "Restaurant Admin")}
         </h2>
+        
+        {/* Global Language Selector */}
+        <div className="mb-6 border rounded-md p-3 bg-sidebar-accent/30">
+          <div className="flex items-center gap-2 mb-2">
+            <Globe className="h-4 w-4 text-sidebar-foreground" />
+            <span className="text-sm font-medium text-sidebar-foreground">
+              {t('admin.language.select', 'Select Language')}
+            </span>
+          </div>
+          <div className="grid grid-cols-1 gap-2">
+            {languages.map((lang) => (
+              <Button
+                key={lang}
+                variant={i18n.language === lang ? "default" : "outline"}
+                size="sm"
+                className="justify-start"
+                onClick={() => handleLanguageChange(lang)}
+              >
+                <span className="mr-2">{flagEmoji[lang]}</span>
+                {t(`admin.language.${lang}`, lang === 'en' ? 'English' : lang === 'it' ? 'Italian' : 'Spanish')}
+              </Button>
+            ))}
+          </div>
+        </div>
       </div>
       <nav className="px-4 space-y-2">
         {menuItems.map((item) => {
@@ -123,7 +165,7 @@ export function Sidebar() {
           onClick={handleLogout}
         >
           <LogOut className="h-4 w-4 mr-2" />
-          Logout
+          {t("admin.logout", "Logout")}
         </Button>
       </div>
     </div>

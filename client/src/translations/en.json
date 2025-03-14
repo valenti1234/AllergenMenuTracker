@@ -9,9 +9,32 @@
     "healthScore": "Health Score",
     "loading": "Loading...",
     "error": "Error",
-    "success": "Success"
+    "success": "Success",
+    "continue": "Continue"
   },
   "menu": {
+    "title": "Our Menu",
+    "orderType": {
+      "title": "Order Type",
+      "dineIn": "Dine In",
+      "takeaway": "Takeaway",
+      "phoneNumber": "Phone Number",
+      "tableNumber": "Table Number",
+      "customerName": "Name",
+      "enterTableNumber": "Enter table number",
+      "enterName": "Enter your name"
+    },
+    "categories": {
+      "starters": "Starters",
+      "mains": "Main Courses",
+      "desserts": "Desserts",
+      "drinks": "Drinks",
+      "sides": "Side Dishes"
+    },
+    "filters": {
+      "allergens": "Filter by Allergens",
+      "dietary": "Dietary Preferences"
+    },
     "ingredients": "Ingredients",
     "allergens": "Allergen Warnings",
     "contains": "Contains",
@@ -19,14 +42,103 @@
     "nutritionalInfo": "Nutritional Information",
     "prepTime": "Preparation Time",
     "healthyChoice": "Healthy Choice!",
-    "healthScoreExplanation": "This score is calculated based on protein content, calories, fat content, and special dietary attributes. A higher score indicates a healthier option."
+    "healthScoreExplanation": "This score is calculated based on protein content, calories, fat content, and special dietary attributes. A higher score indicates a healthier option.",
+    "addToOrder": "Add to Order",
+    "orderSummary": "Order Summary",
+    "total": "Total",
+    "specialInstructions": "Special Instructions",
+    "specialInstructionsPlaceholder": "Any special requests or notes?",
+    "placeOrder": "Place Order",
+    "placingOrder": "Placing Order...",
+    "subscribe": "Subscribe for Updates"
+  },
+  "orders": {
+    "title": "Order Management",
+    "filterPlaceholder": "Filter by Status",
+    "filters": {
+      "all": "All Active Orders"
+    },
+    "orderNumber": "Order #",
+    "table": "Table",
+    "note": "Note",
+    "noOrders": "No orders found",
+    "noOrdersWithStatus": "No orders with status: {{status}}",
+    "status": {
+      "title": "Change Status",
+      "pending": "Pending",
+      "preparing": "Preparing",
+      "delayed": "Delayed",
+      "ready": "Ready",
+      "served": "Served",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "confirmChange": "Are you sure you want to change the order status?",
+      "changeSuccess": "Order status updated successfully",
+      "changeError": "Failed to update order status"
+    },
+    "archive": {
+      "title": "Archived Orders",
+      "filters": {
+        "all": "All Archived"
+      },
+      "noOrders": "No archived orders found"
+    }
+  },
+  "kitchen": {
+    "title": "Kitchen Display System",
+    "activeOrders": "Active Orders",
+    "staffMembers": "Kitchen Staff",
+    "staffMembersCount": "Staff Members",
+    "workflowOptimizer": "Kitchen Workflow Optimizer",
+    "suggestions": "Suggestions",
+    "priorityOrder": "Priority Order",
+    "estimatedTimes": "Estimated Times",
+    "columns": {
+      "pending": "Pending",
+      "preparing": "Preparing",
+      "delayed": "Delayed",
+      "ready": "Ready",
+      "served": "Served",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "actions": {
+      "startPreparing": "Start Preparing",
+      "markDelayed": "Mark Delayed",
+      "markReady": "Mark Ready",
+      "markServed": "Mark Served"
+    },
+    "orderInfo": {
+      "table": "Table",
+      "customer": "Customer",
+      "phone": "Phone",
+      "specialInstructions": "Special Instructions"
+    }
   },
   "nav": {
     "home": "Home",
     "menu": "Menu",
     "trackOrder": "Track Your Order",
     "cart": "Cart",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "profile": "Profile",
+    "settings": "Settings",
+    "adminPanel": "Admin Panel",
+    "dashboard": "Dashboard",
+    "menuItems": "Menu Items",
+    "orders": "Orders",
+    "archive": "Archive",
+    "kitchenDisplay": "Kitchen Display",
+    "userManagement": "User Management",
+    "database": "Database"
+  },
+  "newsletter": {
+    "title": "Stay Updated!",
+    "description": "Would you like to receive updates about our new dishes, special offers, and exclusive events?",
+    "subscribe": "Yes, keep me updated",
+    "skip": "Maybe later",
+    "success": "Thanks for subscribing!",
+    "error": "Subscription failed. Please try again."
   },
   "dietary": {
     "vegan": "Vegan",
@@ -36,10 +148,32 @@
     "keto": "Keto",
     "paleo": "Paleo"
   },
+  "allergens": {
+    "gluten": "Gluten",
+    "dairy": "Dairy",
+    "nuts": "Nuts",
+    "eggs": "Eggs",
+    "soy": "Soy",
+    "shellfish": "Shellfish",
+    "fish": "Fish",
+    "peanuts": "Peanuts"
+  },
   "errors": {
     "generic": "Something went wrong",
     "loading": "Error loading data",
     "network": "Network error",
     "required": "This field is required"
+  },
+  "admin": {
+    "title": "Restaurant Admin",
+    "kitchenStaff": "Kitchen Staff",
+    "language": {
+      "select": "Select Language",
+      "en": "English",
+      "it": "Italian",
+      "es": "Spanish"
+    },
+    "logout": "Logout",
+    "logoutError": "Failed to logout"
   }
 } 

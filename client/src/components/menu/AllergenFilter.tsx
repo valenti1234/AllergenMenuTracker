@@ -22,10 +22,10 @@ export function AllergenFilter({
           <Badge
             key={allergen}
             variant={selectedAllergens.includes(allergen) ? "default" : "outline"}
-            className="cursor-pointer capitalize"
+            className="cursor-pointer"
             onClick={() => onToggle(allergen)}
           >
-            {t(`allergens.${allergen.toLowerCase()}`)}
+            {t(`allergens.${allergen}`)}
           </Badge>
         ))}
       </div>

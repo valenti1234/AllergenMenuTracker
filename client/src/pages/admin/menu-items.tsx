@@ -25,8 +25,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
-import type { MenuItem } from "@shared/schema";
-import { insertMenuItemSchema, categories, allergens, dietaryPreferences } from "@shared/schema";
+import type { MenuItem, Language } from "@shared/schema";
+import { insertMenuItemSchema, categories, allergens, dietaryPreferences, languages } from "@shared/schema";
 import { z } from "zod";
 import { RefreshCw } from "lucide-react";
 
@@ -36,6 +36,7 @@ export default function MenuItems() {
   const { toast } = useToast();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string>("");
+  const [currentLanguage, setCurrentLanguage] = useState<Language>("en");
 
   const { data: menuItems, isLoading } = useQuery<MenuItem[]>({
     queryKey: ["/api/menu"],
@@ -44,21 +45,34 @@ export default function MenuItems() {
   const form = useForm<FormValues>({
     resolver: zodResolver(insertMenuItemSchema),
     defaultValues: {
-      name: "",
-      description: "",
+      name: {
+        en: "",
+        it: "",
+        es: ""
+      },
+      description: {
+        en: "",
+        it: "",
+        es: ""
+      },
       price: 0,
       category: "starters",
       imageUrl: "",
       allergens: [],
       prepTime: 15,
       available: true,
-      ingredients: [],
+      ingredients: {
+        en: [],
+        it: [],
+        es: []
+      },
       calories: 0,
       protein: 0,
       carbs: 0,
       fat: 0,
       dietaryInfo: [],
     },
+    mode: "onChange"
   });
 
   const createMutation = useMutation({
@@ -99,17 +113,23 @@ export default function MenuItems() {
     },
   });
 
-  const generateMutation = useMutation({
+  const generateMutation = useMutation<
+    MenuItem,
+    Error,
+    string
+  >({
     mutationFn: async (name: string) => {
       console.log('Generating menu item for:', name);
-      const data = await apiRequest<MenuItem>("POST", "/api/menu/generate", { name });
-      console.log('API Response data:', data);
-      return data;
+      const response = await apiRequest<MenuItem>("POST", "/api/menu/generate", { name });
+      if (!response) {
+        throw new Error("Failed to generate menu item");
+      }
+      return response;
     },
     onSuccess: (data) => {
       console.log('Mutation onSuccess received data:', data);
       const formValues = {
-        name: form.getValues().name,
+        name: data.name,
         description: data.description,
         price: data.price,
         category: data.category,
@@ -117,11 +137,12 @@ export default function MenuItems() {
         allergens: data.allergens || [],
         prepTime: data.prepTime,
         available: true,
-        ingredients: data.ingredients || [],
+        ingredients: data.ingredients || { en: [], it: [], es: [] },
         calories: data.calories || 0,
         protein: data.protein || 0,
         carbs: data.carbs || 0,
         fat: data.fat || 0,
+        dietaryInfo: data.dietaryInfo || [],
       };
 
       console.log('Setting form values:', formValues);
@@ -145,7 +166,7 @@ export default function MenuItems() {
 
   const regenerateImageMutation = useMutation({
     mutationFn: async () => {
-      const name = form.getValues().name;
+      const name = form.watch("name.en");
       if (!name) {
         throw new Error("Please enter a menu item name first");
       }
@@ -161,6 +182,11 @@ export default function MenuItems() {
     }
   };
 
+  const handleIngredientsChange = (value: string) => {
+    const ingredients = value.split('\n').filter(Boolean);
+    form.setValue(`ingredients.${currentLanguage}`, ingredients);
+  };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -170,15 +196,30 @@ export default function MenuItems() {
       <div className="container mx-auto py-8 px-4">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold">Menu Items</h1>
-          <Button
-            variant="outline"
-            onClick={() => {
-              form.reset();
-              setEditingId(null);
-            }}
-          >
-            Clear Form
-          </Button>
+          <div className="flex gap-4">
+            <Select
+              value={currentLanguage}
+              onValueChange={(value: Language) => setCurrentLanguage(value)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="en">English</SelectItem>
+                <SelectItem value="it">Italian</SelectItem>
+                <SelectItem value="es">Spanish</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              variant="outline"
+              onClick={() => {
+                form.reset();
+                setEditingId(null);
+              }}
+            >
+              Clear Form
+            </Button>
+          </div>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-2">
@@ -186,10 +227,10 @@ export default function MenuItems() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
-                name="name"
+                name={`name.${currentLanguage}`}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>Name ({currentLanguage.toUpperCase()})</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -201,20 +242,37 @@ export default function MenuItems() {
                 type="button"
                 variant="outline"
                 className="mt-2"
-                disabled={!form.watch("name") || generateMutation.isPending}
-                onClick={() => generateMutation.mutate(form.watch("name"))}
+                disabled={!form.watch("name.en") || generateMutation.isPending}
+                onClick={() => generateMutation.mutate(form.watch("name.en"))}
               >
                 {generateMutation.isPending ? "Generating..." : "Generate with AI"}
               </Button>
 
               <FormField
                 control={form.control}
-                name="description"
+                name={`description.${currentLanguage}`}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>Description ({currentLanguage.toUpperCase()})</FormLabel>
                     <FormControl>
                       <Textarea {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name={`ingredients.${currentLanguage}`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ingredients ({currentLanguage.toUpperCase()}) (one per line)</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        value={field.value?.join('\n') || ''}
+                        onChange={(e) => handleIngredientsChange(e.target.value)}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -249,18 +307,12 @@ export default function MenuItems() {
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a category" />
-                        </SelectTrigger>
-                      </FormControl>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
                       <SelectContent>
                         {categories.map((category) => (
-                          <SelectItem
-                            key={category}
-                            value={category}
-                            className="capitalize"
-                          >
+                          <SelectItem key={category} value={category}>
                             {category}
                           </SelectItem>
                         ))}
@@ -319,10 +371,10 @@ export default function MenuItems() {
                         variant="outline"
                         size="sm"
                         className="h-7"
-                        disabled={!form.watch("ingredients") || !form.watch("description") || !form.watch("name")}
+                        disabled={!form.watch("ingredients.en") || !form.watch("description.en") || !form.watch("name.en")}
                         onClick={async () => {
                           try {
-                            const ingredients = form.getValues("ingredients");
+                            const ingredients = form.getValues("ingredients.en");
                             
                             // Make sure ingredients is an array
                             if (!Array.isArray(ingredients)) {
@@ -330,9 +382,9 @@ export default function MenuItems() {
                             }
 
                             const response = await apiRequest("POST", "/api/menu/analyze-dietary", {
-                              name: form.getValues("name"),
+                              name: form.getValues("name.en"),
                               ingredients: ingredients,
-                              description: form.getValues("description")
+                              description: form.getValues("description.en")
                             });
 
                             if (response.dietaryCategories) {
@@ -369,7 +421,7 @@ export default function MenuItems() {
                             onCheckedChange={(checked) => {
                               const updatedValue = checked
                                 ? [...(field.value || []), preference]
-                                : (field.value || []).filter((p) => p !== preference);
+                                : (field.value || []).filter((p: string) => p !== preference);
                               field.onChange(updatedValue);
                             }}
                           />
@@ -402,7 +454,7 @@ export default function MenuItems() {
                             onCheckedChange={(checked) => {
                               const updatedValue = checked
                                 ? [...(field.value || []), allergen]
-                                : (field.value || []).filter((a) => a !== allergen);
+                                : (field.value || []).filter((a: string) => a !== allergen);
                               field.onChange(updatedValue);
                             }}
                           />
@@ -415,32 +467,6 @@ export default function MenuItems() {
                         </div>
                       ))}
                     </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="ingredients"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Ingredients (one per line)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        value={field.value.join('\n')}
-                        onChange={(e) => {
-                          const ingredients = e.target.value
-                            .split('\n')
-                            .map((i) => i.trim())
-                            .filter((i) => i !== "");
-                          field.onChange(ingredients);
-                        }}
-                        placeholder="Enter ingredients, one per line"
-                        className="min-h-[100px]"
-                      />
-                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -556,9 +582,13 @@ export default function MenuItems() {
               <Button
                 type="submit"
                 className="w-full"
-                disabled={createMutation.isPending || updateMutation.isPending}
+                disabled={
+                  createMutation.isPending ||
+                  updateMutation.isPending ||
+                  !form.formState.isValid
+                }
               >
-                {editingId ? "Update Menu Item" : "Create Menu Item"}
+                {editingId ? "Update" : "Create"} Menu Item
               </Button>
             </form>
           </Form>
@@ -571,12 +601,16 @@ export default function MenuItems() {
                 className="p-4 border rounded-lg flex justify-between items-center"
               >
                 <div>
-                  <h3 className="font-medium">{item.name}</h3>
+                  <h3 className="font-medium">
+                    {typeof item.name === 'string' ? item.name : item.name?.en || 'Unnamed Item'}
+                  </h3>
                   <p className="text-sm text-muted-foreground">
                     {item.category} - ${(item.price / 100).toFixed(2)}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Ingredients: {(item.ingredients || []).join(", ")}
+                    Ingredients: {Array.isArray(item.ingredients) 
+                      ? item.ingredients.join(", ")
+                      : (item.ingredients?.en || []).join(", ")}
                   </p>
                   {item.calories && (
                     <p className="text-sm text-muted-foreground">
@@ -596,7 +630,7 @@ export default function MenuItems() {
                       setEditingId(item.id);
                       form.reset({
                         ...item,
-                        ingredients: item.ingredients || [],
+                        ingredients: item.ingredients || { en: [], it: [], es: [] },
                         dietaryInfo: item.dietaryInfo || []
                       });
                     }}

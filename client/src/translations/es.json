@@ -2,7 +2,7 @@
   "common": {
     "minutes": "min",
     "calories": "cal",
-    "protein": "proteínas",
+    "protein": "proteína",
     "carbs": "carbohidratos",
     "fat": "grasas",
     "grams": "g",
@@ -15,14 +15,14 @@
     "title": "Nuestro Menú",
     "categories": {
       "starters": "Entrantes",
-      "mains": "Principales",
+      "mains": "Platos Principales",
       "desserts": "Postres",
       "drinks": "Bebidas",
       "sides": "Guarniciones"
     },
     "orderType": {
       "title": "Seleccionar Tipo de Pedido",
-      "dineIn": "Para Mesa",
+      "dineIn": "Para Comer Aquí",
       "takeaway": "Para Llevar",
       "phoneNumber": "Número de Teléfono",
       "tableNumber": "Número de Mesa",
@@ -34,7 +34,7 @@
       "allergens": "Filtrar por Alérgenos",
       "dietary": "Preferencias Dietéticas"
     },
-    "addToOrder": "Agregar al Pedido",
+    "addToOrder": "Añadir al Pedido",
     "ingredients": "Ingredientes",
     "allergens": "Advertencias de Alérgenos",
     "contains": "Contiene",
@@ -42,14 +42,22 @@
     "nutritionalInfo": "Información Nutricional",
     "prepTime": "Tiempo de Preparación",
     "healthyChoice": "¡Opción Saludable!",
-    "healthScoreExplanation": "Esta puntuación se calcula según el contenido de proteínas, calorías, grasas y atributos dietéticos especiales. Una puntuación más alta indica una opción más saludable."
+    "healthScoreExplanation": "Esta puntuación se calcula según el contenido de proteínas, calorías, grasas y atributos dietéticos especiales. Una puntuación más alta indica una opción más saludable.",
+    "total": "Total"
   },
   "nav": {
     "home": "Inicio",
     "menu": "Menú",
     "trackOrder": "Seguir Pedido",
     "cart": "Carrito",
-    "signOut": "Cerrar Sesión"
+    "signOut": "Cerrar Sesión",
+    "dashboard": "Panel de Control",
+    "menuItems": "Elementos del Menú",
+    "orders": "Pedidos",
+    "archive": "Archivo",
+    "kitchenDisplay": "Pantalla de Cocina",
+    "userManagement": "Gestión de Usuarios",
+    "database": "Base de Datos"
   },
   "dietary": {
     "vegan": "Vegano",
@@ -74,5 +82,80 @@
     "loading": "Error al cargar los datos",
     "network": "Error de red",
     "required": "Este campo es obligatorio"
+  },
+  "orders": {
+    "title": "Gestión de Pedidos",
+    "filterPlaceholder": "Filtrar por Estado",
+    "filters": {
+      "all": "Todos los Pedidos Activos"
+    },
+    "orderNumber": "Pedido #",
+    "table": "Mesa",
+    "note": "Nota",
+    "noOrders": "No se encontraron pedidos",
+    "noOrdersWithStatus": "No hay pedidos con estado: {{status}}",
+    "status": {
+      "title": "Cambiar Estado",
+      "pending": "Pendiente",
+      "preparing": "En Preparación",
+      "delayed": "Retrasado",
+      "ready": "Listo",
+      "served": "Servido",
+      "completed": "Completado",
+      "cancelled": "Cancelado",
+      "confirmChange": "¿Estás seguro de que quieres cambiar el estado del pedido?",
+      "changeSuccess": "Estado del pedido actualizado correctamente",
+      "changeError": "Error al actualizar el estado del pedido"
+    },
+    "archive": {
+      "title": "Archivo de Pedidos",
+      "filters": {
+        "all": "Todos los Archivados"
+      },
+      "noOrders": "No se encontraron pedidos archivados"
+    }
+  },
+  "kitchen": {
+    "title": "Sistema de Visualización de Cocina",
+    "activeOrders": "Pedidos Activos",
+    "staffMembers": "Personal de Cocina",
+    "staffMembersCount": "Miembros del Personal",
+    "workflowOptimizer": "Optimizador de Flujo de Trabajo",
+    "suggestions": "Sugerencias",
+    "priorityOrder": "Orden de Prioridad",
+    "estimatedTimes": "Tiempos Estimados",
+    "columns": {
+      "pending": "Pendiente",
+      "preparing": "En Preparación",
+      "delayed": "Retrasado",
+      "ready": "Listo",
+      "served": "Servido",
+      "completed": "Completado",
+      "cancelled": "Cancelado"
+    },
+    "actions": {
+      "startPreparing": "Comenzar Preparación",
+      "markDelayed": "Marcar Retrasado",
+      "markReady": "Marcar Listo",
+      "markServed": "Marcar Servido"
+    },
+    "orderInfo": {
+      "table": "Mesa",
+      "customer": "Cliente",
+      "phone": "Teléfono",
+      "specialInstructions": "Instrucciones Especiales"
+    }
+  },
+  "admin": {
+    "title": "Administración del Restaurante",
+    "kitchenStaff": "Personal de Cocina",
+    "language": {
+      "select": "Seleccionar Idioma",
+      "en": "Inglés",
+      "it": "Italiano",
+      "es": "Español"
+    },
+    "logout": "Cerrar Sesión",
+    "logoutError": "Error al cerrar sesión"
   }
 } 
