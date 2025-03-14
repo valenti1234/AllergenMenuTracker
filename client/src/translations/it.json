@@ -43,7 +43,8 @@
     "prepTime": "Tempo di Preparazione",
     "healthyChoice": "Scelta Salutare!",
     "healthScoreExplanation": "Questo punteggio è calcolato in base al contenuto di proteine, calorie, grassi e attributi dietetici speciali. Un punteggio più alto indica un'opzione più salutare.",
-    "total": "Totale"
+    "total": "Totale",
+    "chefRecommended": "Consigliato dallo Chef"
   },
   "nav": {
     "home": "Home",

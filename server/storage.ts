@@ -64,6 +64,7 @@ export class MongoStorage implements IStorage {
       carbs: item.carbs,
       fat: item.fat,
       dietaryInfo: item.dietaryInfo || [],
+      chefRecommended: item.chefRecommended || false,
     }));
   }
 
@@ -87,6 +88,7 @@ export class MongoStorage implements IStorage {
       carbs: item.carbs,
       fat: item.fat,
       dietaryInfo: item.dietaryInfo || [],
+      chefRecommended: item.chefRecommended || false,
     };
   }
 
@@ -107,6 +109,8 @@ export class MongoStorage implements IStorage {
       protein: newItem.protein,
       carbs: newItem.carbs,
       fat: newItem.fat,
+      dietaryInfo: newItem.dietaryInfo || [],
+      chefRecommended: newItem.chefRecommended || false,
     };
   }
 
@@ -137,6 +141,7 @@ export class MongoStorage implements IStorage {
       carbs: updatedItem.carbs,
       fat: updatedItem.fat,
       dietaryInfo: updatedItem.dietaryInfo || [],
+      chefRecommended: updatedItem.chefRecommended || false,
     };
   }
 

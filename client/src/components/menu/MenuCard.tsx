@@ -24,7 +24,8 @@ import {
   ChefHat,
   Sparkles,
   Info,
-  Plus
+  Plus,
+  X
 } from "lucide-react";
 import React, { useState } from "react";
 import type { MenuItem } from "@shared/schema";
@@ -95,13 +96,21 @@ export function MenuCard({ item, onAddToOrder }: MenuCardProps) {
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer border-primary/10">
+          <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-primary/10 h-[420px] flex flex-col">
             <div className="relative">
               <div className="absolute top-2 right-2 z-10">
                 <Badge variant="secondary" className="bg-black/50 backdrop-blur-sm text-white border-0">
                   {formatPrice(item.price)}
                 </Badge>
               </div>
+              {item.chefRecommended && (
+                <div className="absolute top-2 left-2 z-10">
+                  <Badge variant="default" className="bg-amber-500 text-white border-0 flex items-center gap-1">
+                    <ChefHat className="h-3 w-3" />
+                    {t('menu.chefRecommended')}
+                  </Badge>
+                </div>
+              )}
               <div className="relative h-48 overflow-hidden">
                 <img
                   src={item.imageUrl}
@@ -111,33 +120,43 @@ export function MenuCard({ item, onAddToOrder }: MenuCardProps) {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               </div>
             </div>
-            <CardContent className="p-4">
-              <div className="space-y-3">
-                <div>
-                  <h3 className="font-semibold text-xl mb-1">{getName()}</h3>
-                  <p className="line-clamp-2 text-sm text-muted-foreground">
-                    {getDescription()}
-                  </p>
-                </div>
-                
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span>{item.prepTime} {t('common.minutes')}</span>
-                </div>
+            
+            <div className="flex flex-col flex-1 p-4">
+              <div className="flex-1">
+                <div className="space-y-3">
+                  <div>
+                    <h3 className="font-semibold text-xl mb-1">
+                      {getName()}
+                      {item.chefRecommended && (
+                        <ChefHat className="h-4 w-4 inline-block ml-1 text-amber-500" />
+                      )}
+                    </h3>
+                    <p className="text-sm text-muted-foreground line-clamp-3">
+                      {getDescription()}
+                    </p>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Clock className="h-4 w-4" />
+                    <span>{item.prepTime} {t('common.minutes')}</span>
+                  </div>
 
-                <div className="flex flex-wrap gap-1.5">
-                  {item.dietaryInfo.slice(0, 3).map((diet) => (
-                    <Badge key={diet} variant="outline" className="text-xs">
-                      {t(`dietary.${diet}`)}
-                    </Badge>
-                  ))}
-                  {item.dietaryInfo.length > 3 && (
-                    <Badge variant="outline" className="text-xs">
-                      +{item.dietaryInfo.length - 3}
-                    </Badge>
-                  )}
+                  <div className="flex flex-wrap gap-1.5">
+                    {item.dietaryInfo.slice(0, 3).map((diet) => (
+                      <Badge key={diet} variant="outline" className="text-xs">
+                        {t(`dietary.${diet}`)}
+                      </Badge>
+                    ))}
+                    {item.dietaryInfo.length > 3 && (
+                      <Badge variant="outline" className="text-xs">
+                        +{item.dietaryInfo.length - 3}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
-
+              </div>
+              
+              <div className="mt-auto pt-2">
                 <Button 
                   variant="default"
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2" 
@@ -150,145 +169,134 @@ export function MenuCard({ item, onAddToOrder }: MenuCardProps) {
                   {t('menu.addToOrder')}
                 </Button>
               </div>
-            </CardContent>
+            </div>
           </Card>
         </DialogTrigger>
 
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle>{getName()}</DialogTitle>
-            <DialogDescription>{getDescription()}</DialogDescription>
-          </DialogHeader>
-          <div className="flex-1 overflow-hidden">
-            <ScrollArea className="h-full pr-4">
-              <div className="space-y-6">
-                {/* Header with image */}
-                <div className="relative aspect-video overflow-hidden rounded-lg">
-                  <img
-                    src={item.imageUrl}
-                    alt={getName()}
-                    className="object-cover"
-                  />
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-auto">
+          <button 
+            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+            onClick={() => setIsOpen(false)}
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </button>
+          
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-2xl font-semibold">{getName()}</h2>
+              <p className="text-muted-foreground line-clamp-2">
+                {getDescription()}
+              </p>
+            </div>
+            
+            <div className="relative aspect-video overflow-hidden rounded-lg">
+              <img
+                src={item.imageUrl}
+                alt={getName()}
+                className="object-cover w-full"
+              />
+            </div>
+            
+            <p className="text-muted-foreground">
+              {getDescription()}
+            </p>
+            
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm">{item.prepTime} {t('common.minutes')}</span>
+              </div>
+              
+              {item.dietaryInfo.includes("vegetarian") && (
+                <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-200">
+                  {t('dietary.vegetarian')}
+                </Badge>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Utensils className="h-5 w-5" />
+                  <h3 className="text-lg font-medium">{t('menu.ingredients')}</h3>
                 </div>
-
-                {/* Title and description */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-semibold">{getName()}</h2>
-                    <p className="text-lg font-semibold">
-                      {formatPrice(item.price)}
-                    </p>
-                  </div>
-                  <p className="text-muted-foreground">
-                    {getDescription()}
-                  </p>
+                <ul className="space-y-2">
+                  {getIngredients().map((ingredient, index) => (
+                    <li key={index} className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
+                      <span className="text-sm">{ingredient}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Flame className="h-5 w-5" />
+                  <h3 className="text-lg font-medium">{t('menu.nutritionalInfo')}</h3>
                 </div>
-
-                {/* Preparation time and dietary info */}
-                <div className="flex flex-wrap gap-4">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">
-                      {item.prepTime} {t('common.minutes')}
-                    </span>
+                
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span>{t('common.calories')}</span>
+                    <span className="font-medium">{item.calories || 0}</span>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {item.dietaryInfo.map((diet) => (
-                      <Badge key={diet} variant="secondary">
-                        {t(`dietary.${diet}`)}
-                      </Badge>
-                    ))}
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-blue-500 transition-all" 
+                      style={{ width: `${calculatePercentage(item.calories, 2000)}%` }}
+                    />
                   </div>
-                </div>
-
-                {/* Ingredients and nutrition */}
-                <div className="grid gap-6 sm:grid-cols-2">
-                  {/* Ingredients */}
-                  <div className="space-y-2">
-                    <h4 className="font-medium flex items-center gap-2">
-                      <Utensils className="h-4 w-4" />
-                      {t('menu.ingredients')}
-                    </h4>
-                    <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                      {getIngredients().map((ingredient, index) => (
-                        <li key={index} className="capitalize">{ingredient}</li>
-                      ))}
-                    </ul>
+                  
+                  <div className="flex justify-between items-center">
+                    <span>{t('common.protein')}</span>
+                    <span className="font-medium">{item.protein || 0}{t('common.grams')}</span>
                   </div>
-
-                  {/* Nutritional info */}
-                  <div className="space-y-4">
-                    <h4 className="font-medium flex items-center gap-2">
-                      <Flame className="h-4 w-4" />
-                      {t('menu.nutritionalInfo')}
-                    </h4>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <div className="text-sm text-muted-foreground flex justify-between items-center">
-                          <span>{t('common.calories')}</span>
-                          <span className="font-medium">{item.calories}</span>
-                        </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary transition-all" 
-                            style={{ width: `${calculatePercentage(item.calories, 2000)}%` }}
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="text-sm text-muted-foreground flex justify-between items-center">
-                          <span>{t('common.protein')}</span>
-                          <span className="font-medium">{item.protein}{t('common.grams')}</span>
-                        </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-green-500 transition-all" 
-                            style={{ width: `${Math.min(100, (item.protein ?? 0 / 50) * 100)}%` }}
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="text-sm text-muted-foreground flex justify-between items-center">
-                          <span>{t('common.carbs')}</span>
-                          <span className="font-medium">{item.carbs}{t('common.grams')}</span>
-                        </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-yellow-500 transition-all" 
-                            style={{ width: `${Math.min(100, (item.carbs ?? 0 / 300) * 100)}%` }}
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="text-sm text-muted-foreground flex justify-between items-center">
-                          <span>{t('common.fat')}</span>
-                          <span className="font-medium">{item.fat}{t('common.grams')}</span>
-                        </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-orange-500 transition-all" 
-                            style={{ width: `${Math.min(100, (item.fat ?? 0 / 65) * 100)}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-green-500 transition-all" 
+                      style={{ width: `${calculatePercentage(item.protein, 50)}%` }}
+                    />
                   </div>
-                </div>
-
-                {/* Health score explanation */}
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="flex items-start gap-3">
-                    <Info className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
-                    <div className="space-y-1">
-                      <h4 className="font-medium">{t('common.healthScore')}: {healthScore}/100</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {t('menu.healthScoreExplanation')}
-                      </p>
-                    </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span>{t('common.carbs')}</span>
+                    <span className="font-medium">{item.carbs || 0}{t('common.grams')}</span>
+                  </div>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-yellow-500 transition-all" 
+                      style={{ width: `${calculatePercentage(item.carbs, 300)}%` }}
+                    />
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span>{t('common.fat')}</span>
+                    <span className="font-medium">{item.fat || 0}{t('common.grams')}</span>
+                  </div>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-orange-500 transition-all" 
+                      style={{ width: `${calculatePercentage(item.fat, 65)}%` }}
+                    />
                   </div>
                 </div>
               </div>
-            </ScrollArea>
+            </div>
+            
+            <Button 
+              variant="default"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2 mt-4" 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onAddToOrder();
+                setIsOpen(false);
+              }}
+            >
+              {t('menu.addToOrder')}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

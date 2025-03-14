@@ -96,6 +96,10 @@ const MenuItemSchema = new mongoose.Schema({
     type: [String],
     enum: ['vegan', 'vegetarian', 'gluten-free', 'dairy-free', 'keto', 'paleo'],
     default: []
+  },
+  chefRecommended: { 
+    type: Boolean, 
+    default: false 
   }
 });
 

@@ -126,6 +126,7 @@ export const insertMenuItemSchema = z.object({
   carbs: z.number().min(0, "Carbs must be positive").optional(),
   fat: z.number().min(0, "Fat must be positive").optional(),
   dietaryInfo: z.array(z.enum(dietaryPreferences)).default([]),
+  chefRecommended: z.boolean().default(false),
 });
 
 export type MenuItem = {
@@ -144,6 +145,7 @@ export type MenuItem = {
   carbs?: number;
   fat?: number;
   dietaryInfo: DietaryPreference[];
+  chefRecommended?: boolean;
 };
 
 // Update userRoles to include "kitchen"

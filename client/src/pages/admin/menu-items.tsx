@@ -31,6 +31,8 @@ import { z } from "zod";
 import { RefreshCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "@/contexts/SettingsContext";
+import { Badge } from "@/components/ui/badge";
+import { ChefHat } from "lucide-react";
 
 type FormValues = z.infer<typeof insertMenuItemSchema>;
 
@@ -75,6 +77,7 @@ export default function MenuItems() {
       carbs: 0,
       fat: 0,
       dietaryInfo: [],
+      chefRecommended: false,
     },
     mode: "onChange"
   });
@@ -513,6 +516,23 @@ export default function MenuItems() {
 
               <FormField
                 control={form.control}
+                name="chefRecommended"
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormLabel>Chef's Recommendation</FormLabel>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="calories"
                 render={({ field }) => (
                   <FormItem>
@@ -607,6 +627,12 @@ export default function MenuItems() {
                 <div>
                   <h3 className="font-medium">
                     {typeof item.name === 'string' ? item.name : item.name?.en || 'Unnamed Item'}
+                    {item.chefRecommended && (
+                      <Badge variant="default" className="bg-amber-500 text-white border-0 ml-2">
+                        <ChefHat className="h-3 w-3 mr-1" />
+                        Chef's Recommendation
+                      </Badge>
+                    )}
                   </h3>
                   <p className="text-sm text-muted-foreground">
                     {item.category} - {formatPrice(item.price)}
