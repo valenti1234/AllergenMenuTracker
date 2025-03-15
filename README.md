@@ -36,13 +36,35 @@ npm install
 3. Set up environment variables
 Create a `.env` file in the root directory with:
 ```
+# MongoDB Connection
 MONGODB_URI=your_mongodb_uri
+
+# OpenAI API Key
 OPENAI_API_KEY=your_openai_api_key
+
+# Server Configuration
+PORT=3000
+HOST=0.0.0.0
+
+# Stripe API Keys (optional)
+STRIPE_SECRET_KEY=your_stripe_secret_key
+STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
+
+# POS Configuration (optional)
+POS_ENABLED=true
+POS_TYPE=stripe
+POS_TERMINAL_LOCATION=your_terminal_location_id
+POS_READER_ID=your_reader_id
 ```
 
 4. Start the development server
 ```bash
 npm run dev
+```
+
+5. Access the application
+```
+http://localhost:3000
 ```
 
 ## Project Structure

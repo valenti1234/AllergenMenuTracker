@@ -11,6 +11,10 @@ import { startMetricsCacheService, stopMetricsCacheService } from './services/me
 // Import initialize default settings
 import { initializeDefaultSettings } from './storage';
 
+// Configurazione del server
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 5050;
+const HOST = process.env.HOST || '0.0.0.0';
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -80,13 +84,12 @@ app.use((req, res, next) => {
     startMetricsCacheService();
     log("Started metrics cache service with improved popular items calculation");
 
-    const port = 5050;
     server.listen({
-      port,
-      host: "0.0.0.0",
+      port: PORT,
+      host: HOST,
     });
-    log(`Server running on port ${port}`);
-    log(`API Documentation available at http://localhost:${port}/api-docs`);
+    log(`Server running on ${HOST}:${PORT}`);
+    log(`API Documentation available at http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}/api-docs`);
 
     // Handle graceful shutdown
     const shutdown = () => {

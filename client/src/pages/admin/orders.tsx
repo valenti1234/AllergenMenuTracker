@@ -21,9 +21,11 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Order, OrderStatus } from "@shared/schema";
 import { orderStatuses } from "@shared/schema";
-import { Clock, ClipboardList, Phone } from "lucide-react";
+import { Clock, ClipboardList, Phone, CreditCard } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "@/contexts/SettingsContext";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { StripeTerminalPayment } from "@/components/pos/StripeTerminalPayment";
 
 export default function Orders() {
   const { toast } = useToast();
@@ -256,8 +258,36 @@ export default function Orders() {
                       <Clock className="h-4 w-4" />
                       {new Date(order.createdAt).toLocaleString(i18n.language)}
                     </div>
-                    <div className="font-medium">
-                      {t("menu.total", "Total")}: {formatPrice(order.total)}
+                    <div className="flex items-center gap-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            disabled={order.paymentStatus === 'paid'}
+                            className="flex items-center gap-1"
+                          >
+                            <CreditCard className="h-4 w-4" />
+                            {order.paymentStatus === 'paid' 
+                              ? t("orders.paid", "Paid") 
+                              : t("orders.processPayment", "Process Payment")}
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md">
+                          <StripeTerminalPayment 
+                            order={order} 
+                            onPaymentComplete={(success) => {
+                              if (success) {
+                                // Aggiorna la lista degli ordini
+                                queryClient.invalidateQueries({ queryKey: ["/api/orders"] });
+                              }
+                            }} 
+                          />
+                        </DialogContent>
+                      </Dialog>
+                      <div className="font-medium">
+                        {t("menu.total", "Total")}: {formatPrice(order.total)}
+                      </div>
                     </div>
                   </div>
                 </div>

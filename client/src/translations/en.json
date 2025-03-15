@@ -64,6 +64,8 @@
     "note": "Note",
     "noOrders": "No orders found",
     "noOrdersWithStatus": "No orders with status: {{status}}",
+    "paid": "Paid",
+    "processPayment": "Process Payment",
     "status": {
       "title": "Change Status",
       "pending": "Pending",
@@ -132,7 +134,8 @@
     "kitchenDisplay": "Kitchen Display",
     "userManagement": "User Management",
     "database": "Database",
-    "apiDocs": "API Documentation"
+    "apiDocs": "API Documentation",
+    "posSettings": "POS Settings"
   },
   "newsletter": {
     "title": "Stay Updated!",
@@ -174,6 +177,20 @@
     "localization": "Localization",
     "ordering": "Ordering",
     "social": "Social Media",
+    "pos": "Point of Sale",
+    "posIntegration": "POS Integration",
+    "posDescription": "Connect your restaurant to a POS system to process payments",
+    "posEnabled": "Enable POS Integration",
+    "posType": "POS System",
+    "posNone": "None",
+    "posStripe": "Stripe Terminal",
+    "posSquare": "Square",
+    "posClover": "Clover",
+    "stripeSecretKey": "Stripe Secret Key",
+    "stripePublishableKey": "Stripe Publishable Key",
+    "testConnection": "Test Connection",
+    "connectionSuccess": "Connection successful",
+    "connectionFailed": "Connection failed",
     "restaurantName": "Restaurant Name",
     "phone": "Phone Number",
     "address": "Address",
@@ -267,5 +284,21 @@
       "authInfo": "The API uses cookie-based authentication. Most endpoints require authentication with appropriate user roles.",
       "authDocs": "Authentication Documentation"
     }
+  },
+  "pos": {
+    "title": "Payment Processing",
+    "processPayment": "Process Payment",
+    "connectReader": "Connect to Reader",
+    "connecting": "Connecting...",
+    "connectedTo": "Connected to reader",
+    "noReadersFound": "No card readers found",
+    "readyToProcess": "Ready to process payment",
+    "processing": "Processing payment...",
+    "followInstructions": "Please follow the instructions on the card reader",
+    "paymentSuccessful": "Payment Successful!",
+    "paymentFailed": "Payment failed. Please try again.",
+    "cancel": "Cancel",
+    "completeOrder": "Complete Order",
+    "total": "Total"
   }
 } 

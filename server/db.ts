@@ -132,25 +132,30 @@ const OrderItemSchema = new mongoose.Schema({
 const OrderSchema = new mongoose.Schema({
   type: { 
     type: String, 
-    required: true,
-    enum: orderTypes
+    enum: ["dine-in", "takeaway"],
+    required: true
   },
   status: { 
     type: String, 
-    required: true,
-    enum: orderStatuses,
-    default: 'pending'
+    enum: ["pending", "preparing", "delayed", "ready", "served", "completed", "cancelled"],
+    default: "pending"
   },
-  phoneNumber: { type: String, required: true }, // Add phoneNumber as required field
-  customerName: String,
-  tableNumber: String,
+  phoneNumber: { type: String, required: true },
+  customerName: { type: String },
+  tableNumber: { type: String },
   items: {
     type: [OrderItemSchema],
     required: true,
     validate: [(val: any[]) => val.length > 0, 'At least one item is required']
   },
-  specialInstructions: String,
+  specialInstructions: { type: String },
   total: { type: Number, required: true },
+  paymentStatus: { 
+    type: String, 
+    enum: ["pending", "paid", "failed", "refunded"], 
+    default: "pending" 
+  },
+  posReference: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

@@ -18,6 +18,9 @@ import {
 import { getRestaurantSettings, createOrUpdateRestaurantSettings, initializeDefaultSettings } from "./storage";
 import { insertRestaurantSettingsSchema } from "@shared/schema";
 import { z } from "zod";
+// Importa l'adattatore Stripe Terminal
+import { StripeTerminalAdapter } from "./services/posIntegration/stripeTerminalAdapter";
+import { isPOSEnabled, getPOSConfig, getStripeConfig } from "./services/posIntegration/posConfig";
 
 export async function registerRoutes(app: Express) {
   // Serve uploaded files statically
@@ -472,6 +475,164 @@ export async function registerRoutes(app: Express) {
       }
       console.error("Error updating restaurant settings:", error);
       res.status(500).json({ message: "Failed to update restaurant settings" });
+    }
+  });
+
+  // Endpoint per ottenere un token di connessione per Stripe Terminal
+  app.post("/api/pos/connection-token", requireAuth, async (req, res) => {
+    try {
+      if (!isPOSEnabled() || getPOSConfig().type !== 'stripe') {
+        res.status(400).json({ message: "Stripe Terminal integration not enabled" });
+        return;
+      }
+      
+      const stripeConfig = getStripeConfig();
+      const stripeAdapter = new StripeTerminalAdapter(stripeConfig?.secretKey || '');
+      const result = await stripeAdapter.createConnectionToken();
+      
+      if (result.success) {
+        res.json({ secret: result.secret });
+      } else {
+        res.status(500).json({ message: "Failed to create connection token", error: result.error });
+      }
+    } catch (error) {
+      res.status(500).json({ 
+        message: "Failed to create connection token", 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      });
+    }
+  });
+
+  // Endpoint per creare un Payment Intent per un ordine
+  app.post("/api/pos/payment-intent/:orderId", requireAuth, async (req, res) => {
+    try {
+      const orderId = req.params.orderId;
+      const order = await storage.getOrder(orderId);
+      
+      if (!order) {
+        res.status(404).json({ message: "Order not found" });
+        return;
+      }
+      
+      const stripeConfig = getStripeConfig();
+      const stripeAdapter = new StripeTerminalAdapter(stripeConfig?.secretKey || '');
+      const result = await stripeAdapter.createPaymentIntent(order);
+      
+      if (result.success) {
+        // Aggiorna l'ordine con l'ID del Payment Intent
+        await storage.updateOrder(orderId, {
+          posReference: result.paymentIntentId,
+          paymentStatus: 'pending'
+        });
+        
+        res.json({ 
+          clientSecret: result.clientSecret,
+          paymentIntentId: result.paymentIntentId
+        });
+      } else {
+        res.status(500).json({ message: "Failed to create payment intent", error: result.error });
+      }
+    } catch (error) {
+      res.status(500).json({ 
+        message: "Failed to create payment intent", 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      });
+    }
+  });
+
+  // Endpoint per aggiornare lo stato di un ordine dopo il pagamento
+  app.post("/api/pos/payment-complete/:orderId", requireAuth, async (req, res) => {
+    try {
+      const { paymentIntentId, success } = req.body;
+      const orderId = req.params.orderId;
+      
+      if (!paymentIntentId) {
+        res.status(400).json({ message: "Payment intent ID is required" });
+        return;
+      }
+      
+      const order = await storage.getOrder(orderId);
+      
+      if (!order) {
+        res.status(404).json({ message: "Order not found" });
+        return;
+      }
+      
+      const stripeConfig = getStripeConfig();
+      const stripeAdapter = new StripeTerminalAdapter(stripeConfig?.secretKey || '');
+      
+      if (success) {
+        // Verifica lo stato del pagamento
+        const paymentResult = await stripeAdapter.retrievePaymentIntent(paymentIntentId);
+        
+        if (paymentResult.success && paymentResult.status === 'succeeded') {
+          // Aggiorna l'ordine come pagato
+          await storage.updateOrder(orderId, {
+            paymentStatus: 'paid',
+            status: 'preparing' // Aggiorna lo stato dell'ordine
+          });
+          
+          res.json({ message: "Payment completed successfully" });
+        } else {
+          res.status(400).json({ message: "Payment verification failed" });
+        }
+      } else {
+        // Annulla il Payment Intent
+        await stripeAdapter.cancelPaymentIntent(paymentIntentId);
+        
+        // Aggiorna l'ordine come non pagato
+        await storage.updateOrder(orderId, {
+          paymentStatus: 'failed'
+        });
+        
+        res.json({ message: "Payment cancelled" });
+      }
+    } catch (error) {
+      res.status(500).json({ 
+        message: "Failed to process payment completion", 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      });
+    }
+  });
+
+  // Endpoint per testare la connessione con Stripe
+  app.post("/api/pos/test-connection", requireRole(["admin"]), async (req, res) => {
+    try {
+      const stripeConfig = getStripeConfig();
+      const stripeAdapter = new StripeTerminalAdapter(stripeConfig?.secretKey || '');
+      const result = await stripeAdapter.testConnection();
+      
+      if (result.success) {
+        res.json({ message: "Connection successful" });
+      } else {
+        res.status(400).json({ message: "Connection failed", error: result.error });
+      }
+    } catch (error) {
+      res.status(500).json({ 
+        message: "Failed to test connection", 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      });
+    }
+  });
+
+  // Endpoint per ottenere la configurazione del POS
+  app.get("/api/pos/config", requireAuth, (req, res) => {
+    try {
+      const config = getPOSConfig();
+      
+      // Restituisci solo le informazioni necessarie al client
+      res.json({
+        enabled: config.enabled,
+        type: config.type,
+        publishableKey: config.type === 'stripe' ? config.stripeConfig?.publishableKey : undefined,
+        terminalLocation: config.type === 'stripe' ? config.stripeConfig?.terminalLocation : undefined,
+        readerId: config.type === 'stripe' ? config.stripeConfig?.readerId : undefined,
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        message: "Failed to get POS configuration", 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      });
     }
   });
 

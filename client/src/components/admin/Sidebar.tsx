@@ -11,7 +11,8 @@ import {
   Database,
   Globe,
   FileText,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  CreditCard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/queryClient";
@@ -103,6 +104,12 @@ export function Sidebar() {
       icon: FileText,
       href: "/admin/api-docs",
       roles: ["admin", "manager"]
+    },
+    {
+      title: t("nav.posSettings", "POS Settings"),
+      icon: CreditCard,
+      href: "/admin/pos-settings",
+      roles: ["admin"]
     },
     {
       title: t("nav.settings", "Settings"),

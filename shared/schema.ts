@@ -47,6 +47,10 @@ export type OrderStatus = typeof orderStatuses[number];
 export const orderTypes = ["dine-in", "takeaway"] as const;
 export type OrderType = typeof orderTypes[number];
 
+// Aggiungi gli stati di pagamento
+export const paymentStatuses = ["pending", "paid", "failed", "refunded"] as const;
+export type PaymentStatus = typeof paymentStatuses[number];
+
 // Define multilingual content schema
 const multilingualStringSchema = z.object({
   en: z.string().min(1, "English name is required"),
@@ -81,6 +85,9 @@ export const insertOrderSchema = z.object({
   phoneNumber: z.string().min(10, "Phone number is required").max(15, "Phone number is too long"),
   items: z.array(insertOrderItemSchema).min(1, "At least one item is required"),
   specialInstructions: z.string().optional(),
+  // Aggiungi campi per il pagamento
+  paymentStatus: z.enum(paymentStatuses).default("pending"),
+  posReference: z.string().optional(),
 }).refine(
   (data) => {
     if (data.type === "takeaway") {
@@ -108,6 +115,9 @@ export type Order = {
   total: number;
   createdAt: Date;
   updatedAt: Date;
+  // Aggiungi campi per il pagamento
+  paymentStatus: PaymentStatus;
+  posReference?: string;
 };
 
 // Update MenuItem schema to include dietary info and multilingual content
@@ -173,6 +183,10 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export const currencies = ["USD", "EUR", "GBP", "JPY", "CAD", "AUD", "INR"] as const;
 export type Currency = typeof currencies[number];
 
+// Aggiungi i tipi di POS supportati
+export const posTypes = ["none", "stripe", "square", "clover"] as const;
+export type POSType = typeof posTypes[number];
+
 export const insertRestaurantSettingsSchema = z.object({
   name: multilingualStringSchema,
   address: multilingualStringSchema.optional(),
@@ -197,6 +211,12 @@ export const insertRestaurantSettingsSchema = z.object({
     instagram: z.string().optional(),
     twitter: z.string().optional(),
     yelp: z.string().optional(),
+  }).optional(),
+  // Aggiungi configurazione POS
+  posIntegration: z.object({
+    enabled: z.boolean().default(false),
+    type: z.enum(posTypes).default("none"),
+    config: z.record(z.string(), z.any()).optional(),
   }).optional(),
 });
 
