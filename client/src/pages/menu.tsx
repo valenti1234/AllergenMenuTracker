@@ -4,7 +4,6 @@ import { useLocation } from "wouter";
 import { MenuCard } from "@/components/menu/MenuCard";
 import { AllergenFilter } from "@/components/menu/AllergenFilter";
 import { DietaryFilter } from "@/components/menu/DietaryFilter";
-import { OrderTypeSelector } from "@/components/menu/OrderTypeSelector";
 import { OrderSummary } from "@/components/menu/OrderSummary";
 import { NewsletterDialog } from "@/components/menu/NewsletterDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -114,40 +113,67 @@ export default function Menu() {
     );
   };
 
-  const addToOrder = (item: MenuItem) => {
-    setSelectedItems((current) => {
-      const newMap = new Map(current);
+  const addItem = useCallback((item: MenuItem) => {
+    setSelectedItems((prev) => {
+      const newMap = new Map(prev);
       const existing = newMap.get(item.id);
-      newMap.set(item.id, {
-        item,
-        quantity: existing ? existing.quantity + 1 : 1,
-      });
-      return newMap;
-    });
-  };
-
-  const updateQuantity = (itemId: string, quantity: number) => {
-    if (quantity < 1) return;
-    setSelectedItems((current) => {
-      const newMap = new Map(current);
-      const existing = newMap.get(itemId);
+      
       if (existing) {
-        newMap.set(itemId, { ...existing, quantity });
+        newMap.set(item.id, {
+          item,
+          quantity: existing.quantity + 1,
+        });
+      } else {
+        newMap.set(item.id, { item, quantity: 1 });
       }
+      
+      // Salva nel localStorage
+      saveCartToLocalStorage(newMap);
+      
       return newMap;
     });
-  };
+  }, []);
 
-  const removeItem = (itemId: string) => {
-    setSelectedItems((current) => {
-      const newMap = new Map(current);
-      newMap.delete(itemId);
+  const removeItem = useCallback((itemId: string) => {
+    setSelectedItems((prev) => {
+      const newMap = new Map(prev);
+      const existing = newMap.get(itemId);
+      
+      if (existing && existing.quantity > 1) {
+        newMap.set(itemId, {
+          item: existing.item,
+          quantity: existing.quantity - 1,
+        });
+      } else {
+        newMap.delete(itemId);
+      }
+      
+      // Salva nel localStorage
+      saveCartToLocalStorage(newMap);
+      
       return newMap;
     });
-  };
+  }, []);
 
-  const handlePhoneSubmit = () => {
-    setShowNewsletter(true);
+  // Funzione per salvare il carrello nel localStorage
+  const saveCartToLocalStorage = (cart: Map<string, { item: MenuItem; quantity: number }>) => {
+    try {
+      // Converti la Map in un oggetto per il localStorage
+      const cartObject: Record<string, { item: MenuItem; quantity: number }> = {};
+      cart.forEach((value, key) => {
+        cartObject[key] = value;
+      });
+      
+      localStorage.setItem('cartItems', JSON.stringify(cartObject));
+      
+      // Invia un evento personalizzato per aggiornare il conteggio nel header
+      // Utilizziamo setTimeout per evitare aggiornamenti di stato durante il rendering
+      setTimeout(() => {
+        window.dispatchEvent(new Event('cartUpdated'));
+      }, 0);
+    } catch (error) {
+      console.error('Error saving cart to localStorage:', error);
+    }
   };
 
   const handleSubscribe = async () => {
@@ -186,19 +212,85 @@ export default function Menu() {
     }
   };
 
-  const handleSubmitOrder = async (orderItems: OrderItem[]) => {
+  const handleSkipNewsletter = () => {
     try {
-      setIsSubmittingOrder(true);
-      
-      // Format phone number to remove any non-digit characters
+      const customerInfoStr = localStorage.getItem('customerInfo');
+      if (customerInfoStr) {
+        const customerInfo = JSON.parse(customerInfoStr);
+        
+        // Aggiorna il campo subscribeToNewsletter
+        const updatedInfo = {
+          ...customerInfo,
+          subscribeToNewsletter: false
+        };
+        
+        console.log('Updating customer info with newsletter choice (skipped):', updatedInfo);
+        localStorage.setItem('customerInfo', JSON.stringify(updatedInfo));
+      }
+    } catch (error) {
+      console.error('Error updating customer info:', error);
+    } finally {
+      setShowNewsletter(false);
+    }
+  };
+
+  const handlePhoneSubmit = () => {
+    // This function is no longer needed but kept for compatibility
+    console.log('Phone submitted');
+  };
+
+  const handlePlaceOrder = async () => {
+    if (!phoneNumber || !orderType) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please provide your phone number and order type",
+      });
+      return;
+    }
+
+    if (orderType === 'dine-in' && !tableNumber) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please provide your table number",
+      });
+      return;
+    }
+
+    if (orderType === 'takeaway' && !customerName) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please provide your name",
+      });
+      return;
+    }
+
+    if (selectedItems.size === 0) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Your order is empty",
+      });
+      return;
+    }
+
+    setIsSubmittingOrder(true);
+
+    try {
       const formattedPhoneNumber = phoneNumber.replace(/\D/g, "");
 
       await apiRequest("POST", "/api/orders", {
         type: orderType,
-        customerName: orderType === "takeaway" ? customerName : undefined,
-        tableNumber: orderType === "dine-in" ? tableNumber : undefined,
+        tableNumber: orderType === 'dine-in' ? tableNumber : undefined,
+        customerName: orderType === 'takeaway' ? customerName : undefined,
         phoneNumber: formattedPhoneNumber,
-        items: orderItems,
+        items: Array.from(selectedItems.values()).map(({ item, quantity }) => ({
+          menuItemId: item.id,
+          name: item.name,
+          quantity,
+        })),
         specialInstructions: "",
       });
 
@@ -228,91 +320,61 @@ export default function Menu() {
   return (
     <CustomerLayout>
       <div className="container mx-auto py-8 px-4">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold">{t('menu.title')}</h1>
-          <Link href="/track">
-            <Button variant="outline" className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              {t('nav.trackOrder')}
-            </Button>
-          </Link>
-        </div>
-
-        <div className="grid gap-8 lg:grid-cols-[300px,1fr,300px]">
+        <div className="grid gap-8 lg:grid-cols-[300px,1fr]">
           <div className="space-y-8">
-            <OrderTypeSelector
-              selectedType={orderType}
-              onSelectType={setOrderType}
-              tableNumber={tableNumber}
-              onTableNumberChange={setTableNumber}
-              customerName={customerName}
-              onCustomerNameChange={setCustomerName}
-              phoneNumber={phoneNumber}
-              onPhoneNumberChange={setPhoneNumber}
-              onPhoneSubmit={handlePhoneSubmit}
-            />
-            <AllergenFilter
-              selectedAllergens={selectedAllergens}
-              onToggle={toggleAllergen}
-            />
-            <DietaryFilter
-              selectedDiets={selectedDiets}
-              onToggle={toggleDiet}
-            />
+            <div className="space-y-4">
+              <h3 className="font-medium">{t('menu.filters.allergens')}</h3>
+              <AllergenFilter
+                selectedAllergens={selectedAllergens}
+                onToggle={toggleAllergen}
+              />
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="font-medium">{t('menu.filters.dietary')}</h3>
+              <DietaryFilter
+                selectedDiets={selectedDiets}
+                onToggle={toggleDiet}
+              />
+            </div>
           </div>
 
-          <Tabs defaultValue={categories[0]} className="space-y-6">
-            <TabsList>
+          <div>
+            <Tabs defaultValue={categories[0]}>
+              <TabsList className="mb-4 flex flex-wrap w-full">
+                {categories.map((category) => (
+                  <TabsTrigger key={category} value={category} className="flex-1">
+                    {t(`menu.categories.${category}`)}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+
               {categories.map((category) => (
-                <TabsTrigger
-                  key={category}
-                  value={category}
-                  className="capitalize"
-                >
-                  {t(`menu.categories.${category.toLowerCase()}`)}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-
-            {categories.map((category) => (
-              <TabsContent key={category} value={category}>
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {filteredItems
-                    ?.filter((item) => item.category === category)
-                    .map((item) => (
-                      <div key={item.id}>
-                        <MenuCard 
-                          item={item} 
-                          onAddToOrder={() => addToOrder(item)}
+                <TabsContent key={category} value={category} className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {filteredItems
+                      ?.filter((item) => item.category === category)
+                      .map((item) => (
+                        <MenuCard
+                          key={item.id}
+                          item={item}
+                          onAddToOrder={() => addItem(item)}
                         />
-                      </div>
-                    ))}
-                </div>
-              </TabsContent>
-            ))}
-          </Tabs>
-
-          <div className="space-y-8">
-            <OrderSummary
-              selectedItems={selectedItems}
-              updateQuantity={updateQuantity}
-              removeItem={removeItem}
-              orderType={orderType}
-              tableNumber={tableNumber}
-              customerName={customerName}
-              phoneNumber={phoneNumber}
-              onSubmitOrder={handleSubmitOrder}
-              isSubmitting={isSubmittingOrder}
-            />
+                      ))}
+                  </div>
+                </TabsContent>
+              ))}
+            </Tabs>
           </div>
         </div>
-        <NewsletterDialog
-          open={showNewsletter}
-          onOpenChange={setShowNewsletter}
-          onSubscribe={handleSubscribe}
-          onSkip={() => setShowNewsletter(false)}
-        />
       </div>
+
+      <NewsletterDialog
+        open={showNewsletter}
+        onOpenChange={setShowNewsletter}
+        onSubscribe={handleSubscribe}
+        onSkip={handleSkipNewsletter}
+      />
     </CustomerLayout>
   );
 }

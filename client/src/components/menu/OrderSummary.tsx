@@ -6,44 +6,32 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { MenuItem, OrderType, OrderItem } from "@shared/schema";
-import { ShoppingCart, Trash2 } from "lucide-react";
+import { ShoppingCart, Trash2, Plus, Minus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSettings } from "@/contexts/SettingsContext";
 
 interface OrderSummaryProps {
-  selectedItems: Map<string, { item: MenuItem; quantity: number }>;
-  updateQuantity: (itemId: string, quantity: number) => void;
-  removeItem: (itemId: string) => void;
-  orderType: OrderType | null;
-  tableNumber: string;
-  customerName: string;
-  phoneNumber: string;
-  onSubmitOrder?: (orderItems: OrderItem[]) => void;
+  items: { item: MenuItem; quantity: number }[];
+  onRemoveItem: (itemId: string) => void;
+  onAddItem: (itemId: string) => void;
+  onPlaceOrder: () => Promise<void>;
   isSubmitting?: boolean;
 }
 
 export function OrderSummary({
-  selectedItems,
-  updateQuantity,
-  removeItem,
-  orderType,
-  tableNumber,
-  customerName,
-  phoneNumber,
-  onSubmitOrder,
-  isSubmitting: externalIsSubmitting,
+  items,
+  onRemoveItem,
+  onAddItem,
+  onPlaceOrder,
+  isSubmitting = false,
 }: OrderSummaryProps) {
   const { language } = useLanguage();
   const { t } = useTranslation();
   const { formatPrice } = useSettings();
   const { toast } = useToast();
   const [specialInstructions, setSpecialInstructions] = useState("");
-  const [internalIsSubmitting, setInternalIsSubmitting] = useState(false);
   
-  // Use external isSubmitting if provided, otherwise use internal state
-  const isSubmitting = externalIsSubmitting !== undefined ? externalIsSubmitting : internalIsSubmitting;
-
   const currentLanguage = language as "en" | "it" | "es";
 
   const getItemName = (item: MenuItem) => {
@@ -51,104 +39,17 @@ export function OrderSummary({
     return item.name?.[currentLanguage] || item.name?.en || 'Unnamed Item';
   };
 
-  const total = Array.from(selectedItems.values()).reduce(
+  const total = items.reduce(
     (sum, { item, quantity }) => sum + item.price * quantity,
     0
   );
 
-  const handleSubmitOrder = async () => {
-    if (!orderType) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please select an order type",
-      });
-      return;
-    }
-
-    if (!phoneNumber) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please enter a phone number",
-      });
-      return;
-    }
-
-    if (orderType === "dine-in" && !tableNumber) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please enter a table number",
-      });
-      return;
-    }
-
-    if (orderType === "takeaway" && !customerName) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please enter your name",
-      });
-      return;
-    }
-
-    try {
-      setInternalIsSubmitting(true);
-      const orderItems: OrderItem[] = Array.from(selectedItems.entries()).map(
-        ([id, { item, quantity }]) => ({
-          menuItemId: id,
-          quantity,
-          price: item.price,
-          name: item.name,
-          id: "", // This will be set by the server
-        })
-      );
-
-      // If onSubmitOrder prop is provided, use it
-      if (onSubmitOrder) {
-        onSubmitOrder(orderItems);
-      } else {
-        // Otherwise, handle submission internally
-        // Format phone number to remove any non-digit characters
-        const formattedPhoneNumber = phoneNumber.replace(/\D/g, "");
-
-        await apiRequest("POST", "/api/orders", {
-          type: orderType,
-          customerName: orderType === "takeaway" ? customerName : undefined,
-          tableNumber: orderType === "dine-in" ? tableNumber : undefined,
-          phoneNumber: formattedPhoneNumber,
-          items: orderItems,
-          specialInstructions: specialInstructions || undefined,
-        });
-
-        toast({
-          title: "Success",
-          description: "Your order has been placed successfully",
-        });
-
-        // Clear the order
-        selectedItems.forEach((_, id) => removeItem(id));
-        setSpecialInstructions("");
-      }
-    } catch (error) {
-      console.error("Order creation error:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to place order. Please try again.",
-      });
-    } finally {
-      setInternalIsSubmitting(false);
-    }
-  };
-
-  if (selectedItems.size === 0) {
+  if (items.length === 0) {
     return (
       <Card className="p-6">
         <div className="text-center text-muted-foreground">
           <ShoppingCart className="mx-auto h-12 w-12 mb-3" />
-          <p>Your cart is empty</p>
+          <p>{t('menu.emptyCart')}</p>
         </div>
       </Card>
     );
@@ -158,8 +59,8 @@ export function OrderSummary({
     <Card className="p-6 space-y-6">
       <h3 className="text-lg font-semibold">{t('menu.orderSummary')}</h3>
       <div className="space-y-4">
-        {Array.from(selectedItems.entries()).map(([id, { item, quantity }]) => (
-          <div key={id} className="flex items-center justify-between gap-4">
+        {items.map(({ item, quantity }) => (
+          <div key={item.id} className="flex items-center justify-between gap-4">
             <div className="flex-1">
               <h4 className="font-medium">{getItemName(item)}</h4>
               <p className="text-sm text-muted-foreground">
@@ -167,21 +68,20 @@ export function OrderSummary({
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Input
-                type="number"
-                value={quantity}
-                onChange={(e) =>
-                  updateQuantity(id, parseInt(e.target.value, 10))
-                }
-                className="w-20"
-                min={1}
-              />
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => removeItem(id)}
+                onClick={() => onRemoveItem(item.id)}
               >
-                <Trash2 className="h-4 w-4" />
+                <Minus className="h-4 w-4" />
+              </Button>
+              <span className="w-8 text-center">{quantity}</span>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => onAddItem(item.id)}
+              >
+                <Plus className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -205,8 +105,8 @@ export function OrderSummary({
 
         <Button
           className="w-full"
-          onClick={handleSubmitOrder}
-          disabled={isSubmitting || !orderType}
+          onClick={onPlaceOrder}
+          disabled={isSubmitting}
         >
           {isSubmitting ? t('menu.placingOrder') : t('menu.placeOrder')}
         </Button>

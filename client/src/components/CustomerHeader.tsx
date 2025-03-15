@@ -14,6 +14,8 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useSettings } from "@/contexts/SettingsContext";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
+import { useCart } from "@/hooks/use-cart";
 
 export function CustomerHeader() {
   const { phoneNumber, signOut } = usePhone();
@@ -21,6 +23,7 @@ export function CustomerHeader() {
   const { t } = useTranslation();
   const { getLocalizedName } = useSettings();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const cartItemCount = useCart();
 
   const formatPhoneNumber = (phone: string) => {
     // Format phone number as (XXX) XXX-XXXX
@@ -37,7 +40,7 @@ export function CustomerHeader() {
       <div className="container flex h-14 items-center justify-between">
         {/* Logo - visible on all screens */}
         <div className="flex items-center">
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href="/menu" className="flex items-center space-x-2">
             <span className="font-bold text-lg">
               {getLocalizedName()}
             </span>
@@ -48,7 +51,10 @@ export function CustomerHeader() {
         <div className="hidden md:flex items-center space-x-4">
           <nav className="flex items-center">
             <Link href="/track">
-              <Button variant="ghost">{t('nav.trackOrder')}</Button>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Phone className="h-4 w-4" />
+                {t('nav.trackOrder')}
+              </Button>
             </Link>
           </nav>
           <LanguageSwitcher
@@ -56,8 +62,13 @@ export function CustomerHeader() {
             onLanguageChange={setLanguage}
           />
           <Link href="/cart">
-            <Button variant="ghost" size="icon" className="w-9 px-0" aria-label={t('nav.cart')}>
+            <Button variant="ghost" size="icon" className="w-9 px-0 relative" aria-label={t('nav.cart')}>
               <ShoppingCart className="h-4 w-4" />
+              {cartItemCount > 0 && (
+                <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                  {cartItemCount}
+                </Badge>
+              )}
             </Button>
           </Link>
         </div>
@@ -65,8 +76,13 @@ export function CustomerHeader() {
         {/* Mobile Navigation */}
         <div className="flex md:hidden items-center space-x-2">
           <Link href="/cart">
-            <Button variant="ghost" size="icon" className="w-9 px-0" aria-label={t('nav.cart')}>
+            <Button variant="ghost" size="icon" className="w-9 px-0 relative" aria-label={t('nav.cart')}>
               <ShoppingCart className="h-4 w-4" />
+              {cartItemCount > 0 && (
+                <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                  {cartItemCount}
+                </Badge>
+              )}
             </Button>
           </Link>
           
@@ -83,7 +99,7 @@ export function CustomerHeader() {
                   <div className="px-2">
                     <h2 className="text-lg font-semibold mb-2">{t('common.menu')}</h2>
                     <nav className="flex flex-col space-y-3">
-                      <Link href="/">
+                      <Link href="/menu">
                         <Button variant="ghost" className="w-full justify-start">
                           {t('nav.menu')}
                         </Button>
@@ -94,8 +110,13 @@ export function CustomerHeader() {
                         </Button>
                       </Link>
                       <Link href="/cart">
-                        <Button variant="ghost" className="w-full justify-start">
+                        <Button variant="ghost" className="w-full justify-start flex items-center">
                           {t('nav.cart')}
+                          {cartItemCount > 0 && (
+                            <Badge variant="destructive" className="ml-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                              {cartItemCount}
+                            </Badge>
+                          )}
                         </Button>
                       </Link>
                     </nav>

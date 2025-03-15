@@ -40,7 +40,7 @@ export default function TrackOrder() {
       <div className="container mx-auto py-4 sm:py-8 px-3 sm:px-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-4xl font-bold">{t('orders.trackYourOrder')}</h1>
-          <Link href="/">
+          <Link href="/menu">
             <Button variant="outline" size="sm" className="flex items-center gap-2 text-xs sm:text-sm">
               <Home className="h-3 w-3 sm:h-4 sm:w-4" />
               {t('nav.backToMenu')}
@@ -66,7 +66,7 @@ export default function TrackOrder() {
                     <p className="text-muted-foreground text-sm sm:text-base">
                       {t('orders.noActiveOrders')}
                     </p>
-                    <Link href="/">
+                    <Link href="/menu">
                       <Button variant="outline" size="sm" className="mt-4">
                         {t('nav.placeOrder')}
                       </Button>

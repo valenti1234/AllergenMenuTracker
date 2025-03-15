@@ -15,20 +15,17 @@ export function AllergenFilter({
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col gap-4">
-      <h3 className="font-medium">{t('menu.filters.allergens')}</h3>
-      <div className="flex flex-wrap gap-2">
-        {allergens.map((allergen) => (
-          <Badge
-            key={allergen}
-            variant={selectedAllergens.includes(allergen) ? "default" : "outline"}
-            className="cursor-pointer"
-            onClick={() => onToggle(allergen)}
-          >
-            {t(`allergens.${allergen}`)}
-          </Badge>
-        ))}
-      </div>
+    <div className="flex flex-wrap gap-2">
+      {allergens.map((allergen) => (
+        <Badge
+          key={allergen}
+          variant={selectedAllergens.includes(allergen) ? "default" : "outline"}
+          className="cursor-pointer"
+          onClick={() => onToggle(allergen)}
+        >
+          {t(`allergens.${allergen}`)}
+        </Badge>
+      ))}
     </div>
   );
 }

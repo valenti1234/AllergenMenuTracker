@@ -177,7 +177,7 @@ export function MenuCard({ item, onAddToOrder }: MenuCardProps) {
           </Card>
         </DialogTrigger>
 
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-auto p-4 sm:p-6">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-auto p-4 sm:p-6" aria-describedby={`${item.id}-description`}>
           <button 
             className="absolute right-3 top-3 sm:right-4 sm:top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
             onClick={() => setIsOpen(false)}
@@ -186,14 +186,14 @@ export function MenuCard({ item, onAddToOrder }: MenuCardProps) {
             <span className="sr-only">Close</span>
           </button>
           
-          <div className="space-y-4">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-semibold">{getName()}</h2>
-              <p className="text-sm text-muted-foreground line-clamp-2">
-                {getDescription()}
-              </p>
-            </div>
-            
+          <DialogHeader>
+            <DialogTitle>{getName()}</DialogTitle>
+            <DialogDescription id={`${item.id}-description`}>
+              {getDescription()}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 mt-4">
             <div className="relative aspect-video overflow-hidden rounded-lg">
               <img
                 src={item.imageUrl}

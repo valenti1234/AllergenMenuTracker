@@ -2,9 +2,38 @@ import { useLocation } from 'wouter';
 import { CustomerInfoFlow } from '@/components/customer/CustomerInfoFlow';
 import type { OrderType } from '@shared/schema';
 import '@/i18n';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function HomePage() {
   const [, setLocation] = useLocation();
+  const [showCustomerFlow, setShowCustomerFlow] = useState(false);
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    // Controlla se customerInfo esiste già nel localStorage
+    const customerInfoStr = localStorage.getItem('customerInfo');
+    if (customerInfoStr) {
+      try {
+        const customerInfo = JSON.parse(customerInfoStr);
+        // Verifica se i dati sono validi e non scaduti (24 ore)
+        const isExpired = Date.now() - customerInfo.timestamp > 24 * 60 * 60 * 1000;
+        
+        if (!isExpired && customerInfo.phoneNumber && customerInfo.orderType) {
+          // Se i dati sono validi, reindirizza direttamente al menu
+          console.log('Customer info found, redirecting to menu');
+          setLocation('/menu');
+          return;
+        }
+      } catch (error) {
+        console.error('Error parsing customer info:', error);
+        localStorage.removeItem('customerInfo');
+      }
+    }
+    
+    // Se non ci sono dati validi, mostra il form
+    setShowCustomerFlow(true);
+  }, [setLocation]);
 
   const handleCustomerInfoComplete = (data: {
     phoneNumber: string;
@@ -43,6 +72,11 @@ export default function HomePage() {
     
     setLocation('/menu');
   };
+
+  // Mostra un loader mentre controlliamo il localStorage
+  if (!showCustomerFlow) {
+    return <div className="flex items-center justify-center h-screen">{t('common.loading')}</div>;
+  }
 
   return (
     <main>

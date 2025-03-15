@@ -43,7 +43,7 @@
     },
     "categories": {
       "starters": "Antipasti",
-      "mains": "Secondi",
+      "mains": "Principali",
       "desserts": "Dolci",
       "drinks": "Bevande",
       "sides": "Contorni"
@@ -67,7 +67,10 @@
     "specialInstructionsPlaceholder": "Hai richieste o note particolari?",
     "placeOrder": "Invia Ordine",
     "placingOrder": "Invio Ordine...",
-    "subscribe": "Iscriviti per Aggiornamenti"
+    "subscribe": "Iscriviti per Aggiornamenti",
+    "orderSummary": "Riepilogo Ordine",
+    "each": "cad.",
+    "emptyCart": "Il tuo carrello è vuoto"
   },
   "nav": {
     "home": "Home",
