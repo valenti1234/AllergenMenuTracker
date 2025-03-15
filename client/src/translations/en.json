@@ -53,10 +53,10 @@
     },
     "categories": {
       "starters": "Starters",
-      "mains": "Main Courses",
+      "mains": "Main",
       "desserts": "Desserts",
       "drinks": "Drinks",
-      "sides": "Side Dishes"
+      "sides": "Sides"
     },
     "filters": {
       "allergens": "Filter by Allergens",

@@ -341,13 +341,15 @@ export default function Menu() {
 
           <div>
             <Tabs defaultValue={categories[0]}>
-              <TabsList className="mb-4 flex flex-wrap w-full">
-                {categories.map((category) => (
-                  <TabsTrigger key={category} value={category} className="flex-1">
-                    {t(`menu.categories.${category}`)}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
+              <div className="mb-4 overflow-x-auto pb-2">
+                <TabsList className="inline-flex w-auto min-w-full no-scrollbar">
+                  {categories.map((category) => (
+                    <TabsTrigger key={category} value={category} className="whitespace-nowrap">
+                      {t(`menu.categories.${category}`)}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </div>
 
               {categories.map((category) => (
                 <TabsContent key={category} value={category} className="space-y-4">

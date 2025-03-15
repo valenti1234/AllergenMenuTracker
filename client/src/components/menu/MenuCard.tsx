@@ -25,7 +25,8 @@ import {
   Sparkles,
   Info,
   Plus,
-  X
+  X,
+  Minus
 } from "lucide-react";
 import React, { useState } from "react";
 import type { MenuItem } from "@shared/schema";
@@ -51,6 +52,7 @@ export function MenuCard({ item, onAddToOrder }: MenuCardProps) {
   const { t, i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [quantity, setQuantity] = useState(1);
   const { language } = useLanguage();
   const { formatPrice } = useSettings();
 
@@ -90,6 +92,21 @@ export function MenuCard({ item, onAddToOrder }: MenuCardProps) {
   const getIngredients = () => {
     if (Array.isArray(item.ingredients)) return item.ingredients;
     return item.ingredients?.[currentLanguage] || item.ingredients?.en || [];
+  };
+
+  const handleAddToOrder = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Aggiungi l'elemento all'ordine per il numero di volte specificato dalla quantità
+    for (let i = 0; i < quantity; i++) {
+      onAddToOrder();
+    }
+    // Resetta la quantità a 1 dopo l'aggiunta
+    setQuantity(1);
+    // Chiudi il dialogo se siamo nel dialogo dettagliato
+    if (isOpen) {
+      setIsOpen(false);
+    }
   };
 
   return (
@@ -159,33 +176,48 @@ export function MenuCard({ item, onAddToOrder }: MenuCardProps) {
               </div>
               
               <div className="mt-auto pt-2">
-                <Button 
-                  variant="default"
-                  size="sm"
-                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm" 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    onAddToOrder();
-                  }}
-                >
-                  <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
-                  {t('menu.addToOrder')}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center border rounded-md">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-7 w-7 rounded-none p-0" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setQuantity(Math.max(1, quantity - 1));
+                      }}
+                    >
+                      <Minus className="h-3 w-3" />
+                    </Button>
+                    <span className="w-6 text-center text-xs">{quantity}</span>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-7 w-7 rounded-none p-0" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setQuantity(quantity + 1);
+                      }}
+                    >
+                      <Plus className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <Button 
+                    variant="default"
+                    size="sm"
+                    className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm" 
+                    onClick={handleAddToOrder}
+                  >
+                    <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4" />
+                    {t('menu.addToOrder')} ({quantity})
+                  </Button>
+                </div>
               </div>
             </div>
           </Card>
         </DialogTrigger>
 
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-auto p-4 sm:p-6" aria-describedby={`${item.id}-description`}>
-          <button 
-            className="absolute right-3 top-3 sm:right-4 sm:top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
-            onClick={() => setIsOpen(false)}
-          >
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </button>
-          
           <DialogHeader>
             <DialogTitle>{getName()}</DialogTitle>
             <DialogDescription id={`${item.id}-description`}>
@@ -291,19 +323,36 @@ export function MenuCard({ item, onAddToOrder }: MenuCardProps) {
               </div>
             </div>
             
-            <Button 
-              variant="default"
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2 mt-4" 
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onAddToOrder();
-                setIsOpen(false);
-              }}
-            >
-              <ShoppingCart className="h-4 w-4" />
-              {t('menu.addToOrder')}
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 items-center mt-4">
+              <div className="flex items-center border rounded-md">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 rounded-none" 
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                >
+                  <Minus className="h-3 w-3" />
+                </Button>
+                <span className="w-8 text-center">{quantity}</span>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 rounded-none" 
+                  onClick={() => setQuantity(quantity + 1)}
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              </div>
+              
+              <Button 
+                variant="default"
+                className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2" 
+                onClick={handleAddToOrder}
+              >
+                <ShoppingCart className="h-4 w-4" />
+                {t('menu.addToOrder')} ({quantity})
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
