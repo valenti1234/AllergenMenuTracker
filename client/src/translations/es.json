@@ -13,6 +13,8 @@
   },
   "menu": {
     "title": "Nuestro Menú",
+    "filteredResults": "Resultados Filtrados",
+    "noResults": "No se encontraron resultados con los filtros seleccionados",
     "categories": {
       "starters": "Entrantes",
       "mains": "Platos Principales",

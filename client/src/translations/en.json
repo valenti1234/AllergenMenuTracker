@@ -24,6 +24,8 @@
   },
   "menu": {
     "title": "Our Menu",
+    "filteredResults": "Filtered Results",
+    "noResults": "No results found with the selected filters",
     "customerInfo": {
       "title": "Welcome!",
       "enterPhone": "Enter your phone number",

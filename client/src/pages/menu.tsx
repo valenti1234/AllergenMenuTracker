@@ -340,33 +340,55 @@ export default function Menu() {
           </div>
 
           <div>
-            <Tabs defaultValue={categories[0]}>
-              <div className="mb-4 overflow-x-auto pb-2">
-                <TabsList className="inline-flex w-auto min-w-full no-scrollbar">
-                  {categories.map((category) => (
-                    <TabsTrigger key={category} value={category} className="whitespace-nowrap">
-                      {t(`menu.categories.${category}`)}
-                    </TabsTrigger>
+            {(selectedAllergens.length > 0 || selectedDiets.length > 0) ? (
+              // Vista senza categorie quando sono applicati i filtri
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold mb-4">{t('menu.filteredResults')}</h2>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {filteredItems?.map((item) => (
+                    <MenuCard
+                      key={item.id}
+                      item={item}
+                      onAddToOrder={() => addItem(item)}
+                    />
                   ))}
-                </TabsList>
-              </div>
-
-              {categories.map((category) => (
-                <TabsContent key={category} value={category} className="space-y-4">
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {filteredItems
-                      ?.filter((item) => item.category === category)
-                      .map((item) => (
-                        <MenuCard
-                          key={item.id}
-                          item={item}
-                          onAddToOrder={() => addItem(item)}
-                        />
-                      ))}
+                </div>
+                {filteredItems?.length === 0 && (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">{t('menu.noResults')}</p>
                   </div>
-                </TabsContent>
-              ))}
-            </Tabs>
+                )}
+              </div>
+            ) : (
+              // Vista con categorie quando non ci sono filtri
+              <Tabs defaultValue={categories[0]}>
+                <div className="mb-4 overflow-x-auto pb-2">
+                  <TabsList className="inline-flex w-auto min-w-full no-scrollbar">
+                    {categories.map((category) => (
+                      <TabsTrigger key={category} value={category} className="whitespace-nowrap">
+                        {t(`menu.categories.${category}`)}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </div>
+
+                {categories.map((category) => (
+                  <TabsContent key={category} value={category} className="space-y-4">
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {filteredItems
+                        ?.filter((item) => item.category === category)
+                        .map((item) => (
+                          <MenuCard
+                            key={item.id}
+                            item={item}
+                            onAddToOrder={() => addItem(item)}
+                          />
+                        ))}
+                    </div>
+                  </TabsContent>
+                ))}
+              </Tabs>
+            )}
           </div>
         </div>
       </div>

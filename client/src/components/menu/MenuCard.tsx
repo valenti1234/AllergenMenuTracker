@@ -58,6 +58,15 @@ export function MenuCard({ item, onAddToOrder }: MenuCardProps) {
 
   const currentLanguage = i18n.language as "en" | "it" | "es";
 
+  // Funzione per convertire il valore dello schema nella chiave di traduzione
+  const getDietaryTranslationKey = (diet: string): string => {
+    switch(diet) {
+      case 'gluten-free': return 'glutenFree';
+      case 'dairy-free': return 'dairyFree';
+      default: return diet;
+    }
+  };
+
   // Calculate health score (simple version)
   const healthScore = Math.min(100, Math.max(0, 
     ((item.protein ?? 0) * 2) + // Protein is good
@@ -163,7 +172,7 @@ export function MenuCard({ item, onAddToOrder }: MenuCardProps) {
                   <div className="flex flex-wrap gap-1 sm:gap-1.5">
                     {item.dietaryInfo.slice(0, 2).map((diet) => (
                       <Badge key={diet} variant="outline" className="text-[10px] sm:text-xs">
-                        {t(`dietary.${diet}`)}
+                        {t(`dietary.${getDietaryTranslationKey(diet)}`)}
                       </Badge>
                     ))}
                     {item.dietaryInfo.length > 2 && (
@@ -247,7 +256,7 @@ export function MenuCard({ item, onAddToOrder }: MenuCardProps) {
               <div className="flex flex-wrap gap-1">
                 {item.dietaryInfo.map((diet) => (
                   <Badge key={diet} variant="secondary" className="text-xs bg-green-100 text-green-800 hover:bg-green-200">
-                    {t(`dietary.${diet}`)}
+                    {t(`dietary.${getDietaryTranslationKey(diet)}`)}
                   </Badge>
                 ))}
               </div>

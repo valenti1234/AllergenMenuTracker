@@ -10,6 +10,15 @@ interface DietaryFilterProps {
 export function DietaryFilter({ selectedDiets, onToggle }: DietaryFilterProps) {
   const { t } = useTranslation();
 
+  // Funzione per convertire il valore dello schema nella chiave di traduzione
+  const getDietaryTranslationKey = (diet: string): string => {
+    switch(diet) {
+      case 'gluten-free': return 'glutenFree';
+      case 'dairy-free': return 'dairyFree';
+      default: return diet;
+    }
+  };
+
   return (
     <div className="flex flex-wrap gap-2">
       {dietaryPreferences.map((diet) => (
@@ -19,7 +28,7 @@ export function DietaryFilter({ selectedDiets, onToggle }: DietaryFilterProps) {
           className="cursor-pointer capitalize"
           onClick={() => onToggle(diet)}
         >
-          {t(`dietary.${diet.toLowerCase().replace(/-(.)/g, (_, c) => c.toUpperCase())}`)}
+          {t(`dietary.${getDietaryTranslationKey(diet)}`)}
         </Badge>
       ))}
     </div>
