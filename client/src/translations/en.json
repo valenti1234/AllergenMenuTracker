@@ -10,10 +10,37 @@
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",
-    "continue": "Continue"
+    "continue": "Continue",
+    "back": "Back",
+    "total": "Total",
+    "menu": "Menu",
+    "orders": "Orders",
+    "revenue": "Revenue",
+    "orderCount": "Order Count",
+    "menuItemCount": "Menu Item Count",
+    "noData": "No data available",
+    "lastUpdated": "Last updated",
+    "refresh": "Refresh"
   },
   "menu": {
     "title": "Our Menu",
+    "customerInfo": {
+      "title": "Welcome!",
+      "enterPhone": "Enter your phone number",
+      "phoneNumber": "Phone Number",
+      "phoneNumberPlaceholder": "(XXX) XXX-XXXX",
+      "invalidPhone": "Please enter a valid phone number",
+      "orderTypeTitle": "Select Order Type",
+      "dineIn": "Dine In",
+      "takeaway": "Takeaway",
+      "tableNumber": "Table Number",
+      "tableNumberPlaceholder": "Enter your table number",
+      "customerName": "Name",
+      "customerNamePlaceholder": "Enter your name",
+      "required": "This field is required",
+      "continue": "Continue",
+      "back": "Back"
+    },
     "orderType": {
       "title": "Order Type",
       "dineIn": "Dine In",
@@ -45,7 +72,6 @@
     "healthScoreExplanation": "This score is calculated based on protein content, calories, fat content, and special dietary attributes. A higher score indicates a healthier option.",
     "addToOrder": "Add to Order",
     "orderSummary": "Order Summary",
-    "total": "Total",
     "specialInstructions": "Special Instructions",
     "specialInstructionsPlaceholder": "Any special requests or notes?",
     "chefRecommended": "Chef's Recommendation",
@@ -54,38 +80,32 @@
     "subscribe": "Subscribe for Updates"
   },
   "orders": {
-    "title": "Order Management",
-    "filterPlaceholder": "Filter by Status",
-    "filters": {
-      "all": "All Active Orders"
-    },
-    "orderNumber": "Order #",
-    "table": "Table",
-    "note": "Note",
-    "noOrders": "No orders found",
-    "noOrdersWithStatus": "No orders with status: {{status}}",
-    "paid": "Paid",
-    "processPayment": "Process Payment",
+    "title": "Orders",
+    "orderNumber": "Order #{{id}}",
+    "orderType": "Order Type",
+    "tableNumber": "Table Number",
+    "customerName": "Customer Name",
+    "phoneNumber": "Phone Number",
+    "trackYourOrder": "Track Your Order",
+    "yourActiveOrders": "Your Active Orders",
+    "noActiveOrders": "No active orders found for your phone number.",
+    "delayedMessage": "Order is Delayed",
+    "cancelledMessage": "This order has been cancelled. Please contact the restaurant for assistance.",
     "status": {
-      "title": "Change Status",
-      "pending": "Pending",
+      "received": "Order Received",
       "preparing": "Preparing",
       "delayed": "Delayed",
       "ready": "Ready",
       "served": "Served",
       "completed": "Completed",
-      "cancelled": "Cancelled",
-      "confirmChange": "Are you sure you want to change the order status?",
-      "changeSuccess": "Order status updated successfully",
-      "changeError": "Failed to update order status"
+      "cancelled": "Cancelled"
     },
-    "archive": {
-      "title": "Archived Orders",
-      "filters": {
-        "all": "All Archived"
-      },
-      "noOrders": "No archived orders found"
-    }
+    "type": {
+      "dine-in": "Dine-in",
+      "takeaway": "Takeaway"
+    },
+    "paid": "Paid",
+    "processPayment": "Process Payment"
   },
   "kitchen": {
     "title": "Kitchen Display System",
@@ -135,7 +155,13 @@
     "userManagement": "User Management",
     "database": "Database",
     "apiDocs": "API Documentation",
-    "posSettings": "POS Settings"
+    "posSettings": "POS Settings",
+    "kitchen": "Kitchen",
+    "users": "Users",
+    "analytics": "Analytics",
+    "logout": "Logout",
+    "backToMenu": "Back to Menu",
+    "placeOrder": "Place Order"
   },
   "newsletter": {
     "title": "Stay Updated!",
@@ -144,6 +170,17 @@
     "skip": "Maybe later",
     "success": "Thanks for subscribing!",
     "error": "Subscription failed. Please try again."
+  },
+  "auth": {
+    "enterPhone": "Enter your phone number",
+    "phoneNumberPlaceholder": "(XXX) XXX-XXXX",
+    "selectOrderType": "Select order type",
+    "dineIn": "Dine In",
+    "takeaway": "Takeaway",
+    "enterTableNumber": "Enter table number",
+    "enterName": "Enter your name",
+    "tableNumberPlaceholder": "Table number",
+    "namePlaceholder": "Your name"
   },
   "dietary": {
     "vegan": "Vegan",
@@ -256,13 +293,6 @@
       "ordersDescription": "Daily order count for the past week",
       "dietaryDistribution": "Dietary Preferences",
       "dietaryDescription": "Distribution of menu items by dietary preferences",
-      "orders": "Orders",
-      "revenue": "Revenue",
-      "orderCount": "Order Count",
-      "menuItemCount": "Menu Item Count",
-      "noData": "No data available",
-      "lastUpdated": "Last updated",
-      "refresh": "Refresh",
       "metricsRefreshed": "Metrics refreshed successfully",
       "metricsRefreshError": "Failed to refresh metrics"
     },

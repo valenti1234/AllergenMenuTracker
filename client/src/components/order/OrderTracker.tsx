@@ -43,43 +43,43 @@ export function OrderTracker({ order }: OrderTrackerProps) {
       icon: Clock, 
       color: "text-yellow-500", 
       step: 0,
-      label: "Order Received" 
+      label: t('orders.status.received')
     },
     preparing: { 
       icon: ChefHat, 
       color: "text-blue-500", 
       step: 1,
-      label: "Preparing" 
+      label: t('orders.status.preparing')
     },
     delayed: { 
       icon: AlertTriangle, 
       color: "text-orange-500", 
       step: 1,
-      label: "Delayed" 
+      label: t('orders.status.delayed')
     },
     ready: { 
       icon: Bell, 
       color: "text-green-500", 
       step: 2,
-      label: "Ready" 
+      label: t('orders.status.ready')
     },
     served: { 
       icon: Utensils, 
       color: "text-purple-500", 
       step: 3,
-      label: "Served" 
+      label: t('orders.status.served')
     },
     completed: { 
       icon: CheckCircle2, 
       color: "text-gray-500", 
       step: 4,
-      label: "Completed" 
+      label: t('orders.status.completed')
     },
     cancelled: { 
       icon: XCircle, 
       color: "text-red-500", 
       step: -1,
-      label: "Cancelled" 
+      label: t('orders.status.cancelled')
     },
   };
 
@@ -96,16 +96,15 @@ export function OrderTracker({ order }: OrderTrackerProps) {
   if (order.status === "cancelled") {
     return (
       <Card className="border-red-200 bg-red-50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-red-500">
-            <XCircle className="h-5 w-5" />
-            Order Cancelled
+        <CardHeader className="py-3 sm:py-4">
+          <CardTitle className="flex items-center gap-2 text-red-500 text-sm sm:text-base">
+            <XCircle className="h-4 w-4 sm:h-5 sm:w-5" />
+            {t('orders.status.cancelled')}
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-red-600">
-            This order has been cancelled. Please contact the restaurant for
-            assistance.
+        <CardContent className="pb-4">
+          <p className="text-xs sm:text-sm text-red-600">
+            {t('orders.cancelledMessage')}
           </p>
         </CardContent>
       </Card>
@@ -117,25 +116,25 @@ export function OrderTracker({ order }: OrderTrackerProps) {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>Order #{order.id.slice(-6)}</span>
+      <CardHeader className="py-3 sm:py-4">
+        <CardTitle className="flex items-center justify-between text-sm sm:text-base">
+          <span>{t('orders.orderNumber', { id: order.id.slice(-6) })}</span>
           {order.status === "delayed" && (
-            <span className={`text-sm ${statusInfo.delayed.color}`}>
-              <AlertTriangle className="h-4 w-4 inline mr-1" />
-              Order is Delayed
+            <span className={`text-xs sm:text-sm ${statusInfo.delayed.color}`}>
+              <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 inline mr-1" />
+              {t('orders.delayedMessage')}
             </span>
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="relative">
+      <CardContent className="space-y-4 sm:space-y-6 pb-4">
+        <div className="relative pt-6 sm:pt-0">
           {/* Progress bar background */}
-          <div className="absolute inset-0 h-2 w-full rounded-full bg-gray-100" />
+          <div className="absolute inset-0 h-1.5 sm:h-2 w-full rounded-full bg-gray-100" />
 
           {/* Animated progress bar */}
           <motion.div
-            className={`absolute inset-0 h-2 rounded-full ${
+            className={`absolute inset-0 h-1.5 sm:h-2 rounded-full ${
               order.status === "delayed" ? "bg-orange-500" : "bg-primary"
             }`}
             initial={{ width: 0 }}
@@ -154,7 +153,7 @@ export function OrderTracker({ order }: OrderTrackerProps) {
               return (
                 <motion.div
                   key={status}
-                  className={`relative flex h-8 w-8 items-center justify-center rounded-full border-2 bg-white ${
+                  className={`relative flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full border-2 bg-white ${
                     isActive
                       ? "border-primary " + color
                       : "border-gray-300 text-gray-400"
@@ -163,8 +162,8 @@ export function OrderTracker({ order }: OrderTrackerProps) {
                   animate={{ scale: isActive ? 1 : 0.8 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <Icon className="h-4 w-4" />
-                  <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-medium">
+                  <Icon className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="absolute -bottom-5 sm:-bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] sm:text-xs font-medium">
                     {isDelayed ? statusInfo.delayed.label : statusInfo[status].label}
                   </span>
                 </motion.div>
@@ -173,28 +172,28 @@ export function OrderTracker({ order }: OrderTrackerProps) {
           </div>
         </div>
 
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Order Type:</span>
-            <span className="font-medium capitalize">{order.type}</span>
+        <div className="space-y-2 pt-4 sm:pt-0">
+          <div className="flex justify-between text-xs sm:text-sm">
+            <span className="text-muted-foreground">{t('orders.orderType')}:</span>
+            <span className="font-medium capitalize">{t(`orders.type.${order.type}`)}</span>
           </div>
           {order.type === "dine-in" ? (
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Table Number:</span>
+            <div className="flex justify-between text-xs sm:text-sm">
+              <span className="text-muted-foreground">{t('orders.tableNumber')}:</span>
               <span className="font-medium">{order.tableNumber}</span>
             </div>
           ) : (
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Customer Name:</span>
+            <div className="flex justify-between text-xs sm:text-sm">
+              <span className="text-muted-foreground">{t('orders.customerName')}:</span>
               <span className="font-medium">{order.customerName}</span>
             </div>
           )}
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Phone Number:</span>
+          <div className="flex justify-between text-xs sm:text-sm">
+            <span className="text-muted-foreground">{t('orders.phoneNumber')}:</span>
             <span className="font-medium">{order.phoneNumber}</span>
           </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Total:</span>
+          <div className="flex justify-between text-xs sm:text-sm">
+            <span className="text-muted-foreground">{t('orders.total')}:</span>
             <span className="font-medium">
               {formatPrice(order.total)}
             </span>

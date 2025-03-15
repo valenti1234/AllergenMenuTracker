@@ -1,4 +1,4 @@
-import { Phone, LogOut, ShoppingCart } from "lucide-react";
+import { Phone, LogOut, ShoppingCart, Menu as MenuIcon, X } from "lucide-react";
 import { usePhone } from "@/contexts/PhoneContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,12 +12,15 @@ import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useSettings } from "@/contexts/SettingsContext";
+import { useState } from "react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export function CustomerHeader() {
   const { phoneNumber, signOut } = usePhone();
   const { language, setLanguage } = useLanguage();
   const { t } = useTranslation();
   const { getLocalizedName } = useSettings();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const formatPhoneNumber = (phone: string) => {
     // Format phone number as (XXX) XXX-XXXX
@@ -31,33 +34,87 @@ export function CustomerHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
-        <div className="mr-4 hidden md:flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <span className="hidden font-bold sm:inline-block">
+      <div className="container flex h-14 items-center justify-between">
+        {/* Logo - visible on all screens */}
+        <div className="flex items-center">
+          <Link href="/" className="flex items-center space-x-2">
+            <span className="font-bold text-lg">
               {getLocalizedName()}
             </span>
           </Link>
         </div>
-        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <div className="w-full flex-1 md:w-auto md:flex-none">
-            <nav className="flex items-center">
-              <Link href="/track">
-                <Button variant="ghost">{t('nav.trackOrder')}</Button>
-              </Link>
-            </nav>
-          </div>
-          <div className="flex items-center gap-2">
-            <LanguageSwitcher
-              currentLanguage={language}
-              onLanguageChange={setLanguage}
-            />
-            <Link href="/cart">
-              <Button variant="ghost" size="icon" className="w-9 px-0" aria-label={t('nav.cart')}>
-                <ShoppingCart className="h-4 w-4" />
-              </Button>
+
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center space-x-4">
+          <nav className="flex items-center">
+            <Link href="/track">
+              <Button variant="ghost">{t('nav.trackOrder')}</Button>
             </Link>
-          </div>
+          </nav>
+          <LanguageSwitcher
+            currentLanguage={language}
+            onLanguageChange={setLanguage}
+          />
+          <Link href="/cart">
+            <Button variant="ghost" size="icon" className="w-9 px-0" aria-label={t('nav.cart')}>
+              <ShoppingCart className="h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+
+        {/* Mobile Navigation */}
+        <div className="flex md:hidden items-center space-x-2">
+          <Link href="/cart">
+            <Button variant="ghost" size="icon" className="w-9 px-0" aria-label={t('nav.cart')}>
+              <ShoppingCart className="h-4 w-4" />
+            </Button>
+          </Link>
+          
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="w-9 px-0">
+                <MenuIcon className="h-5 w-5" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[250px] sm:w-[300px]">
+              <div className="flex flex-col h-full py-6">
+                <div className="flex-1 space-y-4">
+                  <div className="px-2">
+                    <h2 className="text-lg font-semibold mb-2">{t('common.menu')}</h2>
+                    <nav className="flex flex-col space-y-3">
+                      <Link href="/">
+                        <Button variant="ghost" className="w-full justify-start">
+                          {t('nav.menu')}
+                        </Button>
+                      </Link>
+                      <Link href="/track">
+                        <Button variant="ghost" className="w-full justify-start">
+                          {t('nav.trackOrder')}
+                        </Button>
+                      </Link>
+                      <Link href="/cart">
+                        <Button variant="ghost" className="w-full justify-start">
+                          {t('nav.cart')}
+                        </Button>
+                      </Link>
+                    </nav>
+                  </div>
+                  
+                  <div className="px-2 pt-4 border-t">
+                    <h2 className="text-lg font-semibold mb-2">{t('admin.language.select')}</h2>
+                    <div className="grid gap-2">
+                      <LanguageSwitcher
+                        currentLanguage={language}
+                        onLanguageChange={setLanguage}
+                        vertical={true}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>

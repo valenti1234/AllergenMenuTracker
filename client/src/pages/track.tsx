@@ -10,10 +10,12 @@ import { Home } from "lucide-react";
 import type { Order } from "@shared/schema";
 import { CustomerLayout } from "@/components/layouts/CustomerLayout";
 import { usePhone } from "@/contexts/PhoneContext";
+import { useTranslation } from "react-i18next";
 
 export default function TrackOrder() {
   const { phoneNumber } = usePhone();
   const [isSearching, setIsSearching] = useState(false);
+  const { t } = useTranslation();
 
   // Start searching automatically when component mounts if we have a phone number
   useEffect(() => {
@@ -35,30 +37,41 @@ export default function TrackOrder() {
 
   return (
     <CustomerLayout>
-      <div className="container mx-auto py-8 px-4">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold">Track Your Order</h1>
+      <div className="container mx-auto py-4 sm:py-8 px-3 sm:px-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-4xl font-bold">{t('orders.trackYourOrder')}</h1>
           <Link href="/">
-            <Button variant="outline" className="flex items-center gap-2">
-              <Home className="h-4 w-4" />
-              Back to Menu
+            <Button variant="outline" size="sm" className="flex items-center gap-2 text-xs sm:text-sm">
+              <Home className="h-3 w-3 sm:h-4 sm:w-4" />
+              {t('nav.backToMenu')}
             </Button>
           </Link>
         </div>
 
         <div className="max-w-xl mx-auto">
           <Card>
-            <CardHeader>
-              <CardTitle>Your Active Orders</CardTitle>
+            <CardHeader className="pb-2 sm:pb-6">
+              <CardTitle className="text-lg sm:text-xl">{t('orders.yourActiveOrders')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {isLoading && <p>Loading orders...</p>}
+                {isLoading && (
+                  <div className="flex justify-center py-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div>
+                )}
 
                 {!isLoading && activeOrders?.length === 0 && (
-                  <p className="text-muted-foreground">
-                    No active orders found for your phone number.
-                  </p>
+                  <div className="text-center py-6">
+                    <p className="text-muted-foreground text-sm sm:text-base">
+                      {t('orders.noActiveOrders')}
+                    </p>
+                    <Link href="/">
+                      <Button variant="outline" size="sm" className="mt-4">
+                        {t('nav.placeOrder')}
+                      </Button>
+                    </Link>
+                  </div>
                 )}
 
                 {activeOrders?.map((order) => (

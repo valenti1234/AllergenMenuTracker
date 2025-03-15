@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { MenuCard } from "@/components/menu/MenuCard";
 import { AllergenFilter } from "@/components/menu/AllergenFilter";
 import { DietaryFilter } from "@/components/menu/DietaryFilter";
@@ -17,6 +18,7 @@ import { CustomerLayout } from "@/components/layouts/CustomerLayout";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import '@/i18n';
 
 export default function Menu() {
   const { phoneNumber, setPhoneNumber } = usePhone();
@@ -32,10 +34,55 @@ export default function Menu() {
   >(new Map());
   const { t } = useTranslation();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   const { data: menuItems, isLoading } = useQuery<MenuItem[]>({
     queryKey: ["/api/menu"],
   });
+
+  useEffect(() => {
+    try {
+      const customerInfoStr = localStorage.getItem('customerInfo');
+      if (!customerInfoStr) {
+        setLocation('/');
+        return;
+      }
+
+      const customerInfo = JSON.parse(customerInfoStr);
+      console.log('Retrieved customer info:', customerInfo);
+      
+      const isExpired = Date.now() - customerInfo.timestamp > 24 * 60 * 60 * 1000; // 24 hours
+
+      if (isExpired || !customerInfo.phoneNumber || !customerInfo.orderType) {
+        localStorage.removeItem('customerInfo');
+        setLocation('/');
+        return;
+      }
+
+      // Set the state from customerInfo
+      setPhoneNumber(customerInfo.phoneNumber);
+      setOrderType(customerInfo.orderType);
+      if (customerInfo.orderType === 'dine-in' && customerInfo.tableNumber) {
+        setTableNumber(customerInfo.tableNumber);
+      } else if (customerInfo.orderType === 'takeaway' && customerInfo.customerName) {
+        setCustomerName(customerInfo.customerName);
+      }
+      
+      // Log newsletter subscription status
+      const hasSubscribed = customerInfo.subscribeToNewsletter === true;
+      console.log('Newsletter subscription status:', hasSubscribed);
+      
+      // Se l'utente non ha ancora fatto una scelta sulla newsletter, mostra il dialog
+      if (customerInfo.subscribeToNewsletter === undefined) {
+        console.log('No newsletter choice found, showing dialog');
+        setShowNewsletter(true);
+      }
+      
+    } catch (error) {
+      console.error('Error checking customer info:', error);
+      setLocation('/');
+    }
+  }, []); // Empty dependency array - only run once on mount
 
   const filteredItems = menuItems?.filter((item) => {
     // Filter by allergens
@@ -110,6 +157,25 @@ export default function Menu() {
       toast({
         title: t('newsletter.success'),
       });
+      
+      // Aggiorna il localStorage con la scelta dell'utente
+      try {
+        const customerInfoStr = localStorage.getItem('customerInfo');
+        if (customerInfoStr) {
+          const customerInfo = JSON.parse(customerInfoStr);
+          
+          // Aggiorna il campo subscribeToNewsletter
+          const updatedInfo = {
+            ...customerInfo,
+            subscribeToNewsletter: true
+          };
+          
+          console.log('Updating customer info with newsletter subscription:', updatedInfo);
+          localStorage.setItem('customerInfo', JSON.stringify(updatedInfo));
+        }
+      } catch (error) {
+        console.error('Error updating customer info:', error);
+      }
     } catch (error) {
       toast({
         variant: "destructive",

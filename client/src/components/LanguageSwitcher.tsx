@@ -12,9 +12,31 @@ import { Language, languages, getLanguageName } from '@/lib/i18n';
 interface LanguageSwitcherProps {
   currentLanguage: Language;
   onLanguageChange: (language: Language) => void;
+  vertical?: boolean;
 }
 
-export function LanguageSwitcher({ currentLanguage, onLanguageChange }: LanguageSwitcherProps) {
+export function LanguageSwitcher({ 
+  currentLanguage, 
+  onLanguageChange, 
+  vertical = false 
+}: LanguageSwitcherProps) {
+  if (vertical) {
+    return (
+      <div className="flex flex-col space-y-2">
+        {languages.map((lang) => (
+          <Button
+            key={lang}
+            variant={currentLanguage === lang ? "default" : "outline"}
+            className="w-full justify-start"
+            onClick={() => onLanguageChange(lang)}
+          >
+            {getLanguageName(lang)}
+          </Button>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

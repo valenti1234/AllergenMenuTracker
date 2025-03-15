@@ -1,9 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+
+interface CustomerInfo {
+  phoneNumber: string;
+  orderType: 'dine-in' | 'takeaway';
+  tableNumber?: string;
+  customerName?: string;
+  timestamp: number;
+}
 
 interface PhoneContextType {
   phoneNumber: string;
@@ -24,52 +28,43 @@ export function usePhone() {
 
 export function PhoneProvider({ children }: { children: React.ReactNode }) {
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [showDialog, setShowDialog] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [, setLocation] = useLocation();
 
-  // Check for stored phone number on mount
+  // Check for stored customer info on mount
   useEffect(() => {
-    const stored = localStorage.getItem('customerPhone');
+    const stored = localStorage.getItem('customerInfo');
     if (stored) {
-      setPhoneNumber(stored);
-      setIsAuthenticated(true);
-      // If we're on the signin page, redirect to menu
-      if (window.location.pathname === '/signin' || window.location.pathname === '/') {
-        setLocation('/menu');
+      try {
+        const customerInfo: CustomerInfo = JSON.parse(stored);
+        // Check if the info is expired (24 hours)
+        const now = Date.now();
+        if (now - customerInfo.timestamp > 24 * 60 * 60 * 1000) {
+          localStorage.removeItem('customerInfo');
+          setLocation('/');
+          return;
+        }
+        setPhoneNumber(customerInfo.phoneNumber);
+        setIsAuthenticated(true);
+        // If we're on the signin page, redirect to menu
+        if (window.location.pathname === '/signin' || window.location.pathname === '/') {
+          setLocation('/menu');
+        }
+      } catch (error) {
+        console.error('Error parsing customer info:', error);
+        localStorage.removeItem('customerInfo');
+        setLocation('/');
       }
     } else {
-      setShowDialog(true);
+      setLocation('/');
     }
   }, [setLocation]);
 
-  // Store phone number when it changes
-  useEffect(() => {
-    if (phoneNumber && phoneNumber.length === 10) {
-      localStorage.setItem('customerPhone', phoneNumber);
-      setIsAuthenticated(true);
-      setShowDialog(false);
-    }
-  }, [phoneNumber]);
-
   const signOut = () => {
-    localStorage.removeItem('customerPhone');
+    localStorage.removeItem('customerInfo');
     setPhoneNumber('');
     setIsAuthenticated(false);
     setLocation('/signin');
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (phoneNumber.length >= 10) {
-      setShowDialog(false);
-      // Check if there's a stored redirect path
-      const redirectPath = localStorage.getItem('redirectAfterPhone');
-      if (redirectPath) {
-        localStorage.removeItem('redirectAfterPhone');
-        setLocation(redirectPath);
-      }
-    }
   };
 
   return (
@@ -79,40 +74,6 @@ export function PhoneProvider({ children }: { children: React.ReactNode }) {
       signOut,
       isAuthenticated 
     }}>
-      <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Enter Your Phone Number</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="(XXX) XXX-XXXX"
-                value={phoneNumber}
-                onChange={(e) => {
-                  // Only allow numbers
-                  const cleaned = e.target.value.replace(/\D/g, '');
-                  if (cleaned.length <= 10) {
-                    setPhoneNumber(cleaned);
-                  }
-                }}
-                required
-                pattern="[0-9]{10}"
-              />
-            </div>
-            <Button 
-              type="submit" 
-              className="w-full"
-              disabled={phoneNumber.length !== 10}
-            >
-              Continue
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
       {children}
     </PhoneContext.Provider>
   );

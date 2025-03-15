@@ -23,6 +23,39 @@ export function NewsletterDialog({
 }: NewsletterDialogProps) {
   const { t } = useTranslation();
 
+  const handleSubscribe = () => {
+    // Aggiorna il localStorage con la scelta dell'utente
+    updateLocalStorageWithSubscription(true);
+    onSubscribe();
+  };
+
+  const handleSkip = () => {
+    // Aggiorna il localStorage con la scelta dell'utente
+    updateLocalStorageWithSubscription(false);
+    onSkip();
+  };
+
+  // Funzione per aggiornare il localStorage
+  const updateLocalStorageWithSubscription = (subscribe: boolean) => {
+    try {
+      const customerInfoStr = localStorage.getItem('customerInfo');
+      if (customerInfoStr) {
+        const customerInfo = JSON.parse(customerInfoStr);
+        
+        // Aggiorna il campo subscribeToNewsletter
+        const updatedInfo = {
+          ...customerInfo,
+          subscribeToNewsletter: subscribe
+        };
+        
+        console.log('Updating customer info with newsletter choice:', updatedInfo);
+        localStorage.setItem('customerInfo', JSON.stringify(updatedInfo));
+      }
+    } catch (error) {
+      console.error('Error updating customer info:', error);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -33,10 +66,10 @@ export function NewsletterDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4 pt-4">
-          <Button onClick={onSubscribe} className="w-full">
+          <Button onClick={handleSubscribe} className="w-full">
             {t('newsletter.subscribe')}
           </Button>
-          <Button variant="outline" onClick={onSkip} className="w-full">
+          <Button variant="outline" onClick={handleSkip} className="w-full">
             {t('newsletter.skip')}
           </Button>
         </div>

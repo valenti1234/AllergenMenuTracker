@@ -9,26 +9,44 @@
     "healthScore": "Punteggio Salute",
     "loading": "Caricamento...",
     "error": "Errore",
-    "success": "Successo"
+    "success": "Successo",
+    "continue": "Continua",
+    "back": "Indietro",
+    "total": "Totale",
+    "menu": "Menu",
+    "orders": "Ordini",
+    "revenue": "Incasso",
+    "orderCount": "Numero Ordini",
+    "menuItemCount": "Numero Elementi Menu",
+    "noData": "Nessun dato disponibile",
+    "lastUpdated": "Ultimo aggiornamento",
+    "refresh": "Aggiorna"
   },
   "menu": {
     "title": "Il Nostro Menu",
+    "customerInfo": {
+      "title": "Benvenuto!",
+      "enterPhone": "Inserisci il tuo numero di telefono",
+      "phoneNumber": "Numero di Telefono",
+      "phoneNumberPlaceholder": "(XXX) XXX-XXXX",
+      "invalidPhone": "Inserisci un numero di telefono valido",
+      "orderTypeTitle": "Seleziona il Tipo di Ordine",
+      "dineIn": "Al Tavolo",
+      "takeaway": "Da Asporto",
+      "tableNumber": "Numero del Tavolo",
+      "tableNumberPlaceholder": "Inserisci il numero del tavolo",
+      "customerName": "Nome",
+      "customerNamePlaceholder": "Inserisci il tuo nome",
+      "required": "Questo campo è obbligatorio",
+      "continue": "Continua",
+      "back": "Indietro"
+    },
     "categories": {
       "starters": "Antipasti",
       "mains": "Secondi",
       "desserts": "Dolci",
       "drinks": "Bevande",
       "sides": "Contorni"
-    },
-    "orderType": {
-      "title": "Seleziona Tipo di Ordine",
-      "dineIn": "Al Tavolo",
-      "takeaway": "Da Asporto",
-      "phoneNumber": "Numero di Telefono",
-      "tableNumber": "Numero del Tavolo",
-      "customerName": "Nome Cliente",
-      "enterTableNumber": "Inserisci il numero del tavolo",
-      "enterName": "Inserisci il tuo nome"
     },
     "filters": {
       "allergens": "Filtra per Allergeni",
@@ -44,7 +62,12 @@
     "healthyChoice": "Scelta Salutare!",
     "healthScoreExplanation": "Questo punteggio è calcolato in base al contenuto di proteine, calorie, grassi e attributi dietetici speciali. Un punteggio più alto indica un'opzione più salutare.",
     "total": "Totale",
-    "chefRecommended": "Consigliato dallo Chef"
+    "chefRecommended": "Consigliato dallo Chef",
+    "specialInstructions": "Istruzioni Speciali",
+    "specialInstructionsPlaceholder": "Hai richieste o note particolari?",
+    "placeOrder": "Invia Ordine",
+    "placingOrder": "Invio Ordine...",
+    "subscribe": "Iscriviti per Aggiornamenti"
   },
   "nav": {
     "home": "Home",
@@ -52,6 +75,9 @@
     "trackOrder": "Traccia Ordine",
     "cart": "Carrello",
     "signOut": "Esci",
+    "profile": "Profilo",
+    "settings": "Impostazioni",
+    "adminPanel": "Pannello Admin",
     "dashboard": "Dashboard",
     "menuItems": "Voci Menu",
     "orders": "Ordini",
@@ -59,7 +85,22 @@
     "kitchenDisplay": "Display Cucina",
     "userManagement": "Gestione Utenti",
     "database": "Database",
-    "apiDocs": "Documentazione API"
+    "apiDocs": "Documentazione API",
+    "posSettings": "Impostazioni POS",
+    "kitchen": "Cucina",
+    "users": "Utenti",
+    "analytics": "Analisi",
+    "logout": "Disconnetti",
+    "backToMenu": "Torna al Menu",
+    "placeOrder": "Invia Ordine"
+  },
+  "newsletter": {
+    "title": "Iscriviti alla Newsletter",
+    "description": "Desideri ricevere aggiornamenti sui nostri nuovi piatti, offerte speciali ed eventi esclusivi?",
+    "subscribe": "Sì, voglio iscrivermi",
+    "skip": "No, grazie",
+    "success": "Grazie per esserti iscritto!",
+    "error": "Iscrizione fallita. Riprova."
   },
   "dietary": {
     "vegan": "Vegano",
@@ -86,36 +127,32 @@
     "required": "Questo campo è obbligatorio"
   },
   "orders": {
-    "title": "Gestione Ordini",
-    "filterPlaceholder": "Filtra per Stato",
-    "filters": {
-      "all": "Tutti gli Ordini Attivi"
-    },
-    "orderNumber": "Ordine #",
-    "table": "Tavolo",
-    "note": "Nota",
-    "noOrders": "Nessun ordine trovato",
-    "noOrdersWithStatus": "Nessun ordine con stato: {{status}}",
+    "title": "Ordini",
+    "orderNumber": "Ordine #{{id}}",
+    "orderType": "Tipo di Ordine",
+    "tableNumber": "Numero del Tavolo",
+    "customerName": "Nome Cliente",
+    "phoneNumber": "Numero di Telefono",
+    "trackYourOrder": "Traccia il Tuo Ordine",
+    "yourActiveOrders": "I Tuoi Ordini Attivi",
+    "noActiveOrders": "Nessun ordine attivo trovato per il tuo numero di telefono.",
+    "delayedMessage": "Ordine in Ritardo",
+    "cancelledMessage": "Questo ordine è stato annullato. Contatta il ristorante per assistenza.",
     "status": {
-      "title": "Cambia Stato",
-      "pending": "In Attesa",
+      "received": "Ordine Ricevuto",
       "preparing": "In Preparazione",
       "delayed": "In Ritardo",
       "ready": "Pronto",
       "served": "Servito",
       "completed": "Completato",
-      "cancelled": "Annullato",
-      "confirmChange": "Sei sicuro di voler cambiare lo stato dell'ordine?",
-      "changeSuccess": "Stato dell'ordine aggiornato con successo",
-      "changeError": "Impossibile aggiornare lo stato dell'ordine"
+      "cancelled": "Annullato"
     },
-    "archive": {
-      "title": "Archivio Ordini",
-      "filters": {
-        "all": "Tutti gli Archiviati"
-      },
-      "noOrders": "Nessun ordine archiviato trovato"
-    }
+    "type": {
+      "dine-in": "Al Tavolo",
+      "takeaway": "Da Asporto"
+    },
+    "paid": "Pagato",
+    "processPayment": "Processa Pagamento"
   },
   "kitchen": {
     "title": "Sistema di Visualizzazione Cucina",
@@ -147,6 +184,58 @@
       "phone": "Telefono",
       "specialInstructions": "Istruzioni Speciali"
     }
+  },
+  "settings": {
+    "title": "Impostazioni Ristorante",
+    "description": "Configura le impostazioni e le preferenze del ristorante",
+    "restaurant": "Ristorante",
+    "financialSettings": "Finanziario",
+    "localization": "Localizzazione",
+    "ordering": "Ordinazioni",
+    "social": "Social Media",
+    "pos": "Punto Vendita",
+    "posIntegration": "Integrazione POS",
+    "posDescription": "Connetti il tuo ristorante a un sistema POS per processare i pagamenti",
+    "posEnabled": "Abilita Integrazione POS",
+    "posType": "Sistema POS",
+    "posNone": "Nessuno",
+    "posStripe": "Stripe Terminal",
+    "posSquare": "Square",
+    "posClover": "Clover",
+    "stripeSecretKey": "Chiave Segreta Stripe",
+    "stripePublishableKey": "Chiave Pubblica Stripe",
+    "testConnection": "Testa Connessione",
+    "connectionSuccess": "Connessione riuscita",
+    "connectionFailed": "Connessione fallita",
+    "restaurantName": "Nome Ristorante",
+    "phone": "Numero di Telefono",
+    "address": "Indirizzo",
+    "email": "Email",
+    "website": "Sito Web",
+    "logoUrl": "URL Logo",
+    "openingHours": "Orari di Apertura",
+    "openingHoursPlaceholder": "Es., Lun-Ven: 9-22, Sab-Dom: 10-23",
+    "currency": "Valuta",
+    "selectCurrency": "Seleziona valuta",
+    "taxRate": "Aliquota IVA (%)",
+    "serviceCharge": "Servizio (%)",
+    "defaultLanguage": "Lingua Predefinita",
+    "selectLanguage": "Seleziona lingua",
+    "theme": "Tema",
+    "selectTheme": "Seleziona tema",
+    "lightTheme": "Chiaro",
+    "darkTheme": "Scuro",
+    "systemTheme": "Sistema",
+    "onlineOrdering": "Ordinazioni Online",
+    "reservations": "Prenotazioni Tavoli",
+    "delivery": "Consegna",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "twitter": "Twitter",
+    "saveSettings": "Salva Impostazioni",
+    "saving": "Salvataggio...",
+    "saveSuccess": "Impostazioni salvate con successo",
+    "saveError": "Impossibile salvare le impostazioni"
   },
   "admin": {
     "title": "Amministrazione Ristorante",
@@ -209,5 +298,16 @@
       "authInfo": "L'API utilizza l'autenticazione basata su cookie. La maggior parte degli endpoint richiede l'autenticazione con ruoli utente appropriati.",
       "authDocs": "Documentazione sull'autenticazione"
     }
+  },
+  "auth": {
+    "enterPhone": "Inserisci il tuo numero di telefono",
+    "phoneNumberPlaceholder": "(XXX) XXX-XXXX",
+    "selectOrderType": "Seleziona il tipo di ordine",
+    "dineIn": "Al Tavolo",
+    "takeaway": "Da Asporto",
+    "enterTableNumber": "Inserisci il numero del tavolo",
+    "enterName": "Inserisci il tuo nome",
+    "tableNumberPlaceholder": "Numero del tavolo",
+    "namePlaceholder": "Il tuo nome"
   }
 } 

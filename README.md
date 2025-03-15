@@ -1,5 +1,16 @@
 # AllergenMenuTracker
 
+AllergenMenuTracker is a comprehensive restaurant management system focused on tracking allergens in menus. The application enables restaurants to:
+
+1. Manage menus and dishes with detailed allergen information
+2. Track ingredients and allergens to ensure food safety
+3. Process orders and payments through Stripe integration
+4. Manage a Point of Sale (POS) system for restaurants
+5. Provide a modern and accessible user interface for managers and customers
+6. Support authentication and different user roles
+
+The system is designed to help restaurants comply with food safety regulations by providing accurate allergen information to customers and facilitating efficient menu management.
+
 A modern restaurant management system that helps track orders and manage menu items with allergen information.
 
 ## Features

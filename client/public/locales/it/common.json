@@ -1,0 +1,22 @@
+{
+  "menu": {
+    "title": "Il Nostro Menu",
+    "customerInfo": {
+      "title": "Benvenuto!",
+      "enterPhone": "Inserisci il tuo numero di telefono",
+      "phoneNumber": "Numero di Telefono",
+      "phoneNumberPlaceholder": "(XXX) XXX-XXXX",
+      "invalidPhone": "Inserisci un numero di telefono valido",
+      "orderTypeTitle": "Seleziona il Tipo di Ordine",
+      "dineIn": "Al Tavolo",
+      "takeaway": "Da Asporto",
+      "tableNumber": "Numero del Tavolo",
+      "tableNumberPlaceholder": "Inserisci il numero del tavolo",
+      "customerName": "Nome",
+      "customerNamePlaceholder": "Inserisci il tuo nome",
+      "required": "Questo campo è obbligatorio",
+      "continue": "Continua",
+      "back": "Indietro"
+    }
+  }
+} 

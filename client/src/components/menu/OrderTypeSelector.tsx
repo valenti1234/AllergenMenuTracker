@@ -39,58 +39,58 @@ export function OrderTypeSelector({
 
   return (
     <div className="space-y-4">
-      <h3 className="font-medium">{t('menu.orderType.title')}</h3>
+      <h3 className="font-medium">{t('menu.customerInfo.orderTypeTitle')}</h3>
       <div className="flex gap-2">
         <Button
           variant={selectedType === "dine-in" ? "default" : "outline"}
           onClick={() => onSelectType("dine-in")}
         >
           <Utensils className="mr-2 h-4 w-4" />
-          {t('menu.orderType.dineIn')}
+          {t('menu.customerInfo.dineIn')}
         </Button>
         <Button
           variant={selectedType === "takeaway" ? "default" : "outline"}
           onClick={() => onSelectType("takeaway")}
         >
           <Package className="mr-2 h-4 w-4" />
-          {t('menu.orderType.takeaway')}
+          {t('menu.customerInfo.takeaway')}
         </Button>
       </div>
 
       <form onSubmit={handlePhoneSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="phone">{t('menu.orderType.phoneNumber')}</Label>
+          <Label htmlFor="phone">{t('menu.customerInfo.phoneNumber')}</Label>
           <Input
             id="phone"
             type="tel"
             value={phoneNumber}
             onChange={(e) => onPhoneNumberChange(e.target.value)}
-            placeholder="(XXX) XXX-XXXX"
+            placeholder={t('menu.customerInfo.phoneNumberPlaceholder')}
           />
         </div>
 
         {selectedType === "dine-in" && (
           <div className="space-y-2">
-            <Label htmlFor="table">{t('menu.orderType.tableNumber')}</Label>
+            <Label htmlFor="table">{t('menu.customerInfo.tableNumber')}</Label>
             <Input
               id="table"
               type="text"
               value={tableNumber}
               onChange={(e) => onTableNumberChange(e.target.value)}
-              placeholder={t('menu.orderType.enterTableNumber')}
+              placeholder={t('menu.customerInfo.tableNumberPlaceholder')}
             />
           </div>
         )}
 
         {selectedType === "takeaway" && (
           <div className="space-y-2">
-            <Label htmlFor="name">{t('menu.orderType.customerName')}</Label>
+            <Label htmlFor="name">{t('menu.customerInfo.customerName')}</Label>
             <Input
               id="name"
               type="text"
               value={customerName}
               onChange={(e) => onCustomerNameChange(e.target.value)}
-              placeholder={t('menu.orderType.enterName')}
+              placeholder={t('menu.customerInfo.customerNamePlaceholder')}
             />
           </div>
         )}
@@ -101,7 +101,7 @@ export function OrderTypeSelector({
           disabled={!phoneNumber}
         >
           <Phone className="mr-2 h-4 w-4" />
-          {t('menu.subscribe')}
+          {t('common.continue')}
         </Button>
       </form>
     </div>
