@@ -230,6 +230,10 @@ const RestaurantSettingsSchema = new mongoose.Schema({
     twitter: { type: String },
     yelp: { type: String }
   },
+  paymentOptions: {
+    autoRedirectToPayment: { type: Boolean, default: true },
+    payAtOrder: { type: Boolean, default: false }
+  },
   updatedAt: { type: Date, default: Date.now }
 });
 

@@ -248,7 +248,7 @@
     "selectTheme": "Select theme",
     "lightTheme": "Light",
     "darkTheme": "Dark",
-    "systemTheme": "System Default",
+    "systemTheme": "System",
     "onlineOrdering": "Online Ordering",
     "reservations": "Table Reservations",
     "delivery": "Delivery",
@@ -258,7 +258,13 @@
     "saveSettings": "Save Settings",
     "saving": "Saving...",
     "saveSuccess": "Settings saved successfully",
-    "saveError": "Failed to save settings"
+    "saveError": "Failed to save settings",
+    "paymentOptions": "Payment Options",
+    "paymentOptionsDescription": "Configure payment options for customers",
+    "autoRedirectToPayment": "Automatic Redirect to Payment",
+    "autoRedirectToPaymentDescription": "Automatically redirect the customer to the payment page when the order is served",
+    "payAtOrder": "Pay at Order",
+    "payAtOrderDescription": "Allow customers to pay at the time of ordering instead of after service"
   },
   "admin": {
     "title": "Restaurant Admin",
@@ -332,5 +338,24 @@
     "cancel": "Cancel",
     "completeOrder": "Complete Order",
     "total": "Total"
+  },
+  "payment": {
+    "title": "Payment",
+    "processPayment": "Process Payment",
+    "completed": "Payment Completed",
+    "orderDetails": "Order Details #{{id}}",
+    "thankYou": "Thank you for your order!",
+    "payNow": "Pay Now",
+    "cancel": "Cancel",
+    "backToMenu": "Back to Menu",
+    "backToOrders": "Back to Orders",
+    "success": "Payment Successful",
+    "successDescription": "Your payment has been processed successfully",
+    "error": "Payment Error",
+    "errorDescription": "There was an error processing your payment",
+    "invalidOrderStatus": "Invalid Order Status",
+    "orderNotServed": "This order is not ready for payment",
+    "orderNotFound": "Order not found",
+    "receiptSent": "The receipt has been sent to your email address"
   }
 } 

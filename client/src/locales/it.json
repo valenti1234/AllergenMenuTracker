@@ -1,0 +1,22 @@
+{
+  "settings": {
+    "paymentOptions": "Opzioni di pagamento",
+    "paymentOptionsDescription": "Configura le opzioni di pagamento per i clienti",
+    "autoRedirectToPayment": "Reindirizzamento automatico al pagamento",
+    "autoRedirectToPaymentDescription": "Reindirizza automaticamente il cliente alla pagina di pagamento quando l'ordine è servito",
+    "payAtOrder": "Pagamento al momento dell'ordine",
+    "payAtOrderDescription": "Permetti ai clienti di pagare al momento dell'ordine invece che dopo il servizio"
+  },
+  "notifications": {
+    "orderServedTitle": "Il tuo ordine è pronto!",
+    "orderServedBody": "Il tuo ordine #{id} è pronto per essere servito."
+  },
+  "track": {
+    "payNow": "Paga ora"
+  },
+  "menu": {
+    "orderSuccess": "Ordine Effettuato con Successo",
+    "redirectingToPayment": "Reindirizzamento alla pagina di pagamento...",
+    "trackYourOrder": "Puoi tracciare lo stato del tuo ordine"
+  }
+} 

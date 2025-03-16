@@ -54,6 +54,38 @@ export async function registerRoutes(app: Express) {
     }
   });
 
+  // Endpoint per recuperare un ordine specifico per ID
+  app.get("/api/orders/:id", async (req, res) => {
+    try {
+      const order = await storage.getOrder(req.params.id);
+      if (!order) {
+        res.status(404).json({ message: "Order not found" });
+        return;
+      }
+      res.json(order);
+    } catch (error) {
+      console.error('Get order error:', error);
+      res.status(500).json({ message: "Failed to fetch order" });
+    }
+  });
+
+  // Endpoint pubblico per completare un ordine (pagamento)
+  app.patch("/api/orders/:id/complete", async (req, res) => {
+    try {
+      const order = await storage.getOrder(req.params.id);
+      if (!order) {
+        res.status(404).json({ message: "Order not found" });
+        return;
+      }
+      
+      const updatedOrder = await storage.updateOrder(req.params.id, { status: "completed" });
+      res.json(updatedOrder);
+    } catch (error) {
+      console.error('Complete order error:', error);
+      res.status(500).json({ message: "Failed to complete order" });
+    }
+  });
+
   // Orders - accessible by kitchen staff and admin/manager
   app.get("/api/orders", requireAuth, async (_req, res) => {
     try {
@@ -104,6 +136,7 @@ export async function registerRoutes(app: Express) {
       }
 
       const order = await storage.createOrder(result.data);
+      console.log("Created order:", order);
       res.status(201).json(order);
     } catch (error) {
       console.error('Create order error:', error);
@@ -464,13 +497,68 @@ export async function registerRoutes(app: Express) {
   });
 
   // Admin settings routes - Protected endpoint for updating settings
-  app.post("/api/admin/settings", requireRole(["admin"]), async (req, res) => {
+  app.patch("/api/admin/settings", requireRole(["admin"]), async (req, res) => {
     try {
-      const validatedData = insertRestaurantSettingsSchema.parse(req.body);
+      console.log("Received settings update:", JSON.stringify(req.body, null, 2));
+      
+      // Ottieni le impostazioni esistenti
+      const existingSettings = await getRestaurantSettings();
+      
+      // Assicuriamoci che le opzioni di pagamento siano presenti
+      const settingsData = {
+        ...existingSettings,
+        ...req.body,
+        paymentOptions: {
+          ...(existingSettings?.paymentOptions || { autoRedirectToPayment: true, payAtOrder: false }),
+          ...(req.body.paymentOptions || {})
+        }
+      };
+      
+      console.log("Merged settings data:", JSON.stringify(settingsData, null, 2));
+      
+      const validatedData = insertRestaurantSettingsSchema.parse(settingsData);
+      console.log("Validated settings data:", JSON.stringify(validatedData, null, 2));
+      
       const settings = await createOrUpdateRestaurantSettings(validatedData);
       res.json(settings);
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.error("Validation error:", error.errors);
+        return res.status(400).json({ message: "Invalid settings data", errors: error.errors });
+      }
+      console.error("Error updating restaurant settings:", error);
+      res.status(500).json({ message: "Failed to update restaurant settings" });
+    }
+  });
+
+  // Manteniamo anche l'endpoint POST per retrocompatibilità
+  app.post("/api/admin/settings", requireRole(["admin"]), async (req, res) => {
+    try {
+      console.log("Received settings update (POST):", JSON.stringify(req.body, null, 2));
+      
+      // Ottieni le impostazioni esistenti
+      const existingSettings = await getRestaurantSettings();
+      
+      // Assicuriamoci che le opzioni di pagamento siano presenti
+      const settingsData = {
+        ...existingSettings,
+        ...req.body,
+        paymentOptions: {
+          ...(existingSettings?.paymentOptions || { autoRedirectToPayment: true, payAtOrder: false }),
+          ...(req.body.paymentOptions || {})
+        }
+      };
+      
+      console.log("Merged settings data:", JSON.stringify(settingsData, null, 2));
+      
+      const validatedData = insertRestaurantSettingsSchema.parse(settingsData);
+      console.log("Validated settings data:", JSON.stringify(validatedData, null, 2));
+      
+      const settings = await createOrUpdateRestaurantSettings(validatedData);
+      res.json(settings);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        console.error("Validation error:", error.errors);
         return res.status(400).json({ message: "Invalid settings data", errors: error.errors });
       }
       console.error("Error updating restaurant settings:", error);

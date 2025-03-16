@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Menu from "@/pages/menu";
 import Cart from "@/pages/cart";
 import TrackOrder from "@/pages/track";
+import Payment from "@/pages/payment";
 import AdminIndex from "@/pages/admin";
 import AdminLogin from "@/pages/admin/login";
 import AdminDashboard from "@/pages/admin/dashboard";
@@ -51,6 +52,7 @@ function Router() {
       <Route path="/menu" component={Menu} />
       <Route path="/cart" component={Cart} />
       <Route path="/track" component={TrackOrder} />
+      <Route path="/payment" component={Payment} />
       <Route path="/" component={SignIn} />
       <Route path="/admin" component={AdminIndex} />
       <Route path="/admin/login" component={AdminLogin} />

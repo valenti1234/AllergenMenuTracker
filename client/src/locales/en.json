@@ -1,0 +1,22 @@
+{
+  "settings": {
+    "paymentOptions": "Payment Options",
+    "paymentOptionsDescription": "Configure payment options for customers",
+    "autoRedirectToPayment": "Automatic Redirect to Payment",
+    "autoRedirectToPaymentDescription": "Automatically redirect the customer to the payment page when the order is served",
+    "payAtOrder": "Pay at Order",
+    "payAtOrderDescription": "Allow customers to pay at the time of ordering instead of after service"
+  },
+  "notifications": {
+    "orderServedTitle": "Your order is ready!",
+    "orderServedBody": "Your order #{id} is ready to be served."
+  },
+  "track": {
+    "payNow": "Pay Now"
+  },
+  "menu": {
+    "orderSuccess": "Order Placed Successfully",
+    "redirectingToPayment": "Redirecting to payment page...",
+    "trackYourOrder": "You can track your order status"
+  }
+} 

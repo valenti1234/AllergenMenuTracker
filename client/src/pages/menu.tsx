@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import '@/i18n';
+import { useSettings } from "@/contexts/SettingsContext";
 
 export default function Menu() {
   const { phoneNumber, setPhoneNumber } = usePhone();
@@ -34,6 +35,10 @@ export default function Menu() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const { settings } = useSettings();
+  
+  // Verifica se il pagamento al momento dell'ordine è abilitato
+  const payAtOrderEnabled = (settings as any)?.paymentOptions?.payAtOrder === true;
 
   const { data: menuItems, isLoading } = useQuery<MenuItem[]>({
     queryKey: ["/api/menu"],
@@ -281,7 +286,19 @@ export default function Menu() {
     try {
       const formattedPhoneNumber = phoneNumber.replace(/\D/g, "");
 
-      await apiRequest("POST", "/api/orders", {
+      console.log("Sending order request:", {
+        type: orderType,
+        tableNumber: orderType === 'dine-in' ? tableNumber : undefined,
+        customerName: orderType === 'takeaway' ? customerName : undefined,
+        phoneNumber: formattedPhoneNumber,
+        items: Array.from(selectedItems.values()).map(({ item, quantity }) => ({
+          menuItemId: item.id,
+          name: item.name,
+          quantity,
+        })),
+      });
+
+      const order = await apiRequest("POST", "/api/orders", {
         type: orderType,
         tableNumber: orderType === 'dine-in' ? tableNumber : undefined,
         customerName: orderType === 'takeaway' ? customerName : undefined,
@@ -294,13 +311,44 @@ export default function Menu() {
         specialInstructions: "",
       });
 
-      toast({
-        title: "Success",
-        description: "Your order has been placed successfully",
-      });
+      console.log("Order API response:", order);
+      console.log("Order ID:", order?.id);
+      console.log("Payment at order enabled:", payAtOrderEnabled);
+      console.log("Condition check:", payAtOrderEnabled && order && order.id);
 
-      // Clear the order
+      // Pulisci il carrello
+      localStorage.removeItem('cartItems');
       selectedItems.forEach((_, id) => removeItem(id));
+
+      // Se il pagamento al momento dell'ordine è abilitato, reindirizza alla pagina di pagamento
+      if (payAtOrderEnabled && order && order.id) {
+        console.log("Payment at order is enabled, redirecting to track page");
+        
+        // Mostra un toast di successo prima del reindirizzamento
+        toast({
+          title: t('menu.orderSuccess'),
+          description: t('menu.trackYourOrder'),
+        });
+        
+        // Reindirizza alla pagina di tracciamento dell'ordine
+        setTimeout(() => {
+          console.log("Redirecting to track page");
+          setLocation(`/track`);
+        }, 2000);
+        return;
+      }
+      
+      // Altrimenti, mostra solo il messaggio di successo
+      toast({
+        title: t('menu.orderSuccess'),
+        description: t('menu.trackYourOrder'),
+      });
+      
+      // Reindirizza alla pagina di tracciamento
+      setTimeout(() => {
+        console.log("Redirecting to track page");
+        setLocation(`/track`);
+      }, 2000);
     } catch (error) {
       console.error("Order creation error:", error);
       toast({

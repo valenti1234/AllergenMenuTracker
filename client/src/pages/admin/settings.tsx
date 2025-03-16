@@ -63,6 +63,10 @@ const SettingsPage: React.FC = () => {
       instagram: "",
       twitter: "",
       yelp: ""
+    },
+    paymentOptions: {
+      autoRedirectToPayment: true,
+      payAtOrder: false
     }
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -85,7 +89,14 @@ const SettingsPage: React.FC = () => {
           ...data,
           name: data.name || { en: "", it: "", es: "" },
           address: data.address || { en: "", it: "", es: "" },
-          socialMedia: data.socialMedia || { facebook: "", instagram: "", twitter: "", yelp: "" }
+          socialMedia: data.socialMedia || { facebook: "", instagram: "", twitter: "", yelp: "" },
+          paymentOptions: data.paymentOptions || { autoRedirectToPayment: true, payAtOrder: false },
+          // Ensure numeric fields have default values
+          taxRate: data.taxRate || 0,
+          serviceCharge: data.serviceCharge || 0,
+          deliveryRadius: data.deliveryRadius || 0,
+          deliveryFee: data.deliveryFee || 0,
+          minimumOrderAmount: data.minimumOrderAmount || 0
         };
         setSettings(processedData);
       } else {
@@ -111,12 +122,19 @@ const SettingsPage: React.FC = () => {
           en: settings.name?.en || "",
           it: settings.name?.it || "",
           es: settings.name?.es || ""
+        },
+        // Ensure paymentOptions is included
+        paymentOptions: settings.paymentOptions || {
+          autoRedirectToPayment: true,
+          payAtOrder: false
         }
       };
 
-      // Use the admin endpoint for saving settings
+      console.log("Sending settings data:", JSON.stringify(dataToSend, null, 2));
+
+      // Use the admin endpoint for saving settings with PATCH method
       const response = await fetch("/api/admin/settings", {
-        method: "POST",
+        method: "PATCH",
         credentials: "include", // Include cookies for authentication
         headers: {
           "Content-Type": "application/json",
@@ -173,6 +191,40 @@ const SettingsPage: React.FC = () => {
           [field]: value
         }
       });
+    } else if (section === "paymentOptions") {
+      // Handle paymentOptions object - assicuriamo che almeno una opzione sia sempre attiva
+      const currentPaymentOptions = settings.paymentOptions || { autoRedirectToPayment: true, payAtOrder: false };
+      
+      // Se stiamo disattivando un'opzione e l'altra è già disattivata, non permettiamo l'aggiornamento
+      if (field === "autoRedirectToPayment" && value === false && !currentPaymentOptions.payAtOrder) {
+        console.log("Prevented both options from being false - keeping autoRedirect true");
+        return; // Non aggiorniamo lo stato
+      }
+      
+      if (field === "payAtOrder" && value === false && !currentPaymentOptions.autoRedirectToPayment) {
+        console.log("Prevented both options from being false - keeping payAtOrder true");
+        return; // Non aggiorniamo lo stato
+      }
+      
+      // Se stiamo attivando un'opzione, disattiviamo l'altra
+      const updatedPaymentOptions = {
+        ...currentPaymentOptions,
+        [field]: value
+      };
+      
+      // Se stiamo attivando un'opzione, disattiviamo l'altra per mantenere l'esclusività
+      if (value === true) {
+        if (field === "autoRedirectToPayment") {
+          updatedPaymentOptions.payAtOrder = false;
+        } else if (field === "payAtOrder") {
+          updatedPaymentOptions.autoRedirectToPayment = false;
+        }
+      }
+      
+      setSettings({
+        ...settings,
+        paymentOptions: updatedPaymentOptions
+      });
     } else {
       // Handle regular fields
       setSettings({
@@ -180,6 +232,106 @@ const SettingsPage: React.FC = () => {
         [field]: value
       });
     }
+  };
+
+  const handleNestedUpdate = (path: string, value: any) => {
+    const [section, field] = path.split('.');
+    if (section && field) {
+      handleChange(section, field, value);
+    }
+  };
+
+  const PaymentOptionsSection = ({ 
+    settings, 
+    onUpdate 
+  }: { 
+    settings: any; 
+    onUpdate: (field: string, value: any) => void;
+  }) => {
+    const { t } = useTranslation();
+    
+    // Assicuriamoci che paymentOptions esista e che almeno una opzione sia sempre attiva
+    const paymentOptions = settings?.paymentOptions || { autoRedirectToPayment: true, payAtOrder: false };
+    
+    // Se entrambe sono false, impostiamo autoRedirectToPayment a true
+    useEffect(() => {
+      if (!paymentOptions.autoRedirectToPayment && !paymentOptions.payAtOrder) {
+        console.log("Fixing payment options: both were false");
+        onUpdate('paymentOptions.autoRedirectToPayment', true);
+      }
+    }, [paymentOptions.autoRedirectToPayment, paymentOptions.payAtOrder, onUpdate]);
+    
+    // Debug per verificare lo stato attuale
+    console.log("=> Current payment options:", paymentOptions);
+    
+    // Funzione semplificata per gestire il cambio di stato di un'opzione
+    const handleOptionChange = (option: string, checked: boolean) => {
+      console.log(`Changing ${option} to ${checked}`);
+      
+      // Se stiamo attivando un'opzione
+      if (checked) {
+        // Attiviamo questa opzione e disattiviamo l'altra
+        if (option === 'autoRedirectToPayment') {
+          onUpdate('paymentOptions.autoRedirectToPayment', true);
+          onUpdate('paymentOptions.payAtOrder', false);
+        } else {
+          onUpdate('paymentOptions.payAtOrder', true);
+          onUpdate('paymentOptions.autoRedirectToPayment', false);
+        }
+      } else {
+        // Se stiamo disattivando un'opzione, attiviamo l'altra
+        // per garantire che almeno una sia sempre attiva
+        if (option === 'autoRedirectToPayment') {
+          onUpdate('paymentOptions.autoRedirectToPayment', false);
+          onUpdate('paymentOptions.payAtOrder', true);
+        } else {
+          onUpdate('paymentOptions.payAtOrder', false);
+          onUpdate('paymentOptions.autoRedirectToPayment', true);
+        }
+      }
+    };
+    
+    return (
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>{t('settings.paymentOptions')}</CardTitle>
+          <CardDescription>{t('settings.paymentOptionsDescription')}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-col space-y-1.5">
+            <Label htmlFor="autoRedirectToPayment">
+              {t('settings.autoRedirectToPayment')}
+            </Label>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="autoRedirectToPayment"
+                checked={paymentOptions.autoRedirectToPayment}
+                onCheckedChange={(checked) => handleOptionChange('autoRedirectToPayment', checked)}
+              />
+              <span className="text-sm text-muted-foreground">
+                {t('settings.autoRedirectToPaymentDescription')}
+              </span>
+            </div>
+          </div>
+          
+          <div className="flex flex-col space-y-1.5">
+            <Label htmlFor="payAtOrder">
+              {t('settings.payAtOrder')}
+            </Label>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="payAtOrder"
+                checked={paymentOptions.payAtOrder}
+                onCheckedChange={(checked) => handleOptionChange('payAtOrder', checked)}
+              />
+              <span className="text-sm text-muted-foreground">
+                {t('settings.payAtOrderDescription')}
+              </span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
   };
 
   if (isLoading) {
@@ -333,8 +485,8 @@ const SettingsPage: React.FC = () => {
                         min="0"
                         max="100"
                         step="0.01"
-                        value={settings.taxRate}
-                        onChange={(e) => handleChange("", "taxRate", parseFloat(e.target.value))}
+                        value={settings.taxRate || 0}
+                        onChange={(e) => handleChange("", "taxRate", parseFloat(e.target.value) || 0)}
                       />
                     </div>
                     <div className="space-y-2">
@@ -345,8 +497,8 @@ const SettingsPage: React.FC = () => {
                         min="0"
                         max="100"
                         step="0.01"
-                        value={settings.serviceCharge}
-                        onChange={(e) => handleChange("", "serviceCharge", parseFloat(e.target.value))}
+                        value={settings.serviceCharge || 0}
+                        onChange={(e) => handleChange("", "serviceCharge", parseFloat(e.target.value) || 0)}
                       />
                     </div>
                   </div>
@@ -430,8 +582,8 @@ const SettingsPage: React.FC = () => {
                           type="number"
                           min="0"
                           step="0.1"
-                          value={settings.deliveryRadius}
-                          onChange={(e) => handleChange("", "deliveryRadius", parseFloat(e.target.value))}
+                          value={settings.deliveryRadius || 0}
+                          onChange={(e) => handleChange("", "deliveryRadius", parseFloat(e.target.value) || 0)}
                         />
                       </div>
                       <div className="space-y-2">
@@ -441,8 +593,8 @@ const SettingsPage: React.FC = () => {
                           type="number"
                           min="0"
                           step="0.01"
-                          value={settings.deliveryFee}
-                          onChange={(e) => handleChange("", "deliveryFee", parseFloat(e.target.value))}
+                          value={settings.deliveryFee || 0}
+                          onChange={(e) => handleChange("", "deliveryFee", parseFloat(e.target.value) || 0)}
                         />
                       </div>
                       <div className="space-y-2">
@@ -452,8 +604,8 @@ const SettingsPage: React.FC = () => {
                           type="number"
                           min="0"
                           step="0.01"
-                          value={settings.minimumOrderAmount}
-                          onChange={(e) => handleChange("", "minimumOrderAmount", parseFloat(e.target.value))}
+                          value={settings.minimumOrderAmount || 0}
+                          onChange={(e) => handleChange("", "minimumOrderAmount", parseFloat(e.target.value) || 0)}
                         />
                       </div>
                     </div>
@@ -504,6 +656,8 @@ const SettingsPage: React.FC = () => {
             </Tabs>
             
             <Separator className="my-6" />
+            
+            <PaymentOptionsSection settings={settings} onUpdate={handleNestedUpdate} />
             
             {error && (
               <Alert variant="destructive" className="mb-4">

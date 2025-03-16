@@ -206,6 +206,14 @@ export const insertRestaurantSettingsSchema = z.object({
   deliveryRadius: z.number().min(0, "Delivery radius must be positive").optional(),
   deliveryFee: z.number().min(0, "Delivery fee must be positive").optional(),
   minimumOrderAmount: z.number().min(0, "Minimum order amount must be positive").optional(),
+  // Aggiungi opzione per il pagamento automatico
+  paymentOptions: z.object({
+    autoRedirectToPayment: z.boolean().default(true),
+    payAtOrder: z.boolean().default(false),
+  }).default({
+    autoRedirectToPayment: true,
+    payAtOrder: false,
+  }),
   socialMedia: z.object({
     facebook: z.string().optional(),
     instagram: z.string().optional(),

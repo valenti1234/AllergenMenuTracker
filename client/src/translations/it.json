@@ -157,7 +157,7 @@
       "takeaway": "Da Asporto"
     },
     "paid": "Pagato",
-    "processPayment": "Processa Pagamento"
+    "processPayment": "Procedi al Pagamento"
   },
   "kitchen": {
     "title": "Sistema di Visualizzazione Cucina",
@@ -240,7 +240,13 @@
     "saveSettings": "Salva Impostazioni",
     "saving": "Salvataggio...",
     "saveSuccess": "Impostazioni salvate con successo",
-    "saveError": "Impossibile salvare le impostazioni"
+    "saveError": "Impossibile salvare le impostazioni",
+    "paymentOptions": "Opzioni di pagamento",
+    "paymentOptionsDescription": "Configura le opzioni di pagamento per i clienti",
+    "autoRedirectToPayment": "Reindirizzamento automatico al pagamento",
+    "autoRedirectToPaymentDescription": "Reindirizza automaticamente il cliente alla pagina di pagamento quando l'ordine è servito",
+    "payAtOrder": "Pagamento al momento dell'ordine",
+    "payAtOrderDescription": "Permetti ai clienti di pagare al momento dell'ordine invece che dopo il servizio"
   },
   "admin": {
     "title": "Amministrazione Ristorante",
@@ -314,5 +320,24 @@
     "enterName": "Inserisci il tuo nome",
     "tableNumberPlaceholder": "Numero del tavolo",
     "namePlaceholder": "Il tuo nome"
+  },
+  "payment": {
+    "title": "Pagamento",
+    "processPayment": "Procedi al Pagamento",
+    "completed": "Pagamento Completato",
+    "orderDetails": "Dettagli Ordine #{{id}}",
+    "thankYou": "Grazie per il tuo ordine!",
+    "payNow": "Paga Ora",
+    "cancel": "Annulla",
+    "backToMenu": "Torna al Menu",
+    "backToOrders": "Torna agli Ordini",
+    "success": "Pagamento Riuscito",
+    "successDescription": "Il tuo pagamento è stato elaborato con successo",
+    "error": "Errore di Pagamento",
+    "errorDescription": "Si è verificato un errore durante l'elaborazione del pagamento",
+    "invalidOrderStatus": "Stato Ordine Non Valido",
+    "orderNotServed": "Questo ordine non è pronto per il pagamento",
+    "orderNotFound": "Ordine non trovato",
+    "receiptSent": "La ricevuta è stata inviata al tuo indirizzo email"
   }
 } 

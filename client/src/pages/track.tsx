@@ -11,18 +11,26 @@ import type { Order } from "@shared/schema";
 import { CustomerLayout } from "@/components/layouts/CustomerLayout";
 import { usePhone } from "@/contexts/PhoneContext";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "wouter";
+import { useToast } from "@/hooks/use-toast";
+import { useOrderStatus } from "@/contexts/OrderStatusContext";
 
 export default function TrackOrder() {
   const { phoneNumber } = usePhone();
   const [isSearching, setIsSearching] = useState(false);
   const { t } = useTranslation();
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const { startMonitoring } = useOrderStatus();
 
   // Start searching automatically when component mounts if we have a phone number
   useEffect(() => {
     if (phoneNumber) {
       setIsSearching(true);
+      // Avvia il monitoraggio degli ordini in background
+      startMonitoring();
     }
-  }, [phoneNumber]);
+  }, [phoneNumber, startMonitoring]);
 
   const { data: orders, isLoading } = useQuery<Order[]>({
     queryKey: [`/api/orders/track/${phoneNumber}`],

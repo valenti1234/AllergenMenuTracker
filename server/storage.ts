@@ -340,6 +340,8 @@ export class MongoStorage implements IStorage {
         updatedAt: new Date(),
       });
 
+      console.log("Created order with ID:", order._id.toString());
+
       return {
         id: order._id.toString(),
         type: order.type,
@@ -896,9 +898,7 @@ initializeDefaultAdmin(storage).catch(console.error);
 // Restaurant Settings Functions
 export async function getRestaurantSettings(): Promise<RestaurantSettings | null> {
   try {
-    // Always get the first settings document (there should only be one)
-    const settings = await RestaurantSettingsModel.findOne().lean();
-    
+    const settings = await RestaurantSettingsModel.findOne();
     if (!settings) {
       return null;
     }
@@ -924,6 +924,10 @@ export async function getRestaurantSettings(): Promise<RestaurantSettings | null
       deliveryFee: settings.deliveryFee,
       minimumOrderAmount: settings.minimumOrderAmount,
       socialMedia: settings.socialMedia,
+      paymentOptions: settings.paymentOptions || {
+        autoRedirectToPayment: true,
+        payAtOrder: false
+      },
       updatedAt: settings.updatedAt
     };
   } catch (error) {
@@ -934,29 +938,55 @@ export async function getRestaurantSettings(): Promise<RestaurantSettings | null
 
 export async function createOrUpdateRestaurantSettings(settings: InsertRestaurantSettings): Promise<RestaurantSettings> {
   try {
+    console.log("Creating/updating restaurant settings:", JSON.stringify(settings, null, 2));
+    
     // Check if settings already exist
     const existingSettings = await RestaurantSettingsModel.findOne();
     
     if (existingSettings) {
       // Update existing settings
-      Object.assign(existingSettings, settings);
+      // Assicuriamoci che le opzioni di pagamento siano presenti
+      const updatedSettings = {
+        ...settings,
+        paymentOptions: settings.paymentOptions || {
+          autoRedirectToPayment: true,
+          payAtOrder: false
+        }
+      };
+      
+      Object.assign(existingSettings, updatedSettings);
       await existingSettings.save();
       
-      return {
+      const result = {
         id: existingSettings._id.toString(),
-        ...settings,
+        ...updatedSettings,
         updatedAt: existingSettings.updatedAt
       };
+      
+      console.log("Updated settings:", JSON.stringify(result, null, 2));
+      return result;
     } else {
       // Create new settings
-      const newSettings = new RestaurantSettingsModel(settings);
+      // Assicuriamoci che le opzioni di pagamento siano presenti
+      const newSettingsData = {
+        ...settings,
+        paymentOptions: settings.paymentOptions || {
+          autoRedirectToPayment: true,
+          payAtOrder: false
+        }
+      };
+      
+      const newSettings = new RestaurantSettingsModel(newSettingsData);
       await newSettings.save();
       
-      return {
+      const result = {
         id: newSettings._id.toString(),
-        ...settings,
+        ...newSettingsData,
         updatedAt: newSettings.updatedAt
       };
+      
+      console.log("Created new settings:", JSON.stringify(result, null, 2));
+      return result;
     }
   } catch (error) {
     console.error("Error creating/updating restaurant settings:", error);
@@ -967,6 +997,7 @@ export async function createOrUpdateRestaurantSettings(settings: InsertRestauran
 // Initialize default settings if none exist
 export async function initializeDefaultSettings(): Promise<void> {
   try {
+    // Check if settings already exist
     const existingSettings = await RestaurantSettingsModel.findOne();
     
     if (!existingSettings) {
@@ -977,13 +1008,17 @@ export async function initializeDefaultSettings(): Promise<void> {
           es: "Restaurante AllergenMenuTracker"
         },
         currency: "USD",
-        taxRate: 8.5,
+        taxRate: 0,
         serviceCharge: 0,
         defaultLanguage: "en",
         theme: "system",
         enableOnlineOrdering: true,
         enableReservations: false,
-        enableDelivery: false
+        enableDelivery: false,
+        paymentOptions: {
+          autoRedirectToPayment: true,
+          payAtOrder: false
+        }
       };
       
       await createOrUpdateRestaurantSettings(defaultSettings);
@@ -991,5 +1026,6 @@ export async function initializeDefaultSettings(): Promise<void> {
     }
   } catch (error) {
     console.error("Error initializing default settings:", error);
+    throw error;
   }
 }

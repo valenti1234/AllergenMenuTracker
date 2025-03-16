@@ -11,7 +11,7 @@ export async function apiRequest<T = any>(
   method: string,
   url: string,
   data?: unknown | undefined,
-): Promise<T | void> {
+): Promise<T> {
   const res = await fetch(url, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
@@ -21,9 +21,9 @@ export async function apiRequest<T = any>(
 
   await throwIfResNotOk(res);
 
-  // Return void for 204 No Content responses
+  // Return empty object for 204 No Content responses
   if (res.status === 204) {
-    return;
+    return {} as T;
   }
 
   const json = await res.json();

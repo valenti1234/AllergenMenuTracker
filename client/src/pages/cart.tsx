@@ -21,7 +21,7 @@ interface CartItem {
 export default function Cart() {
   const { t } = useTranslation();
   const { language } = useLanguage();
-  const { formatPrice } = useSettings();
+  const { formatPrice, settings } = useSettings();
   const { toast } = useToast();
   const { phoneNumber } = usePhone();
   const [, setLocation] = useLocation();
@@ -33,6 +33,9 @@ export default function Cart() {
   const [customerName, setCustomerName] = useState("");
 
   const currentLanguage = language as "en" | "it" | "es";
+
+  // Verifica se il pagamento al momento dell'ordine è abilitato
+  const payAtOrderEnabled = (settings as any)?.paymentOptions?.payAtOrder === true;
 
   useEffect(() => {
     // Carica i dati del cliente dal localStorage
@@ -158,8 +161,8 @@ export default function Cart() {
 
     try {
       const formattedPhoneNumber = phoneNumber.replace(/\D/g, "");
-
-      await apiRequest("POST", "/api/orders", {
+      
+      console.log("Sending order request:", {
         type: orderType,
         tableNumber: orderType === 'dine-in' ? tableNumber : undefined,
         customerName: orderType === 'takeaway' ? customerName : undefined,
@@ -172,18 +175,58 @@ export default function Cart() {
         specialInstructions: specialInstructions || undefined,
       });
 
-      toast({
-        title: "Success",
-        description: "Your order has been placed successfully",
+      const order = await apiRequest("POST", "/api/orders", {
+        type: orderType,
+        tableNumber: orderType === 'dine-in' ? tableNumber : undefined,
+        customerName: orderType === 'takeaway' ? customerName : undefined,
+        phoneNumber: formattedPhoneNumber,
+        items: Object.values(cartItems).map(({ item, quantity }) => ({
+          menuItemId: item.id,
+          name: item.name,
+          quantity,
+        })),
+        specialInstructions: specialInstructions || undefined,
       });
+      
+      console.log("Order API response:", order);
+      console.log("Order ID:", order?.id);
+      console.log("Payment at order enabled:", payAtOrderEnabled);
+      console.log("Condition check:", payAtOrderEnabled && order && order.id);
 
       // Svuota il carrello
       setCartItems({});
       saveCartToLocalStorage({});
       setSpecialInstructions("");
+      
+      // Se il pagamento al momento dell'ordine è abilitato, reindirizza alla pagina di pagamento
+      if (payAtOrderEnabled && order && order.id) {
+        console.log("Payment at order is enabled, redirecting to track page");
+        
+        // Mostra un toast di successo prima del reindirizzamento
+        toast({
+          title: t('menu.orderSuccess'),
+          description: t('menu.trackYourOrder'),
+        });
+        
+        // Reindirizza alla pagina di tracciamento dell'ordine
+        setTimeout(() => {
+          console.log("Redirecting to track page");
+          setLocation('/track');
+        }, 2000);
+        return;
+      }
+
+      // Altrimenti, mostra solo il messaggio di successo
+      toast({
+        title: t('menu.orderSuccess'),
+        description: t('menu.trackYourOrder'),
+      });
 
       // Reindirizza alla pagina di tracciamento
-      setLocation('/track');
+      setTimeout(() => {
+        console.log("Redirecting to track page");
+        setLocation('/track');
+      }, 2000);
     } catch (error) {
       console.error("Order creation error:", error);
       toast({

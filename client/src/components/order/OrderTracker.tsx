@@ -4,6 +4,8 @@ import { orderStatuses } from "@shared/schema";
 import type { Order, OrderStatus } from "@shared/schema";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 import {
   Clock,
   ChefHat,
@@ -12,6 +14,7 @@ import {
   Bell,
   AlertTriangle,
   Utensils,
+  CreditCard,
   type LucideIcon,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -199,6 +202,21 @@ export function OrderTracker({ order }: OrderTrackerProps) {
             </span>
           </div>
         </div>
+
+        {/* Pulsante di pagamento per ordini in stato "servito" */}
+        {order.status === "served" && (
+          <div className="pt-2">
+            <Link href={`/payment?id=${order.id}`}>
+              <Button 
+                variant="default" 
+                className="w-full flex items-center justify-center gap-2"
+              >
+                <CreditCard className="h-4 w-4" />
+                {t('orders.processPayment')}
+              </Button>
+            </Link>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

@@ -61,20 +61,18 @@ const getLocalizedText = (text: any, language: string) => {
     // Check if it's a JavaScript object string representation (not valid JSON)
     if (text.includes('ObjectId') || (text.includes('{') && text.includes(':') && !text.includes('":'))) {
       try {
-        // Convert JavaScript object notation to valid JSON
-        // Replace property names without quotes with quoted property names
-        const jsonString = text
-          .replace(/(\w+):/g, '"$1":')  // Add quotes around property names
-          .replace(/:\s*'([^']*)'/g, ':"$1"')  // Replace single quotes with double quotes
-          .replace(/:\s*"([^"]*)"/g, ':"$1"')  // Keep existing double quotes
-          .replace(/new ObjectId\(['"](.*)['"]\)/g, '"$1"')  // Replace ObjectId with string
-          .replace(/\n/g, '');  // Remove newlines for better parsing
+        // If the text is already an object (from error output), return directly
+        if (typeof text === 'object' && text !== null) {
+          const textObj = text as Record<string, any>;
+          if (textObj[language]) {
+            return textObj[language];
+          } else if (textObj.en) {
+            return textObj.en;
+          }
+          return JSON.stringify(text);
+        }
         
-        const parsed = JSON.parse(jsonString);
-        return getLocalizedText(parsed, language);
-      } catch (e) {
-        console.error("Error parsing JS object string:", e, text);
-        // If parsing fails, try to extract the language directly using regex
+        // Extract language values directly using regex
         const langRegex = new RegExp(`${language}:\\s*['"]([^'"]*)['"](,|\\s|})`, 'i');
         const enRegex = /en:\s*['"]([^'"]*)['"](,|\s|})/i;
         
@@ -85,6 +83,48 @@ const getLocalizedText = (text: any, language: string) => {
           return langMatch[1];
         } else if (enMatch && enMatch[1]) {
           return enMatch[1];
+        }
+        
+        // If regex extraction fails, try to parse as JSON
+        // First, handle the case where values have extra quotes
+        let cleanedText = text
+          .replace(/:\s*["']([^"']*)["']/g, (match, p1) => {
+            // Remove any quotes inside the value
+            const cleanValue = p1.replace(/^["']|["']$/g, '').replace(/\\["']/g, '');
+            return `: "${cleanValue}"`; 
+          });
+        
+        // Convert JavaScript object notation to valid JSON
+        const jsonString = cleanedText
+          .replace(/(\w+):/g, '"$1":')  // Add quotes around property names
+          .replace(/:\s*'([^']*)'/g, ':"$1"')  // Replace single quotes with double quotes
+          .replace(/new ObjectId\(['"](.*)['"]\)/g, '"$1"')  // Replace ObjectId with string
+          .replace(/\n/g, '');  // Remove newlines for better parsing
+        
+        try {
+          const parsed = JSON.parse(jsonString) as Record<string, any>;
+          if (parsed[language]) {
+            return parsed[language];
+          } else if (parsed.en) {
+            return parsed.en;
+          }
+          return JSON.stringify(parsed);
+        } catch (innerError) {
+          console.error("Secondary parsing error:", innerError);
+          // If all else fails, return as is
+          return text;
+        }
+      } catch (e) {
+        console.error("Error parsing JS object string:", e, text);
+        
+        // If the text is already an object (from error output), return directly
+        if (typeof text === 'object' && text !== null) {
+          const textObj = text as Record<string, any>;
+          if (textObj[language]) {
+            return textObj[language];
+          } else if (textObj.en) {
+            return textObj.en;
+          }
         }
         
         // If all else fails, return as is
@@ -108,27 +148,37 @@ const getLocalizedText = (text: any, language: string) => {
   // Handle objects with language keys
   if (typeof text === "object" && text !== null) {
     // If it's a direct language object (e.g., {en: "text", it: "testo"})
-    if (text[language] || text.en) {
-      return text[language] || text.en || "";
+    if (text[language as keyof typeof text] || text['en' as keyof typeof text]) {
+      // Se il valore contiene virgolette, rimuovile
+      const value = text[language as keyof typeof text] || text['en' as keyof typeof text] || "";
+      if (typeof value === "string" && value.startsWith('"') && value.endsWith('"')) {
+        return value.substring(1, value.length - 1);
+      }
+      return value;
     }
     
     // If it's an object but not in the expected format, try to extract a meaningful value
     if (Object.keys(text).length > 0) {
       // Try to find any key that might contain language data
       for (const key of Object.keys(text)) {
-        const value = text[key];
-        if (typeof value === "object" && value !== null && (value[language] || value.en)) {
-          return value[language] || value.en || "";
+        const value = text[key as keyof typeof text];
+        if (typeof value === "object" && value !== null && (value[language as keyof typeof value] || value['en' as keyof typeof value])) {
+          return getLocalizedText(value, language);
         }
       }
       
-      // If no language-specific data found, return the first value
-      return Object.values(text)[0] || "";
+      // If no language data found, return the first string value
+      for (const key of Object.keys(text)) {
+        const value = text[key as keyof typeof text];
+        if (typeof value === "string") {
+          return value;
+        }
+      }
     }
   }
   
-  // For any other type, convert to string
-  return String(text || "");
+  // If all else fails, convert to string
+  return String(text);
 };
 
 export default function Dashboard() {
@@ -214,7 +264,7 @@ export default function Dashboard() {
     
     // If the name is still an object after getLocalizedText, try to extract it directly
     if (typeof itemName === 'object' && itemName !== null) {
-      itemName = itemName[currentLanguage] || itemName.en || JSON.stringify(itemName);
+      itemName = itemName[currentLanguage as keyof typeof itemName] || itemName['en' as keyof typeof itemName] || JSON.stringify(itemName);
     }
     
     return {
