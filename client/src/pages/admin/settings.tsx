@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { useSettings } from "@/contexts/SettingsContext";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 import { 
   Card, 
   CardContent, 
@@ -372,8 +373,8 @@ const SettingsPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <Card>
+    <AdminLayout>
+      <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle>{t("settings.title")}</CardTitle>
           <CardDescription>{t("settings.description")}</CardDescription>
@@ -686,7 +687,7 @@ const SettingsPage: React.FC = () => {
           </form>
         </CardContent>
       </Card>
-    </div>
+    </AdminLayout>
   );
 };
 

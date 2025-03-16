@@ -234,3 +234,56 @@ export type RestaurantSettings = z.infer<typeof insertRestaurantSettingsSchema> 
 };
 
 export type InsertRestaurantSettings = z.infer<typeof insertRestaurantSettingsSchema>;
+
+// Training Module Types
+export const trainingQuestionSchema = z.object({
+  text: z.string(),
+  options: z.array(z.string()),
+  correctAnswer: z.number()
+});
+
+export type TrainingQuestion = z.infer<typeof trainingQuestionSchema>;
+
+export const trainingQuizSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  questions: z.array(trainingQuestionSchema),
+  passingScore: z.number().min(0).max(100).default(70)
+});
+
+export type TrainingQuiz = z.infer<typeof trainingQuizSchema> & {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export const trainingModuleSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  duration: z.number().min(1),
+  topics: z.array(z.string()),
+  quizId: z.string()
+});
+
+export type TrainingModule = z.infer<typeof trainingModuleSchema> & {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export const staffTrainingRecordSchema = z.object({
+  userId: z.string(),
+  userName: z.string(),
+  moduleId: z.string(),
+  moduleName: z.string(),
+  completed: z.boolean().default(false),
+  score: z.number().nullable().optional(),
+  passed: z.boolean().default(false),
+  completedAt: z.date().nullable().optional()
+});
+
+export type StaffTrainingRecord = z.infer<typeof staffTrainingRecordSchema> & {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+};

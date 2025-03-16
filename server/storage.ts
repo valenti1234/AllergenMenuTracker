@@ -1,5 +1,5 @@
-import { MenuItem, InsertMenuItem, User, InsertUser, Order, InsertOrder, OrderStatus, RestaurantSettings, InsertRestaurantSettings } from "@shared/schema";
-import { MenuItemModel, UserModel, OrderModel, RestaurantSettingsModel } from "./db";
+import { MenuItem, InsertMenuItem, User, InsertUser, Order, InsertOrder, OrderStatus, RestaurantSettings, InsertRestaurantSettings, TrainingModule as TrainingModuleType, TrainingQuiz as TrainingQuizType, StaffTrainingRecord } from "@shared/schema";
+import { MenuItemModel, UserModel, OrderModel, RestaurantSettingsModel, TrainingModule, Quiz, StaffTraining } from "./db";
 import bcrypt from "bcryptjs";
 
 export interface IStorage {
@@ -42,6 +42,25 @@ export interface IStorage {
   getDailyRevenue(days: number): Promise<{date: string, revenue: number}[]>;
   getMonthlyRevenue(months: number): Promise<{month: string, revenue: number}[]>;
   getDietaryDistribution(): Promise<{preference: string, count: number}[]>;
+
+  // Training Module Methods
+  getTrainingModules(): Promise<TrainingModuleType[]>;
+  getTrainingModule(id: string): Promise<TrainingModuleType | null>;
+  createTrainingModule(moduleData: any): Promise<TrainingModuleType>;
+  updateTrainingModule(id: string, moduleData: any): Promise<TrainingModuleType | null>;
+  deleteTrainingModule(id: string): Promise<any>;
+
+  // Quiz Methods
+  getQuizzes(): Promise<TrainingQuizType[]>;
+  getQuiz(id: string): Promise<TrainingQuizType | null>;
+  createQuiz(quizData: any): Promise<TrainingQuizType>;
+  updateQuiz(id: string, quizData: any): Promise<TrainingQuizType | null>;
+  deleteQuiz(id: string): Promise<any>;
+
+  // Staff Training Methods
+  getStaffTrainingRecords(): Promise<StaffTrainingRecord[]>;
+  getUserTrainingRecords(userId: string): Promise<StaffTrainingRecord[]>;
+  createTrainingRecord(recordData: any): Promise<StaffTrainingRecord>;
 }
 
 export class MongoStorage implements IStorage {
@@ -831,6 +850,283 @@ export class MongoStorage implements IStorage {
     ]);
     
     return result;
+  }
+
+  // Training Module Methods
+  async getTrainingModules(): Promise<TrainingModuleType[]> {
+    try {
+      const modules = await TrainingModule.find().sort({ createdAt: -1 });
+      return modules.map(module => ({
+        id: module._id.toString(),
+        title: module.title,
+        description: module.description,
+        duration: module.duration,
+        topics: module.topics,
+        quizId: module.quizId,
+        createdAt: module.createdAt,
+        updatedAt: module.updatedAt
+      }));
+    } catch (error) {
+      console.error('Error fetching training modules:', error);
+      throw error;
+    }
+  }
+
+  async getTrainingModule(id: string): Promise<TrainingModuleType | null> {
+    try {
+      const module = await TrainingModule.findById(id);
+      if (!module) return null;
+      
+      return {
+        id: module._id.toString(),
+        title: module.title,
+        description: module.description,
+        duration: module.duration,
+        topics: module.topics,
+        quizId: module.quizId,
+        createdAt: module.createdAt,
+        updatedAt: module.updatedAt
+      };
+    } catch (error) {
+      console.error(`Error fetching training module ${id}:`, error);
+      throw error;
+    }
+  }
+
+  async createTrainingModule(moduleData: any): Promise<TrainingModuleType> {
+    try {
+      const newModule = new TrainingModule(moduleData);
+      await newModule.save();
+      
+      return {
+        id: newModule._id.toString(),
+        title: newModule.title,
+        description: newModule.description,
+        duration: newModule.duration,
+        topics: newModule.topics,
+        quizId: newModule.quizId,
+        createdAt: newModule.createdAt,
+        updatedAt: newModule.updatedAt
+      };
+    } catch (error) {
+      console.error('Error creating training module:', error);
+      throw error;
+    }
+  }
+
+  async updateTrainingModule(id: string, moduleData: any): Promise<TrainingModuleType | null> {
+    try {
+      const updatedModule = await TrainingModule.findByIdAndUpdate(
+        id,
+        { $set: moduleData },
+        { new: true }
+      );
+      
+      if (!updatedModule) return null;
+      
+      return {
+        id: updatedModule._id.toString(),
+        title: updatedModule.title,
+        description: updatedModule.description,
+        duration: updatedModule.duration,
+        topics: updatedModule.topics,
+        quizId: updatedModule.quizId,
+        createdAt: updatedModule.createdAt,
+        updatedAt: updatedModule.updatedAt
+      };
+    } catch (error) {
+      console.error(`Error updating training module ${id}:`, error);
+      throw error;
+    }
+  }
+
+  async deleteTrainingModule(id: string): Promise<any> {
+    try {
+      const result = await TrainingModule.findByIdAndDelete(id);
+      return result;
+    } catch (error) {
+      console.error(`Error deleting training module ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Quiz Methods
+  async getQuizzes(): Promise<TrainingQuizType[]> {
+    try {
+      const quizzes = await Quiz.find().sort({ createdAt: -1 });
+      return quizzes.map(quiz => ({
+        id: quiz._id.toString(),
+        title: quiz.title,
+        description: quiz.description,
+        questions: quiz.questions.map(q => ({
+          text: q.text,
+          options: q.options,
+          correctAnswer: q.correctAnswer
+        })),
+        passingScore: quiz.passingScore,
+        createdAt: quiz.createdAt,
+        updatedAt: quiz.updatedAt
+      }));
+    } catch (error) {
+      console.error('Error fetching quizzes:', error);
+      throw error;
+    }
+  }
+
+  async getQuiz(id: string): Promise<TrainingQuizType | null> {
+    try {
+      const quiz = await Quiz.findById(id);
+      if (!quiz) return null;
+      
+      return {
+        id: quiz._id.toString(),
+        title: quiz.title,
+        description: quiz.description,
+        questions: quiz.questions.map(q => ({
+          text: q.text,
+          options: q.options,
+          correctAnswer: q.correctAnswer
+        })),
+        passingScore: quiz.passingScore,
+        createdAt: quiz.createdAt,
+        updatedAt: quiz.updatedAt
+      };
+    } catch (error) {
+      console.error(`Error fetching quiz ${id}:`, error);
+      throw error;
+    }
+  }
+
+  async createQuiz(quizData: any): Promise<TrainingQuizType> {
+    try {
+      const newQuiz = new Quiz(quizData);
+      await newQuiz.save();
+      
+      return {
+        id: newQuiz._id.toString(),
+        title: newQuiz.title,
+        description: newQuiz.description,
+        questions: newQuiz.questions.map(q => ({
+          text: q.text,
+          options: q.options,
+          correctAnswer: q.correctAnswer
+        })),
+        passingScore: newQuiz.passingScore,
+        createdAt: newQuiz.createdAt,
+        updatedAt: newQuiz.updatedAt
+      };
+    } catch (error) {
+      console.error('Error creating quiz:', error);
+      throw error;
+    }
+  }
+
+  async updateQuiz(id: string, quizData: any): Promise<TrainingQuizType | null> {
+    try {
+      const updatedQuiz = await Quiz.findByIdAndUpdate(
+        id,
+        { $set: quizData },
+        { new: true }
+      );
+      
+      if (!updatedQuiz) return null;
+      
+      return {
+        id: updatedQuiz._id.toString(),
+        title: updatedQuiz.title,
+        description: updatedQuiz.description,
+        questions: updatedQuiz.questions.map(q => ({
+          text: q.text,
+          options: q.options,
+          correctAnswer: q.correctAnswer
+        })),
+        passingScore: updatedQuiz.passingScore,
+        createdAt: updatedQuiz.createdAt,
+        updatedAt: updatedQuiz.updatedAt
+      };
+    } catch (error) {
+      console.error(`Error updating quiz ${id}:`, error);
+      throw error;
+    }
+  }
+
+  async deleteQuiz(id: string): Promise<any> {
+    try {
+      const result = await Quiz.findByIdAndDelete(id);
+      return result;
+    } catch (error) {
+      console.error(`Error deleting quiz ${id}:`, error);
+      throw error;
+    }
+  }
+
+  // Staff Training Methods
+  async getStaffTrainingRecords(): Promise<StaffTrainingRecord[]> {
+    try {
+      const records = await StaffTraining.find().sort({ createdAt: -1 });
+      return records.map(record => ({
+        id: record._id.toString(),
+        userId: record.userId,
+        userName: record.userName,
+        moduleId: record.moduleId,
+        moduleName: record.moduleName,
+        completed: record.completed,
+        score: record.score,
+        passed: record.passed,
+        completedAt: record.completedAt,
+        createdAt: record.createdAt,
+        updatedAt: record.updatedAt
+      }));
+    } catch (error) {
+      console.error('Error fetching staff training records:', error);
+      throw error;
+    }
+  }
+
+  async getUserTrainingRecords(userId: string): Promise<StaffTrainingRecord[]> {
+    try {
+      const records = await StaffTraining.find({ userId }).sort({ createdAt: -1 });
+      return records.map(record => ({
+        id: record._id.toString(),
+        userId: record.userId,
+        userName: record.userName,
+        moduleId: record.moduleId,
+        moduleName: record.moduleName,
+        completed: record.completed,
+        score: record.score,
+        passed: record.passed,
+        completedAt: record.completedAt,
+        createdAt: record.createdAt,
+        updatedAt: record.updatedAt
+      }));
+    } catch (error) {
+      console.error(`Error fetching training records for user ${userId}:`, error);
+      throw error;
+    }
+  }
+
+  async createTrainingRecord(recordData: any): Promise<StaffTrainingRecord> {
+    try {
+      const newRecord = new StaffTraining(recordData);
+      await newRecord.save();
+      
+      return {
+        id: newRecord._id.toString(),
+        userId: newRecord.userId,
+        userName: newRecord.userName,
+        moduleId: newRecord.moduleId,
+        moduleName: newRecord.moduleName,
+        completed: newRecord.completed,
+        score: newRecord.score,
+        passed: newRecord.passed,
+        completedAt: newRecord.completedAt,
+        createdAt: newRecord.createdAt,
+        updatedAt: newRecord.updatedAt
+      };
+    } catch (error) {
+      console.error('Error creating training record:', error);
+      throw error;
+    }
   }
 }
 

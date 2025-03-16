@@ -19,6 +19,7 @@ import Database from "@/pages/admin/database";
 import ApiDocs from "@/pages/admin/api-docs";
 import Settings from "@/pages/admin/settings";
 import PosSettings from "@/pages/admin/pos-settings";
+import Training from "@/pages/admin/training";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
@@ -85,6 +86,9 @@ function Router() {
       </Route>
       <Route path="/admin/pos-settings">
         <ProtectedRoute component={PosSettings} />
+      </Route>
+      <Route path="/admin/training">
+        <ProtectedRoute component={Training} />
       </Route>
       <Route component={NotFound} />
     </Switch>

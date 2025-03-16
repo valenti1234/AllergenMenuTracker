@@ -237,6 +237,48 @@ const RestaurantSettingsSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
+// Training Module Schema
+const TrainingModuleSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  duration: { type: Number, required: true, min: 1 }, // in minutes
+  topics: { type: [String], required: true },
+  quizId: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+// Quiz Question Schema
+const QuestionSchema = new mongoose.Schema({
+  text: { type: String, required: true },
+  options: { type: [String], required: true },
+  correctAnswer: { type: Number, required: true }
+});
+
+// Quiz Schema
+const QuizSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  questions: { type: [QuestionSchema], required: true },
+  passingScore: { type: Number, required: true, min: 0, max: 100, default: 70 },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+// Staff Training Record Schema
+const StaffTrainingSchema = new mongoose.Schema({
+  userId: { type: String, required: true },
+  userName: { type: String, required: true },
+  moduleId: { type: String, required: true },
+  moduleName: { type: String, required: true },
+  completed: { type: Boolean, default: false },
+  score: { type: Number, default: null },
+  passed: { type: Boolean, default: false },
+  completedAt: { type: Date, default: null },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
 // Update timestamp on save
 UserSchema.pre('save', function(next) {
   this.updatedAt = new Date();
@@ -253,7 +295,25 @@ RestaurantSettingsSchema.pre('save', function(next) {
   next();
 });
 
+TrainingModuleSchema.pre('save', function(next) {
+  this.updatedAt = new Date();
+  next();
+});
+
+QuizSchema.pre('save', function(next) {
+  this.updatedAt = new Date();
+  next();
+});
+
+StaffTrainingSchema.pre('save', function(next) {
+  this.updatedAt = new Date();
+  next();
+});
+
 export const MenuItemModel = mongoose.model('MenuItem', MenuItemSchema);
 export const UserModel = mongoose.model('User', UserSchema);
 export const OrderModel = mongoose.model('Order', OrderSchema);
 export const RestaurantSettingsModel = mongoose.model('RestaurantSettings', RestaurantSettingsSchema);
+export const TrainingModule = mongoose.model('TrainingModule', TrainingModuleSchema);
+export const Quiz = mongoose.model('Quiz', QuizSchema);
+export const StaffTraining = mongoose.model('StaffTraining', StaffTrainingSchema);

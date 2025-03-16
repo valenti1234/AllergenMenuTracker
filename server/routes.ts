@@ -724,5 +724,160 @@ export async function registerRoutes(app: Express) {
     }
   });
 
+  // Training Module API Routes
+  app.get("/api/training/modules", requireAuth, async (_req, res) => {
+    try {
+      const modules = await storage.getTrainingModules();
+      res.json(modules);
+    } catch (error) {
+      console.error('Get training modules error:', error);
+      res.status(500).json({ message: "Failed to fetch training modules" });
+    }
+  });
+
+  app.get("/api/training/modules/:id", requireAuth, async (req, res) => {
+    try {
+      const module = await storage.getTrainingModule(req.params.id);
+      if (!module) {
+        res.status(404).json({ message: "Training module not found" });
+        return;
+      }
+      res.json(module);
+    } catch (error) {
+      console.error('Get training module error:', error);
+      res.status(500).json({ message: "Failed to fetch training module" });
+    }
+  });
+
+  app.post("/api/training/modules", requireAuth, requireRole(["admin"]), async (req, res) => {
+    try {
+      const newModule = await storage.createTrainingModule(req.body);
+      res.status(201).json(newModule);
+    } catch (error) {
+      console.error('Create training module error:', error);
+      res.status(500).json({ message: "Failed to create training module" });
+    }
+  });
+
+  app.put("/api/training/modules/:id", requireAuth, requireRole(["admin"]), async (req, res) => {
+    try {
+      const updatedModule = await storage.updateTrainingModule(req.params.id, req.body);
+      if (!updatedModule) {
+        res.status(404).json({ message: "Training module not found" });
+        return;
+      }
+      res.json(updatedModule);
+    } catch (error) {
+      console.error('Update training module error:', error);
+      res.status(500).json({ message: "Failed to update training module" });
+    }
+  });
+
+  app.delete("/api/training/modules/:id", requireAuth, requireRole(["admin"]), async (req, res) => {
+    try {
+      const result = await storage.deleteTrainingModule(req.params.id);
+      if (!result) {
+        res.status(404).json({ message: "Training module not found" });
+        return;
+      }
+      res.json({ message: "Training module deleted successfully" });
+    } catch (error) {
+      console.error('Delete training module error:', error);
+      res.status(500).json({ message: "Failed to delete training module" });
+    }
+  });
+
+  app.get("/api/training/quizzes", requireAuth, async (_req, res) => {
+    try {
+      const quizzes = await storage.getQuizzes();
+      res.json(quizzes);
+    } catch (error) {
+      console.error('Get quizzes error:', error);
+      res.status(500).json({ message: "Failed to fetch quizzes" });
+    }
+  });
+
+  app.get("/api/training/quizzes/:id", requireAuth, async (req, res) => {
+    try {
+      const quiz = await storage.getQuiz(req.params.id);
+      if (!quiz) {
+        res.status(404).json({ message: "Quiz not found" });
+        return;
+      }
+      res.json(quiz);
+    } catch (error) {
+      console.error('Get quiz error:', error);
+      res.status(500).json({ message: "Failed to fetch quiz" });
+    }
+  });
+
+  app.post("/api/training/quizzes", requireAuth, requireRole(["admin"]), async (req, res) => {
+    try {
+      const newQuiz = await storage.createQuiz(req.body);
+      res.status(201).json(newQuiz);
+    } catch (error) {
+      console.error('Create quiz error:', error);
+      res.status(500).json({ message: "Failed to create quiz" });
+    }
+  });
+
+  app.put("/api/training/quizzes/:id", requireAuth, requireRole(["admin"]), async (req, res) => {
+    try {
+      const updatedQuiz = await storage.updateQuiz(req.params.id, req.body);
+      if (!updatedQuiz) {
+        res.status(404).json({ message: "Quiz not found" });
+        return;
+      }
+      res.json(updatedQuiz);
+    } catch (error) {
+      console.error('Update quiz error:', error);
+      res.status(500).json({ message: "Failed to update quiz" });
+    }
+  });
+
+  app.delete("/api/training/quizzes/:id", requireAuth, requireRole(["admin"]), async (req, res) => {
+    try {
+      const result = await storage.deleteQuiz(req.params.id);
+      if (!result) {
+        res.status(404).json({ message: "Quiz not found" });
+        return;
+      }
+      res.json({ message: "Quiz deleted successfully" });
+    } catch (error) {
+      console.error('Delete quiz error:', error);
+      res.status(500).json({ message: "Failed to delete quiz" });
+    }
+  });
+
+  app.get("/api/training/staff", requireAuth, requireRole(["admin", "manager"]), async (_req, res) => {
+    try {
+      const staffTraining = await storage.getStaffTrainingRecords();
+      res.json(staffTraining);
+    } catch (error) {
+      console.error('Get staff training records error:', error);
+      res.status(500).json({ message: "Failed to fetch staff training records" });
+    }
+  });
+
+  app.get("/api/training/staff/:userId", requireAuth, async (req, res) => {
+    try {
+      const userTraining = await storage.getUserTrainingRecords(req.params.userId);
+      res.json(userTraining);
+    } catch (error) {
+      console.error('Get user training records error:', error);
+      res.status(500).json({ message: "Failed to fetch user training records" });
+    }
+  });
+
+  app.post("/api/training/staff/record", requireAuth, async (req, res) => {
+    try {
+      const newRecord = await storage.createTrainingRecord(req.body);
+      res.status(201).json(newRecord);
+    } catch (error) {
+      console.error('Create training record error:', error);
+      res.status(500).json({ message: "Failed to create training record" });
+    }
+  });
+
   return createServer(app);
 }

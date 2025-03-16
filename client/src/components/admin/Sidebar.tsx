@@ -12,7 +12,10 @@ import {
   Globe,
   FileText,
   Settings as SettingsIcon,
-  CreditCard
+  CreditCard,
+  UtensilsCrossed,
+  ChefHat,
+  GraduationCap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/queryClient";
@@ -116,6 +119,12 @@ export function Sidebar() {
       icon: SettingsIcon,
       href: "/admin/settings",
       roles: ["admin"]
+    },
+    {
+      title: t("nav.training", "Training"),
+      icon: GraduationCap,
+      href: "/admin/training",
+      roles: ["admin", "manager"]
     }
   ];
 
