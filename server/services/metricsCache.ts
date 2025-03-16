@@ -1,5 +1,9 @@
 import { storage } from "../storage";
 import { log } from "../vite";
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 // Type for cached metrics
 interface CachedMetrics {
@@ -167,9 +171,13 @@ function startMetricsCacheService() {
   // Initial update
   initializeMetricsCache();
   
-  // Set up interval (2 minutes = 120000 ms)
-  updateInterval = setInterval(updateAllMetrics, 120000);
-  log("Metrics cache service started (2-minute interval)");
+  // Get interval from environment variable or use default (60 minutes in milliseconds)
+  const updateIntervalMs = process.env.METRICS_UPDATE_INTERVAL ? 
+    parseInt(process.env.METRICS_UPDATE_INTERVAL) : 60000 * 60;
+  
+  // Set up interval using the environment variable
+  updateInterval = setInterval(updateAllMetrics, updateIntervalMs);
+  log(`Metrics cache service started (${updateIntervalMs/1000} seconds interval)`);
 }
 
 function stopMetricsCacheService() {
