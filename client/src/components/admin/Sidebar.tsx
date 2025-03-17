@@ -15,7 +15,10 @@ import {
   CreditCard,
   UtensilsCrossed,
   ChefHat,
-  GraduationCap
+  GraduationCap,
+  Moon,
+  Sun,
+  Monitor
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/queryClient";
@@ -24,12 +27,14 @@ import { queryClient } from "@/lib/queryClient";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { useTranslation } from "react-i18next";
 import { languages } from "@shared/schema";
+import { useTheme } from "@/components/theme-provider";
 
 export function Sidebar() {
   const [location, navigate] = useLocation();
   const { toast } = useToast();
   const { user } = useAdminAuth();
   const { t, i18n } = useTranslation();
+  const { theme, setTheme } = useTheme();
   
   // Flag emoji mapping
   const flagEmoji: Record<string, string> = {
@@ -134,39 +139,17 @@ export function Sidebar() {
   );
 
   return (
-    <div className="min-h-screen w-64 bg-sidebar border-r border-sidebar-border">
+    <div className="min-h-screen w-64 bg-sidebar border-r border-sidebar-border flex flex-col">
       <div className="p-6">
         <h2 className="text-lg font-semibold text-sidebar-foreground mb-4">
           {user?.role === "kitchen" 
             ? t("admin.kitchenStaff", "Kitchen Staff") 
             : t("admin.title", "Restaurant Admin")}
         </h2>
-        
-        {/* Global Language Selector */}
-        <div className="mb-6 border rounded-md p-3 bg-sidebar-accent/30">
-          <div className="flex items-center gap-2 mb-2">
-            <Globe className="h-4 w-4 text-sidebar-foreground" />
-            <span className="text-sm font-medium text-sidebar-foreground">
-              {t('admin.language.select', 'Select Language')}
-            </span>
-          </div>
-          <div className="grid grid-cols-1 gap-2">
-            {languages.map((lang) => (
-              <Button
-                key={lang}
-                variant={i18n.language === lang ? "default" : "outline"}
-                size="sm"
-                className="justify-start"
-                onClick={() => handleLanguageChange(lang)}
-              >
-                <span className="mr-2">{flagEmoji[lang]}</span>
-                {t(`admin.language.${lang}`, lang === 'en' ? 'English' : lang === 'it' ? 'Italian' : 'Spanish')}
-              </Button>
-            ))}
-          </div>
-        </div>
       </div>
-      <nav className="px-4 space-y-2">
+      
+      {/* Menu items */}
+      <nav className="px-4 space-y-2 flex-1">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = location === item.href;
@@ -188,15 +171,89 @@ export function Sidebar() {
           );
         })}
       </nav>
-      <div className="absolute bottom-4 w-64 px-4">
-        <Button
-          variant="outline"
-          className="w-full justify-start text-sidebar-foreground"
-          onClick={handleLogout}
-        >
-          <LogOut className="h-4 w-4 mr-2" />
-          {t("admin.logout", "Logout")}
-        </Button>
+      
+      {/* Theme selector at bottom */}
+      <div className="mt-auto">
+        <div className="px-4 py-2 border-t border-sidebar-border">
+          <div className="flex flex-col">
+            <div className="text-xs font-medium text-sidebar-foreground mb-2">
+              {t('admin.theme.select', 'Theme')}
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant={theme === 'light' ? "default" : "outline"}
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => setTheme('light')}
+              >
+                <Sun className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={theme === 'dark' ? "default" : "outline"}
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => setTheme('dark')}
+              >
+                <Moon className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={theme === 'system' ? "default" : "outline"}
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => setTheme('system')}
+              >
+                <Monitor className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Language selector */}
+        <div className="px-4 py-2 border-t border-sidebar-border">
+          <div className="flex flex-col">
+            <div className="text-xs font-medium text-sidebar-foreground mb-2">
+              {t('admin.language.select', 'Seleziona Lingua')}
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant={i18n.language === 'en' ? "default" : "outline"}
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => handleLanguageChange('en')}
+              >
+                <span>{flagEmoji['en']}</span>
+              </Button>
+              <Button
+                variant={i18n.language === 'it' ? "default" : "outline"}
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => handleLanguageChange('it')}
+              >
+                <span>{flagEmoji['it']}</span>
+              </Button>
+              <Button
+                variant={i18n.language === 'es' ? "default" : "outline"}
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => handleLanguageChange('es')}
+              >
+                <span>{flagEmoji['es']}</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Logout Button */}
+        <div className="px-4 py-2 border-t border-sidebar-border">
+          <Button
+            variant="outline"
+            className="w-full justify-start text-sidebar-foreground"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            {t("admin.logout", "Disconnetti")}
+          </Button>
+        </div>
       </div>
     </div>
   );

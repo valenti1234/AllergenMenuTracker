@@ -8,10 +8,14 @@ import {
   Users,
   Database,
   ChefHat,
-  Globe
+  Globe,
+  Moon,
+  Sun,
+  Monitor
 } from "lucide-react";
 import { languages } from "@shared/schema";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "@/components/theme-provider";
 
 const menuItems = [
   {
@@ -53,6 +57,7 @@ const menuItems = [
 
 export function Sidebar() {
   const { t, i18n } = useTranslation();
+  const { theme, setTheme } = useTheme();
   
   // Flag emoji mapping
   const flagEmoji: Record<string, string> = {
@@ -75,7 +80,7 @@ export function Sidebar() {
         <h2 className="text-lg font-semibold mb-4">{t('admin.title')}</h2>
         
         {/* Global Language Selector */}
-        <div className="mb-6 border rounded-md p-3 bg-muted/30">
+        <div className="mb-4 border rounded-md p-3 bg-muted/30">
           <div className="flex items-center gap-2 mb-2">
             <Globe className="h-4 w-4" />
             <span className="text-sm font-medium">{t('admin.language.select')}</span>
@@ -93,6 +98,49 @@ export function Sidebar() {
                 {t(`admin.language.${lang}`)}
               </Button>
             ))}
+          </div>
+        </div>
+        
+        {/* Theme Selector */}
+        <div className="mb-6 border rounded-md p-3 bg-muted/30">
+          <div className="flex items-center gap-2 mb-2">
+            {theme === 'dark' ? (
+              <Moon className="h-4 w-4" />
+            ) : theme === 'light' ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Monitor className="h-4 w-4" />
+            )}
+            <span className="text-sm font-medium">{t('admin.theme.select')}</span>
+          </div>
+          <div className="grid grid-cols-1 gap-2">
+            <Button
+              variant={theme === 'light' ? "default" : "outline"}
+              size="sm"
+              className="justify-start"
+              onClick={() => setTheme('light')}
+            >
+              <Sun className="mr-2 h-4 w-4" />
+              {t('admin.theme.light')}
+            </Button>
+            <Button
+              variant={theme === 'dark' ? "default" : "outline"}
+              size="sm"
+              className="justify-start"
+              onClick={() => setTheme('dark')}
+            >
+              <Moon className="mr-2 h-4 w-4" />
+              {t('admin.theme.dark')}
+            </Button>
+            <Button
+              variant={theme === 'system' ? "default" : "outline"}
+              size="sm"
+              className="justify-start"
+              onClick={() => setTheme('system')}
+            >
+              <Monitor className="mr-2 h-4 w-4" />
+              {t('admin.theme.system')}
+            </Button>
           </div>
         </div>
         

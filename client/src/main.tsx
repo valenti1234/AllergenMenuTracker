@@ -14,7 +14,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <LanguageProvider>
         <SettingsProvider>
           <QueryClientProvider client={queryClient}>

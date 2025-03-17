@@ -97,7 +97,7 @@ function Router() {
 
 export function App() {
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <LanguageProvider>
         <SettingsProvider>
           <QueryClientProvider client={queryClient}>

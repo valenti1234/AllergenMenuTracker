@@ -18,5 +18,24 @@
     "orderSuccess": "Ordine Effettuato con Successo",
     "redirectingToPayment": "Reindirizzamento alla pagina di pagamento...",
     "trackYourOrder": "Puoi tracciare lo stato del tuo ordine"
-  }
+  },
+  "admin": {
+    "title": "Pannello di Amministrazione",
+    "language": {
+      "select": "Seleziona Lingua",
+      "en": "Inglese",
+      "it": "Italiano",
+      "es": "Spagnolo"
+    },
+    "theme": {
+      "select": "Seleziona Tema",
+      "light": "Chiaro",
+      "dark": "Scuro",
+      "system": "Sistema"
+    }
+  },
+  "Toggle theme": "Cambia tema",
+  "Light": "Chiaro",
+  "Dark": "Scuro",
+  "System": "Sistema"
 } 

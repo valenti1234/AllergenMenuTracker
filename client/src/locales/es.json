@@ -1,0 +1,41 @@
+{
+  "settings": {
+    "paymentOptions": "Opciones de pago",
+    "paymentOptionsDescription": "Configurar opciones de pago para los clientes",
+    "autoRedirectToPayment": "Redirección automática al pago",
+    "autoRedirectToPaymentDescription": "Redirigir automáticamente al cliente a la página de pago cuando se sirve el pedido",
+    "payAtOrder": "Pagar al ordenar",
+    "payAtOrderDescription": "Permitir a los clientes pagar en el momento de ordenar en lugar de después del servicio"
+  },
+  "notifications": {
+    "orderServedTitle": "¡Tu pedido está listo!",
+    "orderServedBody": "Tu pedido #{id} está listo para ser servido."
+  },
+  "track": {
+    "payNow": "Pagar ahora"
+  },
+  "menu": {
+    "orderSuccess": "Pedido Realizado con Éxito",
+    "redirectingToPayment": "Redirigiendo a la página de pago...",
+    "trackYourOrder": "Puedes seguir el estado de tu pedido"
+  },
+  "admin": {
+    "title": "Panel de Administración",
+    "language": {
+      "select": "Seleccionar Idioma",
+      "en": "Inglés",
+      "it": "Italiano",
+      "es": "Español"
+    },
+    "theme": {
+      "select": "Seleccionar Tema",
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema"
+    }
+  },
+  "Toggle theme": "Cambiar tema",
+  "Light": "Claro",
+  "Dark": "Oscuro",
+  "System": "Sistema"
+} 

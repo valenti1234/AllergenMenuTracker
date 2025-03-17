@@ -1,4 +1,4 @@
-import { Phone, LogOut, ShoppingCart, Menu as MenuIcon, X } from "lucide-react";
+import { Phone, LogOut, ShoppingCart, Menu as MenuIcon, X, Moon, Sun, Monitor } from "lucide-react";
 import { usePhone } from "@/contexts/PhoneContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +16,8 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/hooks/use-cart";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { useTheme } from "@/components/theme-provider";
 
 export function CustomerHeader() {
   const { phoneNumber, signOut } = usePhone();
@@ -24,6 +26,7 @@ export function CustomerHeader() {
   const { getLocalizedName } = useSettings();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const cartItemCount = useCart();
+  const { theme, setTheme } = useTheme();
 
   const formatPhoneNumber = (phone: string) => {
     // Format phone number as (XXX) XXX-XXXX
@@ -61,6 +64,7 @@ export function CustomerHeader() {
             currentLanguage={language}
             onLanguageChange={setLanguage}
           />
+          <ThemeToggle />
           <Link href="/cart">
             <Button variant="ghost" size="icon" className="w-9 px-0 relative" aria-label={t('nav.cart')}>
               <ShoppingCart className="h-4 w-4" />
@@ -130,6 +134,40 @@ export function CustomerHeader() {
                         onLanguageChange={setLanguage}
                         vertical={true}
                       />
+                    </div>
+                  </div>
+                  
+                  {/* Theme Selector for Mobile */}
+                  <div className="px-2 pt-4 border-t">
+                    <h2 className="text-lg font-semibold mb-2">{t('admin.theme.select')}</h2>
+                    <div className="grid gap-2">
+                      <Button
+                        variant={theme === 'light' ? "default" : "outline"}
+                        size="sm"
+                        className="w-full justify-start"
+                        onClick={() => setTheme('light')}
+                      >
+                        <Sun className="mr-2 h-4 w-4" />
+                        {t('admin.theme.light')}
+                      </Button>
+                      <Button
+                        variant={theme === 'dark' ? "default" : "outline"}
+                        size="sm"
+                        className="w-full justify-start"
+                        onClick={() => setTheme('dark')}
+                      >
+                        <Moon className="mr-2 h-4 w-4" />
+                        {t('admin.theme.dark')}
+                      </Button>
+                      <Button
+                        variant={theme === 'system' ? "default" : "outline"}
+                        size="sm"
+                        className="w-full justify-start"
+                        onClick={() => setTheme('system')}
+                      >
+                        <Monitor className="mr-2 h-4 w-4" />
+                        {t('admin.theme.system')}
+                      </Button>
                     </div>
                   </div>
                 </div>

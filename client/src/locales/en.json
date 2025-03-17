@@ -18,5 +18,24 @@
     "orderSuccess": "Order Placed Successfully",
     "redirectingToPayment": "Redirecting to payment page...",
     "trackYourOrder": "You can track your order status"
-  }
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "language": {
+      "select": "Select Language",
+      "en": "English",
+      "it": "Italian",
+      "es": "Spanish"
+    },
+    "theme": {
+      "select": "Select Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
+  },
+  "Toggle theme": "Toggle theme",
+  "Light": "Light",
+  "Dark": "Dark",
+  "System": "System"
 } 
