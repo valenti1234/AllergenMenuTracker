@@ -10,17 +10,17 @@ export default function AdminIndex() {
     // Se l'autenticazione è ancora in caricamento, aspetta
     if (isLoading) return;
     
-    // Usa setLocation per reindirizzare con percorsi relativi al base path
+    // Usiamo percorsi completi
     if (isAuthenticated && user) {
       console.log("User authenticated as:", user.role);
       if (user.role === "kitchen") {
-        setLocation("/kds");
+        setLocation("/admin/kds");
       } else {
-        setLocation("/dashboard");
+        setLocation("/admin/dashboard");
       }
     } else {
       console.log("User not authenticated, redirecting to login");
-      setLocation("/login");
+      setLocation("/admin/login");
     }
   }, [isLoading, isAuthenticated, user, setLocation]);
 

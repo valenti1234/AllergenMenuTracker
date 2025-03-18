@@ -31,10 +31,10 @@ export default function AdminLogin() {
   const { isAuthenticated, isLoading: authLoading } = useAdminAuth();
 
   useEffect(() => {
-    // Se già autenticato, reindirizza alla dashboard usando percorsi relativi
+    // Se già autenticato, reindirizza alla dashboard usando percorsi completi
     if (!authLoading && isAuthenticated) {
       console.log("User is authenticated, redirecting to dashboard");
-      setLocation("/dashboard");
+      setLocation("/admin/dashboard");
     }
   }, [authLoading, isAuthenticated, setLocation]);
 
@@ -67,8 +67,8 @@ export default function AdminLogin() {
       
       // Reindirizza manualmente dopo un login riuscito
       if (sessionResponse.authenticated) {
-        // Usa percorsi relativi per il reindirizzamento
-        setLocation("/dashboard");
+        // Usa percorsi completi per il reindirizzamento
+        setLocation("/admin/dashboard");
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -112,7 +112,7 @@ export default function AdminLogin() {
         <CardHeader>
           <CardTitle>Admin Login</CardTitle>
           <CardDescription>
-            Per accedere, usa username: valenti1234 e password: Itnelav3465#
+            Area di accesso riservata agli amministratori
           </CardDescription>
         </CardHeader>
         <CardContent>

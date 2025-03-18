@@ -16,7 +16,9 @@ import {
 import { languages } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
+import { Link } from "wouter";
 
+// Usa percorsi completi con /admin/
 const menuItems = [
   {
     title: "nav.dashboard",
@@ -41,7 +43,7 @@ const menuItems = [
   {
     title: "nav.kitchen",
     icon: ChefHat,
-    href: "/admin/kitchen"
+    href: "/admin/kds" 
   },
   {
     title: "nav.users",
@@ -147,10 +149,10 @@ export function Sidebar() {
         <nav className="space-y-1">
           {menuItems.map((item) => {
             const Icon = item.icon;
-            const isActive = currentPath === item.href;
+            const isActive = currentPath === item.href || (item.href === '/admin/dashboard' && currentPath === '/admin');
 
             return (
-              <a
+              <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
@@ -162,7 +164,7 @@ export function Sidebar() {
               >
                 <Icon className="h-4 w-4" />
                 {t(item.title)}
-              </a>
+              </Link>
             );
           })}
         </nav>

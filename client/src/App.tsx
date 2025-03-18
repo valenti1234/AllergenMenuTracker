@@ -47,7 +47,7 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      navigate("/login");
+      navigate("/admin/login");
     }
   }, [isLoading, isAuthenticated, navigate]);
 
@@ -62,63 +62,58 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
 const isAdminPath = window.location.pathname.startsWith('/admin');
 
 function App() {
-  // Router per l'area admin
-  if (isAdminPath) {
-    return (
-      <>
-        <Switch>
-          <Route path="/" component={AdminIndex} />
-          <Route path="/login" component={AdminLogin} />
-          <Route path="/dashboard">
-            <ProtectedRoute component={AdminDashboard} />
-          </Route>
-          <Route path="/menu-items">
-            <ProtectedRoute component={MenuItems} />
-          </Route>
-          <Route path="/orders">
-            <ProtectedRoute component={Orders} />
-          </Route>
-          <Route path="/archive">
-            <ProtectedRoute component={Archive} />
-          </Route>
-          <Route path="/kds">
-            <ProtectedRoute component={KDS} />
-          </Route>
-          <Route path="/users">
-            <ProtectedRoute component={Users} />
-          </Route>
-          <Route path="/database">
-            <ProtectedRoute component={Database} />
-          </Route>
-          <Route path="/api-docs">
-            <ProtectedRoute component={ApiDocs} />
-          </Route>
-          <Route path="/settings">
-            <ProtectedRoute component={Settings} />
-          </Route>
-          <Route path="/pos-settings">
-            <ProtectedRoute component={PosSettings} />
-          </Route>
-          <Route path="/training">
-            <ProtectedRoute component={Training} />
-          </Route>
-          <Route component={NotFound} />
-        </Switch>
-        <Toaster />
-      </>
-    );
-  }
-  
-  // Router per l'area clienti
+  // Non utilizziamo più la divisione basata su isAdminPath
+  // Ora mostreremo tutte le rotte insieme e lasciamo che il router gestisca il matching
+
   return (
     <>
       <Switch>
+        {/* Customer Routes */}
         <Route path="/signin" component={SignIn} />
         <Route path="/menu" component={Menu} />
         <Route path="/cart" component={Cart} />
         <Route path="/track" component={TrackOrder} />
         <Route path="/payment" component={Payment} />
         <Route path="/" component={HomeRedirect} />
+
+        {/* Admin Routes - Usiamo percorsi completi */}
+        <Route path="/admin" component={AdminIndex} />
+        <Route path="/admin/login" component={AdminLogin} />
+        <Route path="/admin/dashboard">
+          <ProtectedRoute component={AdminDashboard} />
+        </Route>
+        <Route path="/admin/menu-items">
+          <ProtectedRoute component={MenuItems} />
+        </Route>
+        <Route path="/admin/orders">
+          <ProtectedRoute component={Orders} />
+        </Route>
+        <Route path="/admin/archive">
+          <ProtectedRoute component={Archive} />
+        </Route>
+        <Route path="/admin/kds">
+          <ProtectedRoute component={KDS} />
+        </Route>
+        <Route path="/admin/users">
+          <ProtectedRoute component={Users} />
+        </Route>
+        <Route path="/admin/database">
+          <ProtectedRoute component={Database} />
+        </Route>
+        <Route path="/admin/api-docs">
+          <ProtectedRoute component={ApiDocs} />
+        </Route>
+        <Route path="/admin/settings">
+          <ProtectedRoute component={Settings} />
+        </Route>
+        <Route path="/admin/pos-settings">
+          <ProtectedRoute component={PosSettings} />
+        </Route>
+        <Route path="/admin/training">
+          <ProtectedRoute component={Training} />
+        </Route>
+
+        {/* 404 Page */}
         <Route component={NotFound} />
       </Switch>
       <Toaster />

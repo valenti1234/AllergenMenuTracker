@@ -16,9 +16,6 @@ import { Router } from "wouter";
 // Determina se siamo in un path admin
 const isAdminPath = window.location.pathname.startsWith('/admin');
 
-// Seleziona il percorso base corretto
-const basePath = isAdminPath ? '/admin' : '';
-
 // Wrapper condizionale per PhoneProvider
 function ConditionalPhoneProvider({ children }: { children: React.ReactNode }) {
   if (isAdminPath) {
@@ -37,7 +34,7 @@ createRoot(document.getElementById("root")!).render(
         <SettingsProvider>
           <QueryClientProvider client={queryClient}>
             <TooltipProvider>
-              <Router base={basePath}>
+              <Router>
                 <ConditionalPhoneProvider>
                   <OrderStatusProvider>
                     <App />
