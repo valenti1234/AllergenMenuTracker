@@ -11,6 +11,24 @@ import { OrderStatusProvider } from "@/contexts/OrderStatusContext";
 import { queryClient } from "@/lib/queryClient";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { Router } from "wouter";
+
+// Determina se siamo in un path admin
+const isAdminPath = window.location.pathname.startsWith('/admin');
+
+// Seleziona il percorso base corretto
+const basePath = isAdminPath ? '/admin' : '';
+
+// Wrapper condizionale per PhoneProvider
+function ConditionalPhoneProvider({ children }: { children: React.ReactNode }) {
+  if (isAdminPath) {
+    // Nell'area admin, non usare PhoneProvider
+    return <>{children}</>;
+  } else {
+    // Nell'area clienti, usa PhoneProvider
+    return <PhoneProvider>{children}</PhoneProvider>;
+  }
+}
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -19,11 +37,13 @@ createRoot(document.getElementById("root")!).render(
         <SettingsProvider>
           <QueryClientProvider client={queryClient}>
             <TooltipProvider>
-              <PhoneProvider>
-                <OrderStatusProvider>
-                  <App />
-                </OrderStatusProvider>
-              </PhoneProvider>
+              <Router base={basePath}>
+                <ConditionalPhoneProvider>
+                  <OrderStatusProvider>
+                    <App />
+                  </OrderStatusProvider>
+                </ConditionalPhoneProvider>
+              </Router>
             </TooltipProvider>
           </QueryClientProvider>
         </SettingsProvider>

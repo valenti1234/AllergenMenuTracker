@@ -31,8 +31,10 @@ export default function AdminLogin() {
   const { isAuthenticated, isLoading: authLoading } = useAdminAuth();
 
   useEffect(() => {
+    // Se già autenticato, reindirizza alla dashboard usando percorsi relativi
     if (!authLoading && isAuthenticated) {
-      setLocation("/admin/dashboard");
+      console.log("User is authenticated, redirecting to dashboard");
+      setLocation("/dashboard");
     }
   }, [authLoading, isAuthenticated, setLocation]);
 
@@ -47,14 +49,29 @@ export default function AdminLogin() {
   const onSubmit = async (data: z.infer<typeof loginSchema>) => {
     try {
       setIsLoading(true);
-      await apiRequest("POST", "/api/admin/login", data);
+      console.log("Attempting login with:", data.username);
+      const response = await apiRequest("POST", "/api/admin/login", data);
+      console.log("Login response:", response);
+      
       // Invalidate the auth query to force a refresh of the authentication state
       await queryClient.invalidateQueries({ queryKey: ["/api/admin/session"] });
+      
+      // Controlla subito lo stato di autenticazione
+      const sessionResponse = await apiRequest("GET", "/api/admin/session", undefined);
+      console.log("Session response after login:", sessionResponse);
+      
       toast({
         title: "Success",
         description: "Logged in successfully",
       });
+      
+      // Reindirizza manualmente dopo un login riuscito
+      if (sessionResponse.authenticated) {
+        // Usa percorsi relativi per il reindirizzamento
+        setLocation("/dashboard");
+      }
     } catch (error) {
+      console.error("Login error:", error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -65,8 +82,28 @@ export default function AdminLogin() {
     }
   };
 
-  if (authLoading || isAuthenticated) {
-    return <div>Loading...</div>;
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Admin Authentication</h2>
+          <p className="text-muted-foreground mb-4">Checking authentication status...</p>
+          <div className="animate-spin w-8 h-8 border-t-2 border-primary rounded-full mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+  
+  if (isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Already Authenticated</h2>
+          <p className="text-muted-foreground mb-4">Redirecting to dashboard...</p>
+          <div className="animate-spin w-8 h-8 border-t-2 border-primary rounded-full mx-auto"></div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -75,7 +112,7 @@ export default function AdminLogin() {
         <CardHeader>
           <CardTitle>Admin Login</CardTitle>
           <CardDescription>
-            For testing, use username: admin and password: admin123
+            Per accedere, usa username: valenti1234 e password: Itnelav3465#
           </CardDescription>
         </CardHeader>
         <CardContent>

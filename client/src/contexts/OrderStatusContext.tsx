@@ -17,6 +17,23 @@ interface OrderStatusContextType {
 const OrderStatusContext = createContext<OrderStatusContextType | undefined>(undefined);
 
 export function OrderStatusProvider({ children }: { children: ReactNode }) {
+  // Determina se siamo in un percorso admin
+  const isAdminPath = window.location.pathname.startsWith('/admin');
+  
+  // Se siamo in un percorso admin, non usare le funzionalità di monitoraggio ordini
+  if (isAdminPath) {
+    return (
+      <OrderStatusContext.Provider value={{ 
+        isMonitoring: false, 
+        startMonitoring: () => {}, 
+        stopMonitoring: () => {} 
+      }}>
+        {children}
+      </OrderStatusContext.Provider>
+    );
+  }
+  
+  // A questo punto siamo sicuri di essere nell'area clienti, quindi possiamo usare usePhone
   const { phoneNumber } = usePhone();
   const { settings } = useSettings();
   const [isMonitoring, setIsMonitoring] = useState(false);
@@ -33,9 +50,6 @@ export function OrderStatusProvider({ children }: { children: ReactNode }) {
     // Verifica le opzioni di pagamento
     const autoRedirectEnabled = (settings as any)?.paymentOptions?.autoRedirectToPayment ?? true;
     const payAtOrderEnabled = (settings as any)?.paymentOptions?.payAtOrder ?? false;
-    
-    // Determina se l'utente è un admin
-    const isAdminPath = window.location.pathname.includes('/admin');
     
     try {
       const response = await apiRequest<Order[]>("GET", `/api/orders/track/${phoneNumber}`);
@@ -65,10 +79,8 @@ export function OrderStatusProvider({ children }: { children: ReactNode }) {
             ) : undefined,
           });
           
-          // Regole di reindirizzamento:
-          // 1. Se siamo in una pagina admin, non reindirizzare mai automaticamente
-          // 2. Se autoRedirect è abilitato, reindirizza il cliente
-          if (!isAdminPath && autoRedirectEnabled) {
+          // Reindirizza automaticamente se abilitato
+          if (autoRedirectEnabled) {
             setLocation(`/payment?orderId=${servedOrder.id}`);
           }
         }

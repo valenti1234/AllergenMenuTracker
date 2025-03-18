@@ -30,41 +30,54 @@ export function PhoneProvider({ children }: { children: React.ReactNode }) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [, setLocation] = useLocation();
+  const currentPath = window.location.pathname;
 
   // Check for stored customer info on mount
   useEffect(() => {
+    console.log("PhoneContext effect running, current path:", currentPath);
     const stored = localStorage.getItem('customerInfo');
+    
     if (stored) {
       try {
         const customerInfo: CustomerInfo = JSON.parse(stored);
         // Check if the info is expired (24 hours)
         const now = Date.now();
         if (now - customerInfo.timestamp > 24 * 60 * 60 * 1000) {
+          console.log("Customer info expired, removing");
           localStorage.removeItem('customerInfo');
-          setLocation('/');
+          // Non reindirizzare, lasceremo che l'utente veda la form di signin normalmente
           return;
         }
+        
+        console.log("Found valid customer info:", customerInfo.phoneNumber);
         setPhoneNumber(customerInfo.phoneNumber);
         setIsAuthenticated(true);
-        // If we're on the signin page, redirect to menu
-        if (window.location.pathname === '/signin' || window.location.pathname === '/') {
+        
+        // Se siamo nella home o signin E abbiamo informazioni valide, reindirizzare al menu
+        if (currentPath === '/signin' || currentPath === '/') {
+          console.log("Redirecting to menu because we're on signin/home with valid info");
           setLocation('/menu');
         }
       } catch (error) {
         console.error('Error parsing customer info:', error);
         localStorage.removeItem('customerInfo');
-        setLocation('/');
+        // Non reindirizzare, lasceremo che l'utente veda la form di signin normalmente
       }
     } else {
-      setLocation('/');
+      console.log("No customer info found, staying on current page");
+      // Non reindirizzare, l'utente vedrà la form di signin nella home
     }
-  }, [setLocation]);
+  }, [setLocation, currentPath]);
 
   const signOut = () => {
+    console.log("Signing out, removing customer info");
     localStorage.removeItem('customerInfo');
     setPhoneNumber('');
     setIsAuthenticated(false);
-    setLocation('/signin');
+    // Reindirizza a signin solo se non siamo già lì
+    if (currentPath !== '/signin' && currentPath !== '/') {
+      setLocation('/signin');
+    }
   };
 
   return (

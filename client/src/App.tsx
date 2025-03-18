@@ -23,11 +23,23 @@ import Training from "@/pages/admin/training";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
-import { PhoneProvider } from "./contexts/PhoneContext";
 import SignIn from "@/pages/signin";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { SettingsProvider } from "@/contexts/SettingsContext";
+
+// Versione semplificata che mostra solo la pagina di signin direttamente
+function HomeRedirect() {
+  // Invece di reindirizzare automaticamente, mostriamo direttamente il componente SignIn
+  // ma wrappato nel nostro UI personalizzato
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-background">
+      <div className="w-full max-w-md">
+        <SignIn />
+      </div>
+    </div>
+  );
+}
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const [location, navigate] = useLocation();
@@ -35,7 +47,7 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      navigate("/admin/login");
+      navigate("/login");
     }
   }, [isLoading, isAuthenticated, navigate]);
 
@@ -46,71 +58,71 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
   return isAuthenticated ? <Component /> : null;
 }
 
-function Router() {
-  return (
-    <Switch>
-      <Route path="/signin" component={SignIn} />
-      <Route path="/menu" component={Menu} />
-      <Route path="/cart" component={Cart} />
-      <Route path="/track" component={TrackOrder} />
-      <Route path="/payment" component={Payment} />
-      <Route path="/" component={SignIn} />
-      <Route path="/admin" component={AdminIndex} />
-      <Route path="/admin/login" component={AdminLogin} />
-      <Route path="/admin/dashboard">
-        <ProtectedRoute component={AdminDashboard} />
-      </Route>
-      <Route path="/admin/menu-items">
-        <ProtectedRoute component={MenuItems} />
-      </Route>
-      <Route path="/admin/orders">
-        <ProtectedRoute component={Orders} />
-      </Route>
-      <Route path="/admin/archive">
-        <ProtectedRoute component={Archive} />
-      </Route>
-      <Route path="/admin/kds">
-        <ProtectedRoute component={KDS} />
-      </Route>
-      <Route path="/admin/users">
-        <ProtectedRoute component={Users} />
-      </Route>
-      <Route path="/admin/database">
-        <ProtectedRoute component={Database} />
-      </Route>
-      <Route path="/admin/api-docs">
-        <ProtectedRoute component={ApiDocs} />
-      </Route>
-      <Route path="/admin/settings">
-        <ProtectedRoute component={Settings} />
-      </Route>
-      <Route path="/admin/pos-settings">
-        <ProtectedRoute component={PosSettings} />
-      </Route>
-      <Route path="/admin/training">
-        <ProtectedRoute component={Training} />
-      </Route>
-      <Route component={NotFound} />
-    </Switch>
-  );
-}
+// Determina se siamo in un path admin
+const isAdminPath = window.location.pathname.startsWith('/admin');
 
-export function App() {
+function App() {
+  // Router per l'area admin
+  if (isAdminPath) {
+    return (
+      <>
+        <Switch>
+          <Route path="/" component={AdminIndex} />
+          <Route path="/login" component={AdminLogin} />
+          <Route path="/dashboard">
+            <ProtectedRoute component={AdminDashboard} />
+          </Route>
+          <Route path="/menu-items">
+            <ProtectedRoute component={MenuItems} />
+          </Route>
+          <Route path="/orders">
+            <ProtectedRoute component={Orders} />
+          </Route>
+          <Route path="/archive">
+            <ProtectedRoute component={Archive} />
+          </Route>
+          <Route path="/kds">
+            <ProtectedRoute component={KDS} />
+          </Route>
+          <Route path="/users">
+            <ProtectedRoute component={Users} />
+          </Route>
+          <Route path="/database">
+            <ProtectedRoute component={Database} />
+          </Route>
+          <Route path="/api-docs">
+            <ProtectedRoute component={ApiDocs} />
+          </Route>
+          <Route path="/settings">
+            <ProtectedRoute component={Settings} />
+          </Route>
+          <Route path="/pos-settings">
+            <ProtectedRoute component={PosSettings} />
+          </Route>
+          <Route path="/training">
+            <ProtectedRoute component={Training} />
+          </Route>
+          <Route component={NotFound} />
+        </Switch>
+        <Toaster />
+      </>
+    );
+  }
+  
+  // Router per l'area clienti
   return (
-    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <LanguageProvider>
-        <SettingsProvider>
-          <QueryClientProvider client={queryClient}>
-            <TooltipProvider>
-              <PhoneProvider>
-                <Router />
-                <Toaster />
-              </PhoneProvider>
-            </TooltipProvider>
-          </QueryClientProvider>
-        </SettingsProvider>
-      </LanguageProvider>
-    </ThemeProvider>
+    <>
+      <Switch>
+        <Route path="/signin" component={SignIn} />
+        <Route path="/menu" component={Menu} />
+        <Route path="/cart" component={Cart} />
+        <Route path="/track" component={TrackOrder} />
+        <Route path="/payment" component={Payment} />
+        <Route path="/" component={HomeRedirect} />
+        <Route component={NotFound} />
+      </Switch>
+      <Toaster />
+    </>
   );
 }
 
