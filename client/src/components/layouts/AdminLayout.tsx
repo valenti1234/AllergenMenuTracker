@@ -1,4 +1,4 @@
-import { Sidebar } from "@/components/layouts/Sidebar";
+import { Sidebar } from "@/components/admin/Sidebar";
 import { useTranslation } from "react-i18next";
 import {
   DropdownMenu,

@@ -18,7 +18,8 @@ import {
   GraduationCap,
   Moon,
   Sun,
-  Monitor
+  Monitor,
+  BarChart
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/queryClient";
@@ -94,6 +95,12 @@ export function Sidebar() {
       icon: Utensils,
       href: "/admin/kds",
       roles: ["admin", "manager", "kitchen"]
+    },
+    {
+      title: t("nav.kitchenPerformance", "Kitchen Performance"),
+      icon: BarChart,
+      href: "/admin/kitchen-performance",
+      roles: ["admin", "manager"]
     },
     {
       title: t("nav.userManagement", "User Management"),

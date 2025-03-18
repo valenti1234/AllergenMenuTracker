@@ -11,7 +11,8 @@ import {
   Globe,
   Moon,
   Sun,
-  Monitor
+  Monitor,
+  LineChart
 } from "lucide-react";
 import { languages } from "@shared/schema";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,11 @@ const menuItems = [
     title: "nav.kitchen",
     icon: ChefHat,
     href: "/admin/kds" 
+  },
+  {
+    title: "nav.kitchenPerformance",
+    icon: LineChart,
+    href: "/admin/kitchen-performance" 
   },
   {
     title: "nav.users",

@@ -20,7 +20,26 @@
     "menuItemCount": "Numero Elementi Menu",
     "noData": "Nessun dato disponibile",
     "lastUpdated": "Ultimo aggiornamento",
-    "refresh": "Aggiorna"
+    "refresh": "Aggiorna",
+    "selectTimeRange": "Seleziona periodo",
+    "hours": "Ora"
+  },
+  "days": {
+    "mon": "Lun",
+    "tue": "Mar",
+    "wed": "Mer",
+    "thu": "Gio",
+    "fri": "Ven",
+    "sat": "Sab",
+    "sun": "Dom"
+  },
+  "dishes": {
+    "risotto": "Risotto ai funghi",
+    "brasato": "Brasato al barolo",
+    "pizza": "Pizza gourmet",
+    "pizze": "Pizze",
+    "tiramisu": "Tiramisù",
+    "fiorentina": "Fiorentina"
   },
   "menu": {
     "title": "Il Nostro Menu",
@@ -87,17 +106,14 @@
     "menuItems": "Voci Menu",
     "orders": "Ordini",
     "archive": "Archivio",
-    "kitchenDisplay": "Display Cucina",
+    "kitchen": "Cucina",
+    "kitchenDisplay": "Visualizzazione Cucina",
     "userManagement": "Gestione Utenti",
     "database": "Database",
     "apiDocs": "Documentazione API",
     "posSettings": "Impostazioni POS",
-    "kitchen": "Cucina",
-    "users": "Utenti",
-    "analytics": "Analisi",
-    "logout": "Disconnetti",
-    "backToMenu": "Torna al Menu",
-    "placeOrder": "Invia Ordine"
+    "kitchenPerformance": "Performance Cucina",
+    "training": "Formazione"
   },
   "newsletter": {
     "title": "Iscriviti alla Newsletter",
@@ -339,5 +355,67 @@
     "orderNotServed": "Questo ordine non è pronto per il pagamento",
     "orderNotFound": "Ordine non trovato",
     "receiptSent": "La ricevuta è stata inviata al tuo indirizzo email"
+  },
+  "kitchenPerformance": {
+    "title": "Performance della Cucina",
+    "timeRanges": {
+      "day": "Ultime 24 ore",
+      "week": "Ultimi 7 giorni",
+      "month": "Ultimo mese",
+      "year": "Ultimo anno"
+    },
+    "exportReport": "Esporta Report",
+    "avgPrepTime": "Tempo medio di preparazione",
+    "completedOrders": "Ordini completati",
+    "punctuality": "Puntualità",
+    "delays": "Ritardi",
+    "tabs": {
+      "overview": "Panoramica",
+      "details": "Dettagli",
+      "staff": "Staff",
+      "bottlenecks": "Colli di Bottiglia"
+    },
+    "charts": {
+      "prepTimeByDay": {
+        "title": "Tempo medio di preparazione per giorno",
+        "description": "Analisi del tempo medio di preparazione degli ordini negli ultimi 7 giorni",
+        "yAxis": "Minuti",
+        "legend": "Tempo medio"
+      },
+      "prepTimeByCategory": {
+        "title": "Tempo di preparazione per categoria",
+        "description": "Tempo medio di preparazione suddiviso per categoria di piatti",
+        "yAxis": "Minuti",
+        "legend": "Tempo medio"
+      },
+      "efficiencyDistribution": {
+        "title": "Distribuzione dell'efficienza",
+        "description": "Percentuale di ordini in tempo vs ordini in ritardo",
+        "onTime": "In tempo",
+        "delayed": "In ritardo"
+      },
+      "peakHours": {
+        "title": "Analisi delle ore di punta",
+        "description": "Conteggio degli ordini e tempi medi di preparazione durante le ore di punta",
+        "orderCount": "Numero ordini",
+        "avgPrepTime": "Tempo medio prep."
+      },
+      "staffPerformance": {
+        "title": "Performance dello staff",
+        "description": "Metriche di performance per i membri dello staff di cucina",
+        "staffMember": "Membro Staff",
+        "ordersHandled": "Ordini Gestiti",
+        "avgPrepTime": "Tempo Medio Prep.",
+        "rating": "Valutazione"
+      },
+      "bottlenecks": {
+        "title": "Colli di bottiglia nella preparazione",
+        "description": "Piatti che richiedono più tempo per essere preparati e possono causare ritardi",
+        "item": "Piatto",
+        "category": "Categoria",
+        "prepTime": "Tempo Prep.",
+        "orderCount": "Numero Ordini"
+      }
+    }
   }
 } 

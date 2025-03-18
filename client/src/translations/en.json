@@ -20,7 +20,26 @@
     "menuItemCount": "Menu Item Count",
     "noData": "No data available",
     "lastUpdated": "Last updated",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "selectTimeRange": "Select time range",
+    "hours": "Hour"
+  },
+  "days": {
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun"
+  },
+  "dishes": {
+    "risotto": "Mushroom Risotto",
+    "brasato": "Braised Beef in Barolo Wine",
+    "pizza": "Gourmet Pizza",
+    "pizze": "Pizzas",
+    "tiramisu": "Tiramisu",
+    "fiorentina": "Florentine Steak"
   },
   "menu": {
     "title": "Our Menu",
@@ -159,6 +178,7 @@
     "apiDocs": "API Documentation",
     "posSettings": "POS Settings",
     "kitchen": "Kitchen",
+    "kitchenPerformance": "Kitchen Performance",
     "users": "Users",
     "analytics": "Analytics",
     "logout": "Logout",
@@ -357,5 +377,67 @@
     "orderNotServed": "This order is not ready for payment",
     "orderNotFound": "Order not found",
     "receiptSent": "The receipt has been sent to your email address"
+  },
+  "kitchenPerformance": {
+    "title": "Kitchen Performance",
+    "timeRanges": {
+      "day": "Last 24 hours",
+      "week": "Last 7 days",
+      "month": "Last month",
+      "year": "Last year"
+    },
+    "exportReport": "Export Report",
+    "avgPrepTime": "Average preparation time",
+    "completedOrders": "Completed orders",
+    "punctuality": "Punctuality",
+    "delays": "Delays",
+    "tabs": {
+      "overview": "Overview",
+      "details": "Details",
+      "staff": "Staff",
+      "bottlenecks": "Bottlenecks"
+    },
+    "charts": {
+      "prepTimeByDay": {
+        "title": "Average preparation time by day",
+        "description": "Analysis of the average order preparation time over the last 7 days",
+        "yAxis": "Minutes",
+        "legend": "Average time"
+      },
+      "prepTimeByCategory": {
+        "title": "Preparation time by category",
+        "description": "Average preparation time broken down by dish category",
+        "yAxis": "Minutes",
+        "legend": "Average time"
+      },
+      "efficiencyDistribution": {
+        "title": "Efficiency distribution",
+        "description": "Percentage of orders on time vs orders delayed",
+        "onTime": "On time",
+        "delayed": "Delayed"
+      },
+      "peakHours": {
+        "title": "Peak hours analysis",
+        "description": "Order counts and average preparation times during peak hours",
+        "orderCount": "Order count",
+        "avgPrepTime": "Avg. prep time"
+      },
+      "staffPerformance": {
+        "title": "Staff performance",
+        "description": "Performance metrics for kitchen staff members",
+        "staffMember": "Staff Member",
+        "ordersHandled": "Orders Handled",
+        "avgPrepTime": "Avg. Prep Time",
+        "rating": "Rating"
+      },
+      "bottlenecks": {
+        "title": "Preparation bottlenecks",
+        "description": "Items that take the longest to prepare and may cause delays",
+        "item": "Item",
+        "category": "Category",
+        "prepTime": "Prep Time",
+        "orderCount": "Order Count"
+      }
+    }
   }
 } 

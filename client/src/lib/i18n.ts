@@ -19,6 +19,15 @@ export const getLanguageName = (lang: Language): string => {
   return names[lang];
 };
 
+// Funzione di debug per verificare le traduzioni
+export const debugTranslations = (lang: Language) => {
+  console.log(`Loading translations for ${lang}:`, {
+    en: en,
+    it: it,
+    es: es
+  }[lang]);
+};
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -31,7 +40,14 @@ i18n
     fallbackLng: defaultLanguage,
     interpolation: {
       escapeValue: false
-    }
+    },
+    debug: true // Attiva la modalità debug per i18next
   });
+
+// Aggiungi un listener per i cambiamenti di lingua
+i18n.on('languageChanged', (lng: string) => {
+  console.log(`Language changed to: ${lng}`);
+  debugTranslations(lng as Language);
+});
 
 export default i18n; 

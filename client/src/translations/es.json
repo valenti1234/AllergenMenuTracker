@@ -9,7 +9,52 @@
     "healthScore": "Puntuación de Salud",
     "loading": "Cargando...",
     "error": "Error",
-    "success": "Éxito"
+    "success": "Éxito",
+    "continue": "Continuar",
+    "back": "Atrás",
+    "total": "Total",
+    "menu": "Menú",
+    "orders": "Pedidos",
+    "revenue": "Ingresos",
+    "orderCount": "Número de Pedidos",
+    "menuItemCount": "Número de Elementos del Menú",
+    "noData": "No hay datos disponibles",
+    "lastUpdated": "Última actualización",
+    "refresh": "Actualizar",
+    "selectTimeRange": "Seleccionar periodo",
+    "hours": "Hora",
+    "welcome": "Bienvenido",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "clear": "Limpiar",
+    "all": "Todos",
+    "none": "Ninguno",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "days": {
+    "mon": "Lun",
+    "tue": "Mar",
+    "wed": "Mié",
+    "thu": "Jue",
+    "fri": "Vie",
+    "sat": "Sáb",
+    "sun": "Dom"
+  },
+  "dishes": {
+    "risotto": "Risotto de hongos",
+    "brasato": "Estofado al barolo",
+    "pizza": "Pizza gourmet",
+    "pizze": "Pizzas",
+    "tiramisu": "Tiramisú",
+    "fiorentina": "Bistec a la florentina"
   },
   "menu": {
     "title": "Nuestro Menú",
@@ -18,6 +63,7 @@
     "categories": {
       "starters": "Entrantes",
       "mains": "Platos Principales",
+      "secondi": "Segundos Platos",
       "desserts": "Postres",
       "drinks": "Bebidas",
       "sides": "Guarniciones"
@@ -45,7 +91,6 @@
     "prepTime": "Tiempo de Preparación",
     "healthyChoice": "¡Opción Saludable!",
     "healthScoreExplanation": "Esta puntuación se calcula según el contenido de proteínas, calorías, grasas y atributos dietéticos especiales. Una puntuación más alta indica una opción más saludable.",
-    "total": "Total",
     "chefRecommended": "Recomendado por el Chef"
   },
   "nav": {
@@ -61,7 +106,13 @@
     "kitchenDisplay": "Pantalla de Cocina",
     "userManagement": "Gestión de Usuarios",
     "database": "Base de Datos",
-    "apiDocs": "Documentación de API"
+    "apiDocs": "Documentación de API",
+    "kitchenPerformance": "Rendimiento de Cocina",
+    "training": "Formación",
+    "kitchen": "Cocina",
+    "settings": "Configuración",
+    "profile": "Perfil",
+    "posSettings": "Configuración POS"
   },
   "dietary": {
     "vegan": "Vegano",
@@ -118,7 +169,16 @@
       },
       "noOrders": "No se encontraron pedidos archivados"
     },
-    "processPayment": "Procesar Pago"
+    "processPayment": "Procesar Pago",
+    "new": "Nuevo Pedido",
+    "pending": "Pendientes",
+    "preparing": "En Preparación",
+    "ready": "Listos",
+    "delivered": "Entregados",
+    "cancelled": "Cancelados",
+    "status": "Estado",
+    "time": "Tiempo",
+    "total": "Total"
   },
   "kitchen": {
     "title": "Sistema de Visualización de Cocina",
@@ -149,10 +209,22 @@
       "customer": "Cliente",
       "phone": "Teléfono",
       "specialInstructions": "Instrucciones Especiales"
+    },
+    "performance": "Rendimiento de la Cocina",
+    "avgPrepTime": "Tiempo medio de preparación",
+    "completedOrders": "Pedidos completados",
+    "punctuality": "Puntualidad",
+    "delays": "Retrasos",
+    "categories": {
+      "starters": "Entrantes",
+      "mains": "Platos Principales",
+      "desserts": "Postres",
+      "drinks": "Bebidas",
+      "sides": "Guarniciones"
     }
   },
   "admin": {
-    "title": "Administración del Restaurante",
+    "title": "Panel de Administración",
     "kitchenStaff": "Personal de Cocina",
     "language": {
       "select": "Seleccionar Idioma",
@@ -211,7 +283,14 @@
       "authDescription": "Cómo autenticarse con la API",
       "authInfo": "La API utiliza autenticación basada en cookies. La mayoría de los endpoints requieren autenticación con roles de usuario apropiados.",
       "authDocs": "Documentación de autenticación"
-    }
+    },
+    "theme": {
+      "select": "Seleccionar Tema",
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema"
+    },
+    "reports": "Informes"
   },
   "payment": {
     "title": "Pago",
@@ -289,5 +368,67 @@
     "autoRedirectToPaymentDescription": "Redirige automáticamente al cliente a la página de pago cuando se sirve el pedido",
     "payAtOrder": "Pago al realizar el pedido",
     "payAtOrderDescription": "Permite a los clientes pagar en el momento de hacer el pedido en lugar de después del servicio"
+  },
+  "kitchenPerformance": {
+    "title": "Rendimiento de Cocina",
+    "timeRanges": {
+      "day": "Últimas 24 horas",
+      "week": "Últimos 7 días",
+      "month": "Último mes",
+      "year": "Último año"
+    },
+    "exportReport": "Exportar Informe",
+    "avgPrepTime": "Tiempo medio de preparación",
+    "completedOrders": "Pedidos completados",
+    "punctuality": "Puntualidad",
+    "delays": "Retrasos",
+    "tabs": {
+      "overview": "Vista General",
+      "details": "Detalles",
+      "staff": "Personal",
+      "bottlenecks": "Cuellos de Botella"
+    },
+    "charts": {
+      "prepTimeByDay": {
+        "title": "Tiempo medio de preparación por día",
+        "description": "Análisis del tiempo medio de preparación de los pedidos en los últimos 7 días",
+        "yAxis": "Minutos",
+        "legend": "Tiempo medio"
+      },
+      "prepTimeByCategory": {
+        "title": "Tiempo de preparación por categoría",
+        "description": "Tiempo medio de preparación desglosado por categoría de platos",
+        "yAxis": "Minutos",
+        "legend": "Tiempo medio"
+      },
+      "efficiencyDistribution": {
+        "title": "Distribución de eficiencia",
+        "description": "Porcentaje de pedidos a tiempo vs pedidos retrasados",
+        "onTime": "A tiempo",
+        "delayed": "Retrasados"
+      },
+      "peakHours": {
+        "title": "Análisis de horas punta",
+        "description": "Recuento de pedidos y tiempos medios de preparación durante las horas punta",
+        "orderCount": "Número de pedidos",
+        "avgPrepTime": "Tiempo medio prep."
+      },
+      "staffPerformance": {
+        "title": "Rendimiento del personal",
+        "description": "Métricas de rendimiento para el personal de cocina",
+        "staffMember": "Miembro Personal",
+        "ordersHandled": "Pedidos Gestionados",
+        "avgPrepTime": "Tiempo Medio Prep.",
+        "rating": "Valoración"
+      },
+      "bottlenecks": {
+        "title": "Cuellos de botella en la preparación",
+        "description": "Platos que requieren más tiempo para prepararse y pueden causar retrasos",
+        "item": "Plato",
+        "category": "Categoría",
+        "prepTime": "Tiempo Prep.",
+        "orderCount": "Número Pedidos"
+      }
+    }
   }
 } 

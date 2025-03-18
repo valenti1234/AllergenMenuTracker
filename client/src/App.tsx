@@ -20,6 +20,7 @@ import ApiDocs from "@/pages/admin/api-docs";
 import Settings from "@/pages/admin/settings";
 import PosSettings from "@/pages/admin/pos-settings";
 import Training from "@/pages/admin/training";
+import KitchenPerformance from "@/pages/admin/kitchen-performance";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
@@ -93,6 +94,9 @@ function App() {
         </Route>
         <Route path="/admin/kds">
           <ProtectedRoute component={KDS} />
+        </Route>
+        <Route path="/admin/kitchen-performance">
+          <ProtectedRoute component={KitchenPerformance} />
         </Route>
         <Route path="/admin/users">
           <ProtectedRoute component={Users} />
