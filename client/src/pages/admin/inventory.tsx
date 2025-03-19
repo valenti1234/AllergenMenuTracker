@@ -582,7 +582,7 @@ export default function Inventory() {
                   <TableHead>{t("inventory.category", "Categoria")}</TableHead>
                   <TableHead>{t("inventory.quantity", "Quantità")}</TableHead>
                   <TableHead>{t("inventory.unit", "Unità")}</TableHead>
-                  <TableHead>{t("inventory.status", "Stato")}</TableHead>
+                  <TableHead>{t("inventory.statusLabel", "Stato")}</TableHead>
                   <TableHead>{t("inventory.allergens", "Allergeni")}</TableHead>
                   <TableHead>{t("inventory.lastUpdated", "Ultimo Aggiornamento")}</TableHead>
                   <TableHead className="text-right">{t("common.actions", "Azioni")}</TableHead>
@@ -598,7 +598,7 @@ export default function Inventory() {
                     <TableCell>
                       <Badge variant={getStatusColor(item.status)}>
                         {item.status === "critical" && <AlertTriangle className="w-4 h-4 mr-1" />}
-                        {t(`inventory.status.${item.status}`, item.status)}
+                        {t(`inventory.status.${item.status}`)}
                       </Badge>
                     </TableCell>
                     <TableCell>

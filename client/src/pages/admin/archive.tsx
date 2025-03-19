@@ -36,75 +36,120 @@ export default function Archive() {
   const getLocalizedText = (textObj: any) => {
     if (!textObj) return "";
     
-    // If it's already a string, check if it's a MongoDB stringified object
+    // Handle simple string values
     if (typeof textObj === "string") {
-      // Check if it's a MongoDB stringified object with language keys
-      if (textObj.includes('en:') || textObj.includes('it:') || textObj.includes('es:')) {
-        // Extract the current language using regex
-        const currentLangRegex = new RegExp(`${i18n.language}:\\s*['"]([^'"]+)['"]`);
-        const enLangRegex = /en:\s*['"]([^'"]+)['"]/;
-        const itLangRegex = /it:\s*['"]([^'"]+)['"]/;
-        const esLangRegex = /es:\s*['"]([^'"]+)['"]/;
-        
-        // Try to match the current language first
-        const currentLangMatch = currentLangRegex.exec(textObj);
-        if (currentLangMatch && currentLangMatch[1]) {
-          return currentLangMatch[1];
-        }
-        
-        // Fall back to English
-        const enMatch = enLangRegex.exec(textObj);
-        if (enMatch && enMatch[1]) {
-          return enMatch[1];
-        }
-        
-        // Try other languages
-        const itMatch = itLangRegex.exec(textObj);
-        if (itMatch && itMatch[1]) {
-          return itMatch[1];
-        }
-        
-        const esMatch = esLangRegex.exec(textObj);
-        if (esMatch && esMatch[1]) {
-          return esMatch[1];
+      // Check if it's a string that looks like a complex object with language keys
+      if (textObj.includes('en:') && textObj.includes('_id:')) {
+        try {
+          // Try to extract using regex pattern matching for the current language
+          const langPattern = new RegExp(`${i18n.language}:\\s*['"]([^'"]+)['"]`);
+          const enPattern = /en:\s*['"]([^'"]+)['"]/;
+          
+          const langMatch = langPattern.exec(textObj);
+          if (langMatch && langMatch[1]) {
+            return langMatch[1];
+          }
+          
+          const enMatch = enPattern.exec(textObj);
+          if (enMatch && enMatch[1]) {
+            return enMatch[1];
+          }
+        } catch (e) {
+          // If extraction fails, continue with other methods
         }
       }
       
-      // If it's a regular string, return it
       return textObj;
     }
     
-    // If it's an object with language keys
-    if (typeof textObj === "object") {
+    // Handle objects with direct language keys (e.g., {en: "Fish & Chips", it: "Pesce e Patatine"})
+    if (typeof textObj === "object" && textObj !== null) {
       // Try current language first
-      if (textObj[i18n.language]) return textObj[i18n.language];
-      
+      if (textObj[i18n.language]) {
+        return textObj[i18n.language];
+      } 
       // Fall back to English
-      if (textObj.en) return textObj.en;
-      
-      // If no matching language, return the first available
-      const firstKey = Object.keys(textObj)[0];
-      if (firstKey) return textObj[firstKey];
+      else if (textObj.en) {
+        return textObj.en;
+      }
+      // If no matching language, try any other language
+      else if (Object.keys(textObj).length > 0) {
+        // Filter out non-language keys like _id
+        const langKeys = Object.keys(textObj).filter(k => 
+          k !== '_id' && k !== 'id' && typeof textObj[k] === 'string'
+        );
+        
+        if (langKeys.length > 0) {
+          return textObj[langKeys[0]];
+        }
+      }
     }
     
-    // If all else fails, stringify the object for debugging
-    return typeof textObj === "object" ? JSON.stringify(textObj) : String(textObj);
+    // If all else fails, convert to string but avoid showing the whole object
+    return typeof textObj === 'object' ? JSON.stringify(textObj).substring(0, 30) : String(textObj);
   };
 
   const filteredOrders = orders?.filter(
-    (order) => order.status === "completed" || order.status === "cancelled"
+    (order) => {
+      // Handle status as string or object
+      const statusStr = typeof order.status === 'string' 
+        ? order.status 
+        : typeof order.status === 'object' && order.status !== null
+          ? (Object.keys(order.status)[0] || 'completed')
+          : 'completed';
+      
+      return statusStr === "completed" || statusStr === "cancelled";
+    }
   ).filter(
-    (order) => filterStatus === "all" || order.status === filterStatus
+    (order) => {
+      if (filterStatus === "all") return true;
+      
+      // Handle status as string or object
+      const statusStr = typeof order.status === 'string' 
+        ? order.status 
+        : typeof order.status === 'object' && order.status !== null
+          ? (Object.keys(order.status)[0] || 'completed')
+          : 'completed';
+      
+      return statusStr === filterStatus;
+    }
   );
 
-  const getStatusColor = (status: OrderStatus) => {
-    switch (status) {
+  const getStatusColor = (status: OrderStatus | any) => {
+    // Ensure status is a string
+    const statusStr = typeof status === 'string' ? status : 
+                      typeof status === 'object' && status !== null ? 
+                      (Object.keys(status)[0] || 'completed') : 'completed';
+    
+    switch (statusStr) {
       case "completed":
         return "bg-gray-500/10 text-gray-500";
       case "cancelled":
         return "bg-red-500/10 text-red-500";
       default:
         return "";
+    }
+  };
+
+  // Funzione per renderizzare lo stato dell'ordine in modo sicuro
+  const renderOrderStatus = (status: any, t: any): string => {
+    // Get status string
+    const statusStr = typeof status === 'string' 
+      ? status 
+      : typeof status === 'object' && status !== null
+        ? (Object.keys(status)[0] || 'completed')
+        : 'completed';
+    
+    // Get translation
+    const translation = t(`orders.status.${statusStr}`, statusStr);
+    
+    // Ensure we return a string
+    if (typeof translation === 'string') {
+      return translation;
+    } else if (typeof translation === 'object') {
+      return JSON.stringify(translation).substring(0, 30);
+    } else {
+      return String(translation);
     }
   };
 
@@ -130,8 +175,8 @@ export default function Archive() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t("orders.archive.filters.all", "All Archived")}</SelectItem>
-              <SelectItem value="completed">{t("orders.status.completed", "Completed")}</SelectItem>
-              <SelectItem value="cancelled">{t("orders.status.cancelled", "Cancelled")}</SelectItem>
+              <SelectItem value="completed">{typeof t("orders.status.completed", "Completed") === 'string' ? t("orders.status.completed", "Completed") : "Completed"}</SelectItem>
+              <SelectItem value="cancelled">{typeof t("orders.status.cancelled", "Cancelled") === 'string' ? t("orders.status.cancelled", "Cancelled") : "Cancelled"}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -146,9 +191,10 @@ export default function Archive() {
                       {t("orders.orderNumber", "Order #")}{order.id.slice(-6)}
                       <Badge
                         variant="secondary"
-                        className={`ml-2 capitalize ${getStatusColor(order.status)}`}
+                        className={`ml-2 capitalize ${getStatusColor(typeof order.status === 'string' 
+? order.status as OrderStatus : 'completed')}`}
                       >
-                        {t(`orders.status.${order.status}`, order.status)}
+                        {renderOrderStatus(order.status, t)}
                       </Badge>
                     </div>
                     <div className="flex items-center text-base font-normal text-muted-foreground">
@@ -238,7 +284,8 @@ export default function Archive() {
                                 <span className="font-medium">{t("orders.date", "Date")}:</span> {new Date(order.createdAt).toLocaleString(i18n.language)}
                               </div>
                               <div>
-                                <span className="font-medium">{t("orders.status", "Status")}:</span> {t(`orders.status.${order.status}`, order.status)}
+                                <span className="font-medium">{t("orders.statusLabel", "Status")}:</span>{" "}
+                                {renderOrderStatus(order.status, t)}
                               </div>
                               <div>
                                 <span className="font-medium">{t("orders.paymentStatus", "Payment")}:</span> 

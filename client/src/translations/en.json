@@ -22,7 +22,12 @@
     "lastUpdated": "Last updated",
     "refresh": "Refresh",
     "selectTimeRange": "Select time range",
-    "hours": "Hour"
+    "hours": "Hour",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "actions": "Actions"
   },
   "days": {
     "mon": "Mon",
@@ -75,6 +80,7 @@
     "categories": {
       "starters": "Starters",
       "mains": "Main",
+      "secondi": "Second Courses",
       "desserts": "Desserts",
       "drinks": "Drinks",
       "sides": "Sides"
@@ -98,7 +104,8 @@
     "chefRecommended": "Chef's Recommendation",
     "placeOrder": "Place Order",
     "placingOrder": "Placing Order...",
-    "subscribe": "Subscribe for Updates"
+    "subscribe": "Subscribe for Updates",
+    "total": "Total"
   },
   "orders": {
     "title": "Orders",
@@ -112,6 +119,11 @@
     "noActiveOrders": "No active orders found for your phone number.",
     "delayedMessage": "Order is Delayed",
     "cancelledMessage": "This order has been cancelled. Please contact the restaurant for assistance.",
+    "filterPlaceholder": "Filter by Status",
+    "filters": {
+      "all": "All Active Orders"
+    },
+    "noOrders": "No orders found",
     "status": {
       "received": "Order Received",
       "preparing": "Preparing",
@@ -119,14 +131,31 @@
       "ready": "Ready",
       "served": "Served",
       "completed": "Completed",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "pending": "Pending"
     },
     "type": {
       "dine-in": "Dine-in",
       "takeaway": "Takeaway"
     },
     "paid": "Paid",
-    "processPayment": "Process Payment"
+    "processPayment": "Process Payment",
+    "table": "Table",
+    "customer": "Customer",
+    "phone": "Phone",
+    "date": "Date",
+    "paymentStatus": "Payment",
+    "pending": "Pending",
+    "items": "Order Items",
+    "orderDetails": "Order Details",
+    "viewDetails": "View Details",
+    "dineIn": "Dine-in",
+    "archive": {
+      "title": "Archived Orders",
+      "filters": {
+        "all": "All Archived"
+      }
+    }
   },
   "kitchen": {
     "title": "Kitchen Display System",
@@ -183,7 +212,10 @@
     "analytics": "Analytics",
     "logout": "Logout",
     "backToMenu": "Back to Menu",
-    "placeOrder": "Place Order"
+    "placeOrder": "Place Order",
+    "training": "Training",
+    "inventory": "Inventory",
+    "recipeMappings": "Recipe Mappings"
   },
   "newsletter": {
     "title": "Stay Updated!",
@@ -297,6 +329,12 @@
       "it": "Italian",
       "es": "Spanish"
     },
+    "theme": {
+      "select": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
     "logout": "Logout",
     "logoutError": "Failed to logout",
     "dashboard": {
@@ -322,7 +360,13 @@
       "dietaryDistribution": "Dietary Preferences",
       "dietaryDescription": "Distribution of menu items by dietary preferences",
       "metricsRefreshed": "Metrics refreshed successfully",
-      "metricsRefreshError": "Failed to refresh metrics"
+      "metricsRefreshError": "Failed to refresh metrics",
+      "lastUpdated": "Last updated",
+      "refresh": "Refresh",
+      "orders": "orders",
+      "revenue": "Revenue",
+      "orderCount": "Order Count",
+      "menuItemCount": "Menu Item Count"
     },
     "apiDocs": {
       "title": "API Documentation",
@@ -456,12 +500,47 @@
     "quantity": "Quantity",
     "unit": "Unit",
     "minThreshold": "Minimum Threshold",
-    "status": "Status",
     "lastUpdated": "Last Updated",
+    "statusLabel": "Status",
     "status": {
       "ok": "OK",
       "low": "Low",
       "critical": "Critical"
-    }
+    },
+    "allergens": "Allergens",
+    "analyzeAllergens": "Analyze Allergens",
+    "analyzeAllergensDescription": "Identify allergens in your ingredients using artificial intelligence",
+    "noAllergens": "No allergens identified",
+    "analyze": "Analyze",
+    "editItem": "Edit Item",
+    "editItemDescription": "Edit item details",
+    "currentStock": "Current Stock",
+    "searchPlaceholder": "Search item...",
+    "allCategories": "All categories"
+  },
+  "recipeMappings": {
+    "title": "Recipe Mappings Management",
+    "generateAll": "Generate All",
+    "list": "Mappings List",
+    "dishName": "Dish Name",
+    "ingredients": "Ingredients",
+    "lastUpdated": "Last Updated",
+    "source": "Source",
+    "noMapping": "No mapping",
+    "editMapping": "Edit Mapping",
+    "editDescription": "Edit ingredients for this recipe",
+    "addIngredient": "Add Ingredient",
+    "ingredientName": "Name",
+    "quantity": "Quantity",
+    "unit": "Unit",
+    "fetchError": "Error loading mappings",
+    "generateSuccess": "Mapping generated successfully",
+    "generateError": "Error generating mapping",
+    "generateAllSuccess": "All mappings generated successfully",
+    "generateAllError": "Error generating all mappings",
+    "updateSuccess": "Mapping updated successfully",
+    "updateError": "Error updating mapping",
+    "deleteSuccess": "Mapping deleted successfully",
+    "deleteError": "Error deleting mapping"
   }
 } 

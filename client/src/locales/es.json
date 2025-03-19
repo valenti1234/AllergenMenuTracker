@@ -5,7 +5,43 @@
     "autoRedirectToPayment": "Redirección automática al pago",
     "autoRedirectToPaymentDescription": "Redirigir automáticamente al cliente a la página de pago cuando se sirve el pedido",
     "payAtOrder": "Pagar al ordenar",
-    "payAtOrderDescription": "Permitir a los clientes pagar en el momento de ordenar en lugar de después del servicio"
+    "payAtOrderDescription": "Permitir a los clientes pagar en el momento de ordenar en lugar de después del servicio",
+    "title": "Configuración",
+    "description": "Gestiona la configuración de tu restaurante",
+    "restaurant": "Restaurante",
+    "financialSettings": "Configuración financiera",
+    "localization": "Localización",
+    "ordering": "Pedidos",
+    "social": "Redes sociales",
+    "restaurantName": "Nombre del restaurante",
+    "phone": "Teléfono",
+    "address": "Dirección",
+    "email": "Correo electrónico",
+    "website": "Sitio web",
+    "logoUrl": "URL del logotipo",
+    "openingHours": "Horario de apertura",
+    "openingHoursPlaceholder": "Ej: Lun-Vie: 9:00-22:00, Sáb-Dom: 10:00-23:00",
+    "currency": "Moneda",
+    "selectCurrency": "Seleccionar moneda",
+    "taxRate": "Tasa de impuestos",
+    "serviceCharge": "Cargo por servicio",
+    "defaultLanguage": "Idioma predeterminado",
+    "selectLanguage": "Seleccionar idioma",
+    "theme": "Tema",
+    "selectTheme": "Seleccionar tema",
+    "lightTheme": "Claro",
+    "darkTheme": "Oscuro",
+    "systemTheme": "Sistema",
+    "onlineOrdering": "Pedidos en línea",
+    "reservations": "Reservas",
+    "delivery": "Entrega a domicilio",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "twitter": "Twitter",
+    "saving": "Guardando...",
+    "saveSettings": "Guardar configuración",
+    "saveSuccess": "Configuración guardada correctamente",
+    "saveError": "Error al guardar la configuración"
   },
   "notifications": {
     "orderServedTitle": "¡Tu pedido está listo!",
@@ -17,7 +53,158 @@
   "menu": {
     "orderSuccess": "Pedido Realizado con Éxito",
     "redirectingToPayment": "Redirigiendo a la página de pago...",
-    "trackYourOrder": "Puedes seguir el estado de tu pedido"
+    "trackYourOrder": "Puedes seguir el estado de tu pedido",
+    "emptyCart": "Tu carrito está vacío",
+    "orderSummary": "Resumen del pedido",
+    "each": "cada uno",
+    "total": "Total",
+    "specialInstructions": "Instrucciones especiales",
+    "specialInstructionsPlaceholder": "Añade instrucciones especiales para tu pedido...",
+    "placingOrder": "Realizando pedido...",
+    "placeOrder": "Realizar pedido",
+    "addToOrder": "Añadir al pedido",
+    "ingredients": "Ingredientes",
+    "nutritionalInfo": "Información nutricional",
+    "chefRecommended": "Recomendado por el chef",
+    "customerInfo": {
+      "title": "Información del cliente",
+      "phoneNumber": "Número de teléfono",
+      "phoneNumberPlaceholder": "Introduce tu número de teléfono",
+      "continue": "Continuar",
+      "orderTypeTitle": "Tipo de pedido",
+      "dineIn": "Para comer aquí",
+      "takeaway": "Para llevar",
+      "back": "Volver",
+      "tableNumber": "Número de mesa",
+      "tableNumberPlaceholder": "Introduce el número de mesa",
+      "customerName": "Nombre del cliente",
+      "customerNamePlaceholder": "Introduce tu nombre"
+    },
+    "categories": {
+      "mains": "Platos principales",
+      "secondi": "Segundos platos",
+      "desserts": "Postres"
+    }
+  },
+  "orders": {
+    "status": {
+      "received": "Recibido",
+      "preparing": "En preparación",
+      "delayed": "Retrasado",
+      "ready": "Listo",
+      "served": "Servido",
+      "completed": "Completado",
+      "cancelled": "Cancelado"
+    },
+    "cancelledMessage": "Este pedido ha sido cancelado",
+    "delayedMessage": "Este pedido está experimentando un retraso",
+    "orderNumber": "Pedido #{id}",
+    "orderType": "Tipo de pedido",
+    "tableNumber": "Número de mesa",
+    "customerName": "Nombre del cliente",
+    "phoneNumber": "Teléfono",
+    "total": "Total",
+    "processPayment": "Procesar pago"
+  },
+  "payment": {
+    "title": "Pago",
+    "invalidOrderStatus": "Estado de pedido no válido",
+    "orderNotServed": "El pedido debe estar servido para proceder al pago",
+    "success": "¡Pago exitoso!",
+    "successDescription": "Tu pago ha sido procesado correctamente",
+    "error": "Error en el pago",
+    "errorDescription": "Ha ocurrido un error al procesar el pago",
+    "orderNotFound": "Pedido no encontrado",
+    "backToOrders": "Volver a pedidos",
+    "completed": "Pago completado",
+    "processPayment": "Procesar pago",
+    "thankYou": "¡Gracias por tu compra!",
+    "orderDetails": "Detalles del pedido #{id}"
+  },
+  "recipeMappings": {
+    "title": "Gestión de Mapeos de Recetas",
+    "generateAll": "Generar Todos",
+    "list": "Lista de Mapeos",
+    "dishName": "Nombre del Plato",
+    "ingredients": "Ingredientes",
+    "lastUpdated": "Última Actualización",
+    "source": "Fuente",
+    "noMapping": "Sin mapeo",
+    "editMapping": "Editar Mapeo",
+    "editDescription": "Editar los ingredientes para esta receta",
+    "addIngredient": "Añadir Ingrediente",
+    "ingredientName": "Nombre",
+    "quantity": "Cantidad",
+    "unit": "Unidad",
+    "fetchError": "Error al cargar los mapeos",
+    "generateSuccess": "Mapeo generado con éxito",
+    "generateError": "Error al generar el mapeo",
+    "generateAllSuccess": "Todos los mapeos generados con éxito",
+    "generateAllError": "Error al generar todos los mapeos",
+    "updateSuccess": "Mapeo actualizado con éxito",
+    "updateError": "Error al actualizar el mapeo",
+    "deleteSuccess": "Mapeo eliminado con éxito",
+    "deleteError": "Error al eliminar el mapeo"
+  },
+  "kitchenPerformance": {
+    "timeRanges": {
+      "day": "Día",
+      "week": "Semana",
+      "month": "Mes",
+      "year": "Año"
+    },
+    "exportReport": "Exportar Informe",
+    "avgPrepTime": "Tiempo medio de preparación",
+    "completedOrders": "Pedidos completados",
+    "punctuality": "Puntualidad",
+    "delays": "Retrasos",
+    "tabs": {
+      "overview": "Resumen",
+      "details": "Detalles",
+      "staff": "Personal",
+      "bottlenecks": "Cuellos de botella"
+    },
+    "charts": {
+      "prepTimeByDay": {
+        "title": "Tiempo de preparación por día",
+        "description": "Tiempo medio de preparación de pedidos por día de la semana",
+        "yAxis": "Minutos",
+        "legend": "Tiempo medio"
+      },
+      "prepTimeByCategory": {
+        "title": "Tiempo de preparación por categoría",
+        "description": "Tiempo medio de preparación por categoría de plato",
+        "yAxis": "Minutos",
+        "legend": "Tiempo medio"
+      },
+      "efficiencyDistribution": {
+        "title": "Distribución de eficiencia",
+        "description": "Distribución de pedidos a tiempo y retrasados",
+        "onTime": "A tiempo",
+        "delayed": "Retrasados"
+      },
+      "peakHours": {
+        "title": "Horas punta",
+        "description": "Distribución de pedidos por hora del día"
+      }
+    }
+  },
+  "days": {
+    "mon": "Lun",
+    "tue": "Mar",
+    "wed": "Mié",
+    "thu": "Jue",
+    "fri": "Vie",
+    "sat": "Sáb",
+    "sun": "Dom"
+  },
+  "dishes": {
+    "risotto": "Risotto de setas",
+    "brasato": "Asado al barolo",
+    "pizza": "Pizza gourmet",
+    "pizze": "Pizzas",
+    "tiramisu": "Tiramisú",
+    "fiorentina": "Bistec a la florentina"
   },
   "admin": {
     "title": "Panel de Administración",
@@ -32,10 +219,103 @@
       "light": "Claro",
       "dark": "Oscuro",
       "system": "Sistema"
+    },
+    "kitchenStaff": "Personal de Cocina",
+    "logout": "Cerrar sesión",
+    "logoutError": "Error al cerrar sesión"
+  },
+  "nav": {
+    "inventory": "Inventario",
+    "orders": "Pedidos",
+    "menu": "Menú",
+    "settings": "Ajustes",
+    "dashboard": "Panel",
+    "kitchen": "Cocina",
+    "archive": "Archivo",
+    "profile": "Perfil",
+    "signOut": "Cerrar sesión",
+    "menuItems": "Elementos del menú",
+    "kitchenDisplay": "Pantalla de cocina",
+    "kitchenPerformance": "Rendimiento de cocina",
+    "userManagement": "Gestión de usuarios",
+    "database": "Base de datos",
+    "apiDocs": "Documentación API",
+    "posSettings": "Configuración TPV",
+    "training": "Formación",
+    "recipeMappings": "Mapeo de recetas"
+  },
+  "common": {
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "add": "Añadir",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "clear": "Limpiar",
+    "loading": "Cargando...",
+    "noResults": "Sin resultados",
+    "error": "Error",
+    "success": "Éxito",
+    "minutes": "minutos",
+    "calories": "Calorías",
+    "protein": "Proteínas",
+    "carbs": "Carbohidratos",
+    "fat": "Grasas",
+    "grams": "g",
+    "continue": "Continuar"
+  },
+  "errors": {
+    "generic": "Ha ocurrido un error"
+  },
+  "kitchen": {
+    "orderInfo": {
+      "table": "Mesa",
+      "specialInstructions": "Instrucciones especiales"
     }
+  },
+  "newsletter": {
+    "title": "Suscríbete a nuestro boletín",
+    "description": "Recibe nuestras últimas noticias y ofertas especiales",
+    "subscribe": "Suscribirse",
+    "skip": "Omitir"
   },
   "Toggle theme": "Cambiar tema",
   "Light": "Claro",
   "Dark": "Oscuro",
-  "System": "Sistema"
+  "System": "Sistema",
+  "auth": {
+    "enterPhone": "Introduce tu número de teléfono",
+    "selectOrderType": "Selecciona el tipo de pedido",
+    "enterTableNumber": "Introduce el número de mesa",
+    "enterName": "Introduce tu nombre",
+    "phoneNumberPlaceholder": "Número de teléfono",
+    "dineIn": "Para comer aquí",
+    "takeaway": "Para llevar",
+    "tableNumberPlaceholder": "Número de mesa",
+    "namePlaceholder": "Tu nombre"
+  },
+  "allergens": {
+    "gluten": "Gluten",
+    "dairy": "Lácteos",
+    "nuts": "Frutos secos",
+    "eggs": "Huevos",
+    "soy": "Soja",
+    "shellfish": "Mariscos",
+    "fish": "Pescado",
+    "peanuts": "Cacahuetes"
+  },
+  "inventory": {
+    "fetchError": "Error al cargar el inventario",
+    "addSuccess": "Artículo añadido correctamente",
+    "addError": "Error al añadir el artículo",
+    "updateSuccess": "Artículo actualizado correctamente",
+    "updateError": "Error al actualizar el artículo",
+    "deleteSuccess": "Artículo eliminado correctamente",
+    "deleteError": "Error al eliminar el artículo"
+  }
 } 

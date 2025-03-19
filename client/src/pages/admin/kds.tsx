@@ -45,59 +45,57 @@ export default function KDS() {
   const getLocalizedText = (textObj: any) => {
     if (!textObj) return "";
     
-    // If it's already a string, check if it's a MongoDB stringified object
+    // Handle simple string values
     if (typeof textObj === "string") {
-      // Check if it's a MongoDB stringified object with language keys
-      if (textObj.includes('en:') || textObj.includes('it:') || textObj.includes('es:')) {
-        // Extract the current language using regex
-        const currentLangRegex = new RegExp(`${i18n.language}:\\s*['"]([^'"]+)['"]`);
-        const enLangRegex = /en:\s*['"]([^'"]+)['"]/;
-        const itLangRegex = /it:\s*['"]([^'"]+)['"]/;
-        const esLangRegex = /es:\s*['"]([^'"]+)['"]/;
-        
-        // Try to match the current language first
-        const currentLangMatch = currentLangRegex.exec(textObj);
-        if (currentLangMatch && currentLangMatch[1]) {
-          return currentLangMatch[1];
-        }
-        
-        // Fall back to English
-        const enMatch = enLangRegex.exec(textObj);
-        if (enMatch && enMatch[1]) {
-          return enMatch[1];
-        }
-        
-        // Try other languages
-        const itMatch = itLangRegex.exec(textObj);
-        if (itMatch && itMatch[1]) {
-          return itMatch[1];
-        }
-        
-        const esMatch = esLangRegex.exec(textObj);
-        if (esMatch && esMatch[1]) {
-          return esMatch[1];
+      // Check if it's a string that looks like a complex object with language keys
+      if (textObj.includes('en:') && textObj.includes('_id:')) {
+        try {
+          // Try to extract using regex pattern matching for the current language
+          const langPattern = new RegExp(`${i18n.language}:\\s*['"]([^'"]+)['"]`);
+          const enPattern = /en:\s*['"]([^'"]+)['"]/;
+          
+          const langMatch = langPattern.exec(textObj);
+          if (langMatch && langMatch[1]) {
+            return langMatch[1];
+          }
+          
+          const enMatch = enPattern.exec(textObj);
+          if (enMatch && enMatch[1]) {
+            return enMatch[1];
+          }
+        } catch (e) {
+          // If extraction fails, continue with other methods
         }
       }
       
-      // If it's a regular string, return it
       return textObj;
     }
     
-    // If it's an object with language keys
-    if (typeof textObj === "object") {
+    // Handle objects with direct language keys (e.g., {en: "Fish & Chips", it: "Pesce e Patatine"})
+    if (typeof textObj === "object" && textObj !== null) {
       // Try current language first
-      if (textObj[i18n.language]) return textObj[i18n.language];
-      
+      if (textObj[i18n.language]) {
+        return textObj[i18n.language];
+      } 
       // Fall back to English
-      if (textObj.en) return textObj.en;
-      
-      // If no matching language, return the first available
-      const firstKey = Object.keys(textObj)[0];
-      if (firstKey) return textObj[firstKey];
+      else if (textObj.en) {
+        return textObj.en;
+      }
+      // If no matching language, try any other language
+      else if (Object.keys(textObj).length > 0) {
+        // Filter out non-language keys like _id
+        const langKeys = Object.keys(textObj).filter(k => 
+          k !== '_id' && k !== 'id' && typeof textObj[k] === 'string'
+        );
+        
+        if (langKeys.length > 0) {
+          return textObj[langKeys[0]];
+        }
+      }
     }
     
-    // If all else fails, stringify the object for debugging
-    return typeof textObj === "object" ? JSON.stringify(textObj) : String(textObj);
+    // If all else fails, convert to string but avoid showing the whole object
+    return typeof textObj === 'object' ? JSON.stringify(textObj).substring(0, 30) : String(textObj);
   };
 
   // Filter out completed and cancelled orders
@@ -145,8 +143,13 @@ export default function KDS() {
     }
   };
 
-  const getStatusColor = (status: OrderStatus) => {
-    switch (status) {
+  const getStatusColor = (status: OrderStatus | any) => {
+    // Ensure status is a string
+    const statusStr = typeof status === 'string' ? status : 
+                      typeof status === 'object' && status !== null ? 
+                      (Object.keys(status)[0] || 'pending') : 'pending';
+    
+    switch (statusStr) {
       case "pending":
         return "bg-yellow-500/10 text-yellow-500";
       case "preparing":
@@ -157,14 +160,21 @@ export default function KDS() {
         return "bg-gray-500/10 text-gray-500";
       case "cancelled":
         return "bg-red-500/10 text-red-500";
+      default:
+        return "bg-gray-500/10 text-gray-500";
     }
   };
 
   const ordersByStatus = activeOrders?.reduce((acc, order) => {
-    if (!acc[order.status]) {
-      acc[order.status] = [];
+    // Ensure order status is a valid string
+    const status = typeof order.status === 'string' && orderStatuses.includes(order.status as OrderStatus) 
+      ? order.status as OrderStatus 
+      : 'pending';
+    
+    if (!acc[status]) {
+      acc[status] = [];
     }
-    acc[order.status].push(order);
+    acc[status].push(order);
     return acc;
   }, {} as Record<OrderStatus, Order[]>);
 
@@ -251,106 +261,115 @@ export default function KDS() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {activeStatuses.map((status) => (
-            <div
-              key={status}
-              className="h-[calc(100vh-12rem)]"
-              onDragOver={handleDragOver}
-              onDrop={() => handleDrop(status)}
-            >
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex justify-between items-center">
-                    <span className="capitalize">{t(`kitchen.columns.${status}`, status)}</span>
-                    <Badge variant="secondary">
-                      {ordersByStatus?.[status]?.length || 0}
-                    </Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <ScrollArea className="h-[calc(100vh-16rem)]">
-                    <div className="p-4 space-y-4">
-                      {ordersByStatus?.[status]?.map((order) => (
-                        <Card
-                          key={order.id}
-                          draggable
-                          onDragStart={() => handleDragStart(order.id)}
-                          className="cursor-move hover:shadow-md transition-shadow"
-                        >
-                          <CardHeader className="p-4 pb-2">
-                            <CardTitle className="text-lg flex flex-col gap-2">
-                              <div className="flex justify-between">
-                                <span>
-                                  #{order.id.slice(-6)}{" "}
-                                  <Badge variant="outline" className="ml-2">
-                                    {t(`menu.orderType.${order.type === "dine-in" ? "dineIn" : "takeaway"}`, order.type)}
+          {activeStatuses.map((status) => {
+            // Verifica che ordersByStatus contenga questa chiave
+            const ordersForStatus = ordersByStatus?.[status] || [];
+            
+            return (
+              <div
+                key={status}
+                className="h-[calc(100vh-12rem)]"
+                onDragOver={handleDragOver}
+                onDrop={() => handleDrop(status)}
+              >
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex justify-between items-center">
+                      <span className="capitalize">{t(`kitchen.columns.${status}`, status)}</span>
+                      <Badge variant="secondary">
+                        {ordersForStatus.length || 0}
+                      </Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <ScrollArea className="h-[calc(100vh-16rem)]">
+                      <div className="p-4 space-y-4">
+                        {ordersForStatus.map((order) => (
+                          <Card
+                            key={order.id}
+                            draggable
+                            onDragStart={() => handleDragStart(order.id)}
+                            className="cursor-move hover:shadow-md transition-shadow"
+                          >
+                            <CardHeader className="p-4 pb-2">
+                              <CardTitle className="text-lg flex flex-col gap-2">
+                                <div className="flex justify-between">
+                                  <span>
+                                    #{order.id.slice(-6)}{" "}
+                                    <Badge variant="outline" className="ml-2">
+                                      {t(`menu.orderType.${order.type === "dine-in" ? "dineIn" : "takeaway"}`, order.type)}
+                                    </Badge>
+                                  </span>
+                                  <Badge className={getStatusColor(typeof order.status === 'string' ? order.status as OrderStatus : 'pending')}>
+                                    {typeof order.status === 'string'
+                                      ? t(`kitchen.columns.${order.status}`, order.status)
+                                      : typeof order.status === 'object'
+                                        ? t(`kitchen.columns.${Object.keys(order.status)[0] || 'pending'}`, "Unknown")
+                                        : "Unknown"}
                                   </Badge>
-                                </span>
-                                <Badge className={getStatusColor(order.status)}>
-                                  {t(`kitchen.columns.${order.status}`, order.status)}
-                                </Badge>
-                              </div>
-                              <div className="flex items-center text-base font-normal text-muted-foreground">
-                                <Phone className="h-4 w-4 mr-2" />
-                                {order.phoneNumber}
-                              </div>
-                            </CardTitle>
-                            <p className="text-sm text-muted-foreground">
-                              {order.type === "dine-in"
-                                ? `${t("kitchen.orderInfo.table", "Table")} ${order.tableNumber}`
-                                : `${t("menu.orderType.takeaway", "Takeaway")} - ${order.customerName}`}
-                            </p>
-                          </CardHeader>
-                          <CardContent className="p-4 pt-0">
-                            <div className="space-y-2">
-                              {order.items.map((item) => (
-                                <div
-                                  key={item.id}
-                                  className="flex justify-between items-start"
-                                >
-                                  <div>
-                                    <span className="font-medium">
-                                      {/* Use a simple approach to display the name */}
-                                      {getLocalizedText(item.name)}
-                                    </span>
-                                    <span className="text-sm text-muted-foreground ml-2">
-                                      × {item.quantity}
-                                    </span>
-                                    {item.specialInstructions && (
-                                      <p className="text-sm text-muted-foreground flex items-center gap-1">
-                                        <AlertCircle className="h-3 w-3" />
-                                        {item.specialInstructions}
-                                      </p>
-                                    )}
-                                  </div>
                                 </div>
-                              ))}
-                            </div>
-                            {order.specialInstructions && (
-                              <div className="mt-2 pt-2 border-t">
-                                <p className="text-sm text-muted-foreground flex items-center gap-1">
-                                  <AlertCircle className="h-3 w-3" />
-                                  {order.specialInstructions}
-                                </p>
+                                <div className="flex items-center text-base font-normal text-muted-foreground">
+                                  <Phone className="h-4 w-4 mr-2" />
+                                  {order.phoneNumber}
+                                </div>
+                              </CardTitle>
+                              <p className="text-sm text-muted-foreground">
+                                {order.type === "dine-in"
+                                  ? `${t("kitchen.orderInfo.table", "Table")} ${order.tableNumber}`
+                                  : `${t("menu.orderType.takeaway", "Takeaway")} - ${order.customerName}`}
+                              </p>
+                            </CardHeader>
+                            <CardContent className="p-4 pt-0">
+                              <div className="space-y-2">
+                                {order.items.map((item) => (
+                                  <div
+                                    key={item.id}
+                                    className="flex justify-between items-start"
+                                  >
+                                    <div>
+                                      <span className="font-medium">
+                                        {/* Use a simple approach to display the name */}
+                                        {getLocalizedText(item.name)}
+                                      </span>
+                                      <span className="text-sm text-muted-foreground ml-2">
+                                        × {item.quantity}
+                                      </span>
+                                      {item.specialInstructions && (
+                                        <p className="text-sm text-muted-foreground flex items-center gap-1">
+                                          <AlertCircle className="h-3 w-3" />
+                                          {item.specialInstructions}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
                               </div>
-                            )}
-                            <div className="mt-2 pt-2 border-t text-sm text-muted-foreground flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {new Date(order.createdAt).toLocaleString(i18n.language, { 
-                                hour: '2-digit', 
-                                minute: '2-digit', 
-                                second: '2-digit' 
-                              })}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-            </div>
-          ))}
+                              {order.specialInstructions && (
+                                <div className="mt-2 pt-2 border-t">
+                                  <p className="text-sm text-muted-foreground flex items-center gap-1">
+                                    <AlertCircle className="h-3 w-3" />
+                                    {order.specialInstructions}
+                                  </p>
+                                </div>
+                              )}
+                              <div className="mt-2 pt-2 border-t text-sm text-muted-foreground flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {new Date(order.createdAt).toLocaleString(i18n.language, { 
+                                  hour: '2-digit', 
+                                  minute: '2-digit', 
+                                  second: '2-digit' 
+                                })}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
+              </div>
+            );
+          })}
         </div>
       </div>
     </AdminLayout>

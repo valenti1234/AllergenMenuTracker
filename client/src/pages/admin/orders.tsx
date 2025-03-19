@@ -41,59 +41,57 @@ export default function Orders() {
   const getLocalizedText = (textObj: any) => {
     if (!textObj) return "";
     
-    // If it's already a string, check if it's a MongoDB stringified object
+    // Handle simple string values
     if (typeof textObj === "string") {
-      // Check if it's a MongoDB stringified object with language keys
-      if (textObj.includes('en:') || textObj.includes('it:') || textObj.includes('es:')) {
-        // Extract the current language using regex
-        const currentLangRegex = new RegExp(`${i18n.language}:\\s*['"]([^'"]+)['"]`);
-        const enLangRegex = /en:\s*['"]([^'"]+)['"]/;
-        const itLangRegex = /it:\s*['"]([^'"]+)['"]/;
-        const esLangRegex = /es:\s*['"]([^'"]+)['"]/;
-        
-        // Try to match the current language first
-        const currentLangMatch = currentLangRegex.exec(textObj);
-        if (currentLangMatch && currentLangMatch[1]) {
-          return currentLangMatch[1];
-        }
-        
-        // Fall back to English
-        const enMatch = enLangRegex.exec(textObj);
-        if (enMatch && enMatch[1]) {
-          return enMatch[1];
-        }
-        
-        // Try other languages
-        const itMatch = itLangRegex.exec(textObj);
-        if (itMatch && itMatch[1]) {
-          return itMatch[1];
-        }
-        
-        const esMatch = esLangRegex.exec(textObj);
-        if (esMatch && esMatch[1]) {
-          return esMatch[1];
+      // Check if it's a string that looks like a complex object with language keys
+      if (textObj.includes('en:') && textObj.includes('_id:')) {
+        try {
+          // Try to extract using regex pattern matching for the current language
+          const langPattern = new RegExp(`${i18n.language}:\\s*['"]([^'"]+)['"]`);
+          const enPattern = /en:\s*['"]([^'"]+)['"]/;
+          
+          const langMatch = langPattern.exec(textObj);
+          if (langMatch && langMatch[1]) {
+            return langMatch[1];
+          }
+          
+          const enMatch = enPattern.exec(textObj);
+          if (enMatch && enMatch[1]) {
+            return enMatch[1];
+          }
+        } catch (e) {
+          // If extraction fails, continue with other methods
         }
       }
       
-      // If it's a regular string, return it
       return textObj;
     }
     
-    // If it's an object with language keys
-    if (typeof textObj === "object") {
+    // Handle objects with direct language keys (e.g., {en: "Fish & Chips", it: "Pesce e Patatine"})
+    if (typeof textObj === "object" && textObj !== null) {
       // Try current language first
-      if (textObj[i18n.language]) return textObj[i18n.language];
-      
+      if (textObj[i18n.language]) {
+        return textObj[i18n.language];
+      } 
       // Fall back to English
-      if (textObj.en) return textObj.en;
-      
-      // If no matching language, return the first available
-      const firstKey = Object.keys(textObj)[0];
-      if (firstKey) return textObj[firstKey];
+      else if (textObj.en) {
+        return textObj.en;
+      }
+      // If no matching language, try any other language
+      else if (Object.keys(textObj).length > 0) {
+        // Filter out non-language keys like _id
+        const langKeys = Object.keys(textObj).filter(k => 
+          k !== '_id' && k !== 'id' && typeof textObj[k] === 'string'
+        );
+        
+        if (langKeys.length > 0) {
+          return textObj[langKeys[0]];
+        }
+      }
     }
     
-    // If all else fails, stringify the object for debugging
-    return typeof textObj === "object" ? JSON.stringify(textObj) : String(textObj);
+    // If all else fails, convert to string but avoid showing the whole object
+    return typeof textObj === 'object' ? JSON.stringify(textObj).substring(0, 30) : String(textObj);
   };
 
   const updateStatusMutation = useMutation({
@@ -117,8 +115,13 @@ export default function Orders() {
     (order) => selectedStatus === "all" || order.status === selectedStatus
   );
 
-  const getStatusColor = (status: OrderStatus) => {
-    switch (status) {
+  const getStatusColor = (status: OrderStatus | any) => {
+    // Ensure status is a string
+    const statusStr = typeof status === 'string' ? status : 
+                      typeof status === 'object' && status !== null ? 
+                      (Object.keys(status)[0] || 'pending') : 'pending';
+    
+    switch (statusStr) {
       case "pending":
         return "bg-yellow-500/10 text-yellow-500";
       case "preparing":
@@ -129,6 +132,8 @@ export default function Orders() {
         return "bg-gray-500/10 text-gray-500";
       case "cancelled":
         return "bg-red-500/10 text-red-500";
+      default:
+        return "bg-gray-500/10 text-gray-500";
     }
   };
 
@@ -179,9 +184,13 @@ export default function Orders() {
                       {order.id.slice(-6)}
                       <Badge
                         variant="secondary"
-                        className={`ml-2 capitalize ${getStatusColor(order.status)}`}
+                        className={`ml-2 capitalize ${getStatusColor(typeof order.status === 'string' ? order.status as OrderStatus : 'pending')}`}
                       >
-                        {t(`orders.status.${order.status}`, order.status)}
+                        {typeof order.status === 'string' 
+                          ? t(`orders.status.${order.status}`, order.status)
+                          : typeof order.status === 'object'
+                            ? t(`orders.status.${Object.keys(order.status)[0] || 'pending'}`, "Unknown")
+                            : "Unknown"}
                       </Badge>
                     </div>
                     <div className="flex items-center text-base font-normal text-muted-foreground">
@@ -196,7 +205,7 @@ export default function Orders() {
                   </CardDescription>
                 </div>
                 <Select
-                  value={order.status}
+                  value={typeof order.status === 'string' ? order.status : 'pending'}
                   onValueChange={(value) =>
                     updateStatusMutation.mutate({
                       id: order.id,
@@ -208,11 +217,15 @@ export default function Orders() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {orderStatuses.map((status) => (
-                      <SelectItem key={status} value={status} className="capitalize">
-                        {t(`orders.status.${status}`, status)}
-                      </SelectItem>
-                    ))}
+                    {orderStatuses.map((status) => {
+                      // Ensure status is a string
+                      const statusStr = String(status);
+                      return (
+                        <SelectItem key={statusStr} value={statusStr} className="capitalize">
+                          {t(`orders.status.${statusStr}`, statusStr)}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </CardHeader>
@@ -321,7 +334,11 @@ export default function Orders() {
                                 <span className="font-medium">{t("orders.date", "Date")}:</span> {new Date(order.createdAt).toLocaleString(i18n.language)}
                               </div>
                               <div>
-                                <span className="font-medium">{t("orders.status", "Status")}:</span> {t(`orders.status.${order.status}`, order.status)}
+                                <span className="font-medium">{t("orders.status", "Status")}:</span> {
+                                  typeof order.status === 'string' 
+                                    ? t(`orders.status.${order.status}`, order.status)
+                                    : (typeof order.status === 'object' ? t(`orders.status.${Object.keys(order.status)[0]}`, "Unknown") : "Unknown")
+                                }
                               </div>
                               <div>
                                 <span className="font-medium">{t("orders.paymentStatus", "Payment")}:</span> 

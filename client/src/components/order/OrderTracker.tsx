@@ -41,6 +41,17 @@ export function OrderTracker({ order }: OrderTrackerProps) {
   const { formatPrice } = useSettings();
   const [progress, setProgress] = useState(0);
 
+  // Ensure order.status is always a string
+  // Reuse the existing approach adding a check for obj with _id
+  const orderStatus = typeof order.status === 'string' 
+    ? (orderStatuses.includes(order.status as OrderStatus) ? order.status : 'pending')
+    : typeof order.status === 'object' && order.status !== null
+      ? (Object.keys(order.status).find(key => orderStatuses.includes(key as OrderStatus)) || 'pending')
+      : 'pending';
+
+  // Ensure orderStatus is of type OrderStatus
+  const validOrderStatus = orderStatus as OrderStatus;
+
   const statusInfo: StatusInfoMap = {
     pending: { 
       icon: Clock, 
@@ -86,7 +97,8 @@ export function OrderTracker({ order }: OrderTrackerProps) {
     },
   };
 
-  const currentStep = statusInfo[order.status].step;
+  // Make sure we have a valid status to avoid trying to access undefined props
+  const currentStep = statusInfo[validOrderStatus]?.step || 0;
 
   useEffect(() => {
     // Animate progress based on current status
@@ -96,7 +108,7 @@ export function OrderTracker({ order }: OrderTrackerProps) {
     return () => clearTimeout(timer);
   }, [currentStep]);
 
-  if (order.status === "cancelled") {
+  if (orderStatus === "cancelled") {
     return (
       <Card className="border-red-200 bg-red-50">
         <CardHeader className="py-3 sm:py-4">
@@ -122,7 +134,7 @@ export function OrderTracker({ order }: OrderTrackerProps) {
       <CardHeader className="py-3 sm:py-4">
         <CardTitle className="flex items-center justify-between text-sm sm:text-base">
           <span>{t('orders.orderNumber', { id: order.id.slice(-6) })}</span>
-          {order.status === "delayed" && (
+          {orderStatus === "delayed" && (
             <span className={`text-xs sm:text-sm ${statusInfo.delayed.color}`}>
               <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 inline mr-1" />
               {t('orders.delayedMessage')}
@@ -138,7 +150,7 @@ export function OrderTracker({ order }: OrderTrackerProps) {
           {/* Animated progress bar */}
           <motion.div
             className={`absolute inset-0 h-1.5 sm:h-2 rounded-full ${
-              order.status === "delayed" ? "bg-orange-500" : "bg-primary"
+              orderStatus === "delayed" ? "bg-orange-500" : "bg-primary"
             }`}
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
@@ -148,8 +160,8 @@ export function OrderTracker({ order }: OrderTrackerProps) {
           {/* Status points */}
           <div className="relative flex justify-between">
             {timelineStatuses.map((status) => {
-              const isActive = statusInfo[order.status].step >= statusInfo[status].step;
-              const isDelayed = order.status === "delayed" && status === "preparing";
+              const isActive = statusInfo[validOrderStatus].step >= statusInfo[status].step;
+              const isDelayed = orderStatus === "delayed" && status === "preparing";
               const Icon = isDelayed ? statusInfo.delayed.icon : statusInfo[status].icon;
               const color = isDelayed ? statusInfo.delayed.color : statusInfo[status].color;
 
@@ -204,7 +216,7 @@ export function OrderTracker({ order }: OrderTrackerProps) {
         </div>
 
         {/* Pulsante di pagamento per ordini in stato "servito" */}
-        {order.status === "served" && (
+        {orderStatus === "served" && (
           <div className="pt-2">
             <Link href={`/payment?id=${order.id}`}>
               <Button 

@@ -5,7 +5,43 @@
     "autoRedirectToPayment": "Automatic Redirect to Payment",
     "autoRedirectToPaymentDescription": "Automatically redirect the customer to the payment page when the order is served",
     "payAtOrder": "Pay at Order",
-    "payAtOrderDescription": "Allow customers to pay at the time of ordering instead of after service"
+    "payAtOrderDescription": "Allow customers to pay at the time of ordering instead of after service",
+    "title": "Settings",
+    "description": "Manage your restaurant settings",
+    "restaurant": "Restaurant",
+    "financialSettings": "Financial Settings",
+    "localization": "Localization",
+    "ordering": "Ordering",
+    "social": "Social Media",
+    "restaurantName": "Restaurant Name",
+    "phone": "Phone",
+    "address": "Address",
+    "email": "Email",
+    "website": "Website",
+    "logoUrl": "Logo URL",
+    "openingHours": "Opening Hours",
+    "openingHoursPlaceholder": "E.g., Mon-Fri: 9:00-22:00, Sat-Sun: 10:00-23:00",
+    "currency": "Currency",
+    "selectCurrency": "Select Currency",
+    "taxRate": "Tax Rate",
+    "serviceCharge": "Service Charge",
+    "defaultLanguage": "Default Language",
+    "selectLanguage": "Select Language",
+    "theme": "Theme",
+    "selectTheme": "Select Theme",
+    "lightTheme": "Light",
+    "darkTheme": "Dark",
+    "systemTheme": "System",
+    "onlineOrdering": "Online Ordering",
+    "reservations": "Reservations",
+    "delivery": "Delivery",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "twitter": "Twitter",
+    "saving": "Saving...",
+    "saveSettings": "Save Settings",
+    "saveSuccess": "Settings saved successfully",
+    "saveError": "Error saving settings"
   },
   "notifications": {
     "orderServedTitle": "Your order is ready!",
@@ -17,7 +53,158 @@
   "menu": {
     "orderSuccess": "Order Placed Successfully",
     "redirectingToPayment": "Redirecting to payment page...",
-    "trackYourOrder": "You can track your order status"
+    "trackYourOrder": "You can track your order status",
+    "emptyCart": "Your cart is empty",
+    "orderSummary": "Order Summary",
+    "each": "each",
+    "total": "Total",
+    "specialInstructions": "Special Instructions",
+    "specialInstructionsPlaceholder": "Add special instructions for your order...",
+    "placingOrder": "Placing order...",
+    "placeOrder": "Place Order",
+    "addToOrder": "Add to Order",
+    "ingredients": "Ingredients",
+    "nutritionalInfo": "Nutritional Information",
+    "chefRecommended": "Chef Recommended",
+    "customerInfo": {
+      "title": "Customer Information",
+      "phoneNumber": "Phone Number",
+      "phoneNumberPlaceholder": "Enter your phone number",
+      "continue": "Continue",
+      "orderTypeTitle": "Order Type",
+      "dineIn": "Dine In",
+      "takeaway": "Takeaway",
+      "back": "Back",
+      "tableNumber": "Table Number",
+      "tableNumberPlaceholder": "Enter table number",
+      "customerName": "Customer Name",
+      "customerNamePlaceholder": "Enter your name"
+    },
+    "categories": {
+      "mains": "Main Courses",
+      "secondi": "Second Courses",
+      "desserts": "Desserts"
+    }
+  },
+  "orders": {
+    "status": {
+      "received": "Received",
+      "preparing": "Preparing",
+      "delayed": "Delayed",
+      "ready": "Ready",
+      "served": "Served",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "cancelledMessage": "This order has been cancelled",
+    "delayedMessage": "This order is experiencing a delay",
+    "orderNumber": "Order #{id}",
+    "orderType": "Order Type",
+    "tableNumber": "Table Number",
+    "customerName": "Customer Name",
+    "phoneNumber": "Phone",
+    "total": "Total",
+    "processPayment": "Process Payment"
+  },
+  "payment": {
+    "title": "Payment",
+    "invalidOrderStatus": "Invalid Order Status",
+    "orderNotServed": "Order must be served to proceed with payment",
+    "success": "Payment Successful!",
+    "successDescription": "Your payment has been processed successfully",
+    "error": "Payment Error",
+    "errorDescription": "An error occurred while processing your payment",
+    "orderNotFound": "Order not found",
+    "backToOrders": "Back to Orders",
+    "completed": "Payment Completed",
+    "processPayment": "Process Payment",
+    "thankYou": "Thank you for your purchase!",
+    "orderDetails": "Order Details #{id}"
+  },
+  "recipeMappings": {
+    "title": "Recipe Mappings Management",
+    "generateAll": "Generate All",
+    "list": "Mappings List",
+    "dishName": "Dish Name",
+    "ingredients": "Ingredients",
+    "lastUpdated": "Last Updated",
+    "source": "Source",
+    "noMapping": "No mapping",
+    "editMapping": "Edit Mapping",
+    "editDescription": "Edit ingredients for this recipe",
+    "addIngredient": "Add Ingredient",
+    "ingredientName": "Name",
+    "quantity": "Quantity",
+    "unit": "Unit",
+    "fetchError": "Error loading mappings",
+    "generateSuccess": "Mapping generated successfully",
+    "generateError": "Error generating mapping",
+    "generateAllSuccess": "All mappings generated successfully",
+    "generateAllError": "Error generating all mappings",
+    "updateSuccess": "Mapping updated successfully",
+    "updateError": "Error updating mapping",
+    "deleteSuccess": "Mapping deleted successfully",
+    "deleteError": "Error deleting mapping"
+  },
+  "kitchenPerformance": {
+    "timeRanges": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month",
+      "year": "Year"
+    },
+    "exportReport": "Export Report",
+    "avgPrepTime": "Average Preparation Time",
+    "completedOrders": "Completed Orders",
+    "punctuality": "Punctuality",
+    "delays": "Delays",
+    "tabs": {
+      "overview": "Overview",
+      "details": "Details",
+      "staff": "Staff",
+      "bottlenecks": "Bottlenecks"
+    },
+    "charts": {
+      "prepTimeByDay": {
+        "title": "Preparation Time by Day",
+        "description": "Average order preparation time by day of the week",
+        "yAxis": "Minutes",
+        "legend": "Average Time"
+      },
+      "prepTimeByCategory": {
+        "title": "Preparation Time by Category",
+        "description": "Average preparation time by dish category",
+        "yAxis": "Minutes",
+        "legend": "Average Time"
+      },
+      "efficiencyDistribution": {
+        "title": "Efficiency Distribution",
+        "description": "Distribution of on-time and delayed orders",
+        "onTime": "On Time",
+        "delayed": "Delayed"
+      },
+      "peakHours": {
+        "title": "Peak Hours",
+        "description": "Distribution of orders by hour of day"
+      }
+    }
+  },
+  "days": {
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun"
+  },
+  "dishes": {
+    "risotto": "Mushroom Risotto",
+    "brasato": "Braised Beef in Barolo",
+    "pizza": "Gourmet Pizza",
+    "pizze": "Pizzas",
+    "tiramisu": "Tiramisu",
+    "fiorentina": "Florentine Steak"
   },
   "admin": {
     "title": "Admin Dashboard",
@@ -28,14 +215,127 @@
       "es": "Spanish"
     },
     "theme": {
-      "select": "Select Theme",
+      "select": "Theme",
       "light": "Light",
       "dark": "Dark",
       "system": "System"
+    },
+    "kitchenStaff": "Kitchen Staff",
+    "logout": "Logout",
+    "logoutError": "Error logging out",
+    "dashboard": {
+      "title": "Dashboard",
+      "lastUpdated": "Last updated",
+      "refresh": "Refresh",
+      "orders": "orders",
+      "revenue": "Revenue",
+      "revenueTab": "Revenue",
+      "ordersTab": "Orders",
+      "dietaryTab": "Dietary Preferences",
+      "revenueOverTime": "Revenue Over Time",
+      "revenueDescription": "Daily revenue for the past week",
+      "ordersOverTime": "Orders Over Time",
+      "ordersDescription": "Daily order count for the past week",
+      "dietaryDistribution": "Dietary Preferences",
+      "dietaryDescription": "Distribution of menu items by dietary preferences",
+      "orderCount": "Order Count",
+      "menuItems": "Menu Items",
+      "activeOrders": "Active Orders",
+      "menuItemCount": "Menu Item Count"
     }
+  },
+  "nav": {
+    "inventory": "Inventory",
+    "orders": "Orders",
+    "menu": "Menu",
+    "settings": "Settings",
+    "dashboard": "Dashboard",
+    "kitchen": "Kitchen",
+    "archive": "Archive",
+    "profile": "Profile",
+    "signOut": "Sign Out",
+    "menuItems": "Menu Items",
+    "kitchenDisplay": "Kitchen Display",
+    "kitchenPerformance": "Kitchen Performance",
+    "userManagement": "User Management",
+    "database": "Database",
+    "apiDocs": "API Documentation",
+    "posSettings": "POS Settings",
+    "training": "Training",
+    "recipeMappings": "Recipe Mappings"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "close": "Close",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "loading": "Loading...",
+    "noResults": "No results",
+    "error": "Error",
+    "success": "Success",
+    "minutes": "minutes",
+    "calories": "Calories",
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fat": "Fat",
+    "grams": "g",
+    "continue": "Continue"
+  },
+  "errors": {
+    "generic": "An error occurred"
+  },
+  "kitchen": {
+    "orderInfo": {
+      "table": "Table",
+      "specialInstructions": "Special Instructions"
+    }
+  },
+  "newsletter": {
+    "title": "Subscribe to our newsletter",
+    "description": "Receive our latest news and special offers",
+    "subscribe": "Subscribe",
+    "skip": "Skip"
   },
   "Toggle theme": "Toggle theme",
   "Light": "Light",
   "Dark": "Dark",
-  "System": "System"
+  "System": "System",
+  "auth": {
+    "enterPhone": "Enter your phone number",
+    "selectOrderType": "Select order type",
+    "enterTableNumber": "Enter table number",
+    "enterName": "Enter your name",
+    "phoneNumberPlaceholder": "Phone number",
+    "dineIn": "Dine In",
+    "takeaway": "Takeaway",
+    "tableNumberPlaceholder": "Table number",
+    "namePlaceholder": "Your name"
+  },
+  "allergens": {
+    "gluten": "Gluten",
+    "dairy": "Dairy",
+    "nuts": "Nuts",
+    "eggs": "Eggs",
+    "soy": "Soy",
+    "shellfish": "Shellfish",
+    "fish": "Fish",
+    "peanuts": "Peanuts"
+  },
+  "inventory": {
+    "fetchError": "Error loading inventory",
+    "addSuccess": "Item added successfully",
+    "addError": "Error adding item",
+    "updateSuccess": "Item updated successfully",
+    "updateError": "Error updating item",
+    "deleteSuccess": "Item deleted successfully",
+    "deleteError": "Error deleting item"
+  }
 } 

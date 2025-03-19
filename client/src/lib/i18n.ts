@@ -41,6 +41,7 @@ i18n
     interpolation: {
       escapeValue: false
     },
+    returnObjects: true,
     debug: true // Attiva la modalità debug per i18next
   });
 

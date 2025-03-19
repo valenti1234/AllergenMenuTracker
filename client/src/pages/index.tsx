@@ -1,7 +1,7 @@
 import { useLocation } from 'wouter';
 import { CustomerInfoFlow } from '@/components/customer/CustomerInfoFlow';
 import type { OrderType } from '@shared/schema';
-import '@/i18n';
+import '@/lib/i18n';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

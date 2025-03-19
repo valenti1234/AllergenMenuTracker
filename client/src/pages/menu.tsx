@@ -17,7 +17,7 @@ import { CustomerLayout } from "@/components/layouts/CustomerLayout";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import '@/i18n';
+import '@/lib/i18n';
 import { useSettings } from "@/contexts/SettingsContext";
 
 export default function Menu() {

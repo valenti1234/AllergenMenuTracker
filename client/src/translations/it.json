@@ -180,7 +180,7 @@
     "customer": "Cliente",
     "phone": "Telefono",
     "date": "Data",
-    "status": "Stato",
+    "statusLabel": "Stato",
     "paymentStatus": "Pagamento",
     "items": "Articoli",
     "specialInstructions": "Istruzioni Speciali"
@@ -438,7 +438,7 @@
     "category": "Categoria",
     "quantity": "Quantità",
     "unit": "Unità",
-    "status": "Stato",
+    "statusLabel": "Stato",
     "lastUpdated": "Ultimo Aggiornamento",
     "addItem": "Aggiungi Articolo",
     "addItemDescription": "Inserisci i dettagli del nuovo articolo",
@@ -468,5 +468,30 @@
     "analyzeSuccess": "Analisi degli allergeni completata",
     "analyzeError": "Errore durante l'analisi degli allergeni",
     "noAllergens": "Nessun allergene identificato"
+  },
+  "recipeMappings": {
+    "title": "Gestione Mappature Ricette",
+    "generateAll": "Genera Tutte",
+    "list": "Lista Mappature",
+    "dishName": "Nome Piatto",
+    "ingredients": "Ingredienti",
+    "lastUpdated": "Ultimo Aggiornamento",
+    "source": "Fonte",
+    "noMapping": "Nessuna mappatura",
+    "editMapping": "Modifica Mappatura",
+    "editDescription": "Modifica gli ingredienti per questa ricetta",
+    "addIngredient": "Aggiungi Ingrediente",
+    "ingredientName": "Nome",
+    "quantity": "Quantità",
+    "unit": "Unità",
+    "fetchError": "Errore nel caricamento delle mappature",
+    "generateSuccess": "Mappatura generata con successo",
+    "generateError": "Errore nella generazione della mappatura",
+    "generateAllSuccess": "Tutte le mappature generate con successo",
+    "generateAllError": "Errore nella generazione di tutte le mappature",
+    "updateSuccess": "Mappatura aggiornata con successo",
+    "updateError": "Errore nell'aggiornamento della mappatura",
+    "deleteSuccess": "Mappatura eliminata con successo",
+    "deleteError": "Errore nell'eliminazione della mappatura"
   }
 } 

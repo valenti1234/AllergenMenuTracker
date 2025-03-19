@@ -141,13 +141,13 @@ export function Sidebar() {
       roles: ["admin", "manager"]
     },
     {
-      title: t("nav.inventory", "Inventario"),
+      title: t("nav.inventory", "Inventory"),
       icon: Package,
       href: "/admin/inventory",
       roles: ["admin", "manager"]
     },
     {
-      title: t("nav.recipeMappings", "Mappature Ricette"),
+      title: t("nav.recipeMappings", "Recipe Mappings"),
       icon: Wand2,
       href: "/admin/recipe-mappings",
       roles: ["admin", "manager", "chef"]
@@ -233,7 +233,7 @@ export function Sidebar() {
         <div className="px-4 py-2 border-t border-sidebar-border">
           <div className="flex flex-col">
             <div className="text-xs font-medium text-sidebar-foreground mb-2">
-              {t('admin.language.select', 'Seleziona Lingua')}
+              {t('admin.language.select', 'Select Language')}
             </div>
             <div className="flex gap-2">
               <Button
@@ -272,7 +272,7 @@ export function Sidebar() {
             onClick={handleLogout}
           >
             <LogOut className="h-4 w-4 mr-2" />
-            {t("admin.logout", "Disconnetti")}
+            {t("admin.logout", "Logout")}
           </Button>
         </div>
       </div>
