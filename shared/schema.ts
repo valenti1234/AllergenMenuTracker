@@ -291,10 +291,11 @@ export type StaffTrainingRecord = z.infer<typeof staffTrainingRecordSchema> & {
 export const inventoryItemSchema = z.object({
   name: z.string().min(1),
   category: z.string().min(1),
-  quantity: z.number().min(0),
+  quantity: z.number(),
   unit: z.string().min(1),
   minThreshold: z.number().min(0),
   status: z.enum(["ok", "low", "critical"]),
+  allergens: z.array(z.enum(allergens)).default([]),
   lastUpdated: z.string()
 });
 

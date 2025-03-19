@@ -1191,89 +1191,150 @@ export class MongoStorage implements IStorage {
       unit: item.unit,
       minThreshold: item.minThreshold,
       status: item.status,
-      lastUpdated: item.lastUpdated
+      lastUpdated: item.lastUpdated.toISOString(),
+      allergens: item.allergens || []
     }));
   }
 
   async getInventoryItem(id: string): Promise<InventoryItem | null> {
     if (!ObjectId.isValid(id)) return null;
-    const item = await InventoryModel.findById(id);
-    if (!item) return null;
     
-    return {
-      id: item._id.toString(),
-      name: item.name,
-      category: item.category,
-      quantity: item.quantity,
-      unit: item.unit,
-      minThreshold: item.minThreshold,
-      status: item.status,
-      lastUpdated: item.lastUpdated
-    };
+    try {
+      const item = await InventoryModel.findById(id);
+      if (!item) return null;
+      
+      return {
+        id: item._id.toString(),
+        name: item.name,
+        category: item.category,
+        quantity: item.quantity,
+        unit: item.unit,
+        minThreshold: item.minThreshold,
+        status: item.status,
+        lastUpdated: item.lastUpdated.toISOString(),
+        allergens: item.allergens || []
+      };
+    } catch (error) {
+      console.error(`Error retrieving inventory item ${id}:`, error);
+      return null;
+    }
   }
 
   async createInventoryItem(item: InsertInventoryItem): Promise<InventoryItem> {
-    const now = new Date().toISOString();
-    const status = item.quantity <= item.minThreshold ? 
-      (item.quantity === 0 ? "critical" : "low") : 
-      "ok";
-
-    const newItem = await InventoryModel.create({
-      ...item,
-      status,
-      lastUpdated: now
-    });
-
-    return {
-      id: newItem._id.toString(),
-      name: newItem.name,
-      category: newItem.category,
-      quantity: newItem.quantity,
-      unit: newItem.unit,
-      minThreshold: newItem.minThreshold,
-      status: newItem.status,
-      lastUpdated: newItem.lastUpdated
-    };
+    try {
+      const status = item.quantity <= item.minThreshold ? 
+        (item.quantity === 0 ? "critical" : "low") : 
+        "ok";
+      
+      const now = new Date();
+      
+      const newItem = await InventoryModel.create({
+        ...item,
+        status,
+        lastUpdated: now,
+        allergens: item.allergens || []
+      });
+      
+      return {
+        id: newItem._id.toString(),
+        name: newItem.name,
+        category: newItem.category,
+        quantity: newItem.quantity,
+        unit: newItem.unit,
+        minThreshold: newItem.minThreshold,
+        status: newItem.status,
+        lastUpdated: newItem.lastUpdated.toISOString(),
+        allergens: newItem.allergens || []
+      };
+    } catch (error) {
+      console.error("Error creating inventory item:", error);
+      throw error;
+    }
   }
 
   async updateInventoryItem(id: string, update: Partial<InsertInventoryItem>): Promise<InventoryItem | null> {
-    if (!ObjectId.isValid(id)) return null;
+    console.log(`Storage: updateInventoryItem called for ${id} with:`, update);
+    console.log(`Storage: Allergens in update:`, update.allergens);
+    
+    if (!ObjectId.isValid(id)) {
+      console.error(`Storage: Invalid ObjectId: ${id}`);
+      return null;
+    }
 
     const currentItem = await this.getInventoryItem(id);
-    if (!currentItem) return null;
+    if (!currentItem) {
+      console.error(`Storage: Item with id ${id} not found`);
+      return null;
+    }
 
+    console.log(`Storage: Current item:`, currentItem);
+    console.log(`Storage: Current item allergens:`, currentItem.allergens);
+    
     const quantity = update.quantity ?? currentItem.quantity;
     const minThreshold = update.minThreshold ?? currentItem.minThreshold;
     const status = quantity <= minThreshold ? 
       (quantity === 0 ? "critical" : "low") : 
       "ok";
 
-    const now = new Date().toISOString();
+    const now = new Date();
     
-    const updatedItem = await InventoryModel.findByIdAndUpdate(
-      id,
-      { 
-        $set: {
-          ...update,
-          status,
-          lastUpdated: now
-        }
-      },
-      { new: true }
-    );
+    // Ensure allergens is defined
+    const allergens = update.allergens !== undefined ? update.allergens : (currentItem.allergens || []);
+    console.log(`Storage: Allergens to be used in update:`, allergens);
+    
+    console.log(`Storage: Updating item with:`, {
+      ...update,
+      allergens,
+      status,
+      lastUpdated: now
+    });
+    
+    try {
+      const updatedItem = await InventoryModel.findByIdAndUpdate(
+        id,
+        { 
+          $set: {
+            ...update,
+            allergens,
+            status,
+            lastUpdated: now
+          }
+        },
+        { new: true }
+      );
 
-    if (!updatedItem) return null;
+      if (!updatedItem) {
+        console.error(`Storage: Update operation returned null for id ${id}`);
+        return null;
+      }
 
-    return {
-      id: updatedItem._id.toString(),
-      name: updatedItem.name,
-      category: updatedItem.category,
-      quantity: updatedItem.quantity,
-      unit: updatedItem.unit,
-      minThreshold: updatedItem.minThreshold,
-      status: updatedItem.status,
-      lastUpdated: updatedItem.lastUpdated
-    };
+      console.log(`Storage: Successfully updated item, returning:`, {
+        id: updatedItem._id.toString(),
+        name: updatedItem.name,
+        category: updatedItem.category,
+        quantity: updatedItem.quantity,
+        unit: updatedItem.unit,
+        minThreshold: updatedItem.minThreshold,
+        status: updatedItem.status,
+        lastUpdated: updatedItem.lastUpdated.toISOString(),
+        allergens: updatedItem.allergens || []
+      });
+      
+      return {
+        id: updatedItem._id.toString(),
+        name: updatedItem.name,
+        category: updatedItem.category,
+        quantity: updatedItem.quantity,
+        unit: updatedItem.unit,
+        minThreshold: updatedItem.minThreshold,
+        status: updatedItem.status,
+        lastUpdated: updatedItem.lastUpdated.toISOString(),
+        allergens: updatedItem.allergens || []
+      };
+    } catch (error) {
+      console.error(`Storage: Error updating inventory item ${id}:`, error);
+      throw error;
+    }
   }
 
   async deleteInventoryItem(id: string): Promise<boolean> {

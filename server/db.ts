@@ -291,6 +291,11 @@ const InventorySchema = new mongoose.Schema({
     enum: ["ok", "low", "critical"],
     default: "ok"
   },
+  allergens: { 
+    type: [String], 
+    enum: ['gluten', 'dairy', 'nuts', 'eggs', 'soy', 'shellfish', 'fish', 'peanuts'],
+    default: []
+  },
   lastUpdated: { type: Date, default: Date.now }
 });
 

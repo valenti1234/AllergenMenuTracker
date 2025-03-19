@@ -21,6 +21,8 @@ import { z } from "zod";
 // Importa l'adattatore Stripe Terminal
 import { StripeTerminalAdapter } from "./services/posIntegration/stripeTerminalAdapter";
 import { isPOSEnabled, getPOSConfig, getStripeConfig } from "./services/posIntegration/posConfig";
+// Importare l'handler per l'endpoint analyze-allergens
+import analyzeAllergens from "./api/analyze-allergens";
 
 export async function registerRoutes(app: Express) {
   // Serve uploaded files statically
@@ -923,20 +925,30 @@ export async function registerRoutes(app: Express) {
   app.patch("/api/inventory/:id", requireRole(["admin", "manager"]), async (req, res) => {
     try {
       const { id } = req.params;
+      console.log(`PATCH /api/inventory/${id}: Received request with body:`, req.body);
+      console.log(`PATCH /api/inventory/${id}: Allergens in request:`, req.body.allergens);
+      
       const result = insertInventoryItemSchema.partial().safeParse(req.body);
       
       if (!result.success) {
+        console.error(`PATCH /api/inventory/${id}: Validation failed:`, result.error.errors);
         return res.status(400).json({ 
           message: "Invalid inventory item data", 
           errors: result.error.errors 
         });
       }
 
+      console.log(`PATCH /api/inventory/${id}: Validation passed, updating item with:`, result.data);
+      console.log(`PATCH /api/inventory/${id}: Allergens after validation:`, result.data.allergens);
+      
       const item = await storage.updateInventoryItem(id, result.data);
+      
       if (!item) {
+        console.error(`PATCH /api/inventory/${id}: Item not found`);
         return res.status(404).json({ message: "Inventory item not found" });
       }
 
+      console.log(`PATCH /api/inventory/${id}: Successfully updated item with allergens:`, item.allergens);
       res.json(item);
     } catch (error) {
       console.error('Error updating inventory item:', error);
@@ -1109,6 +1121,18 @@ export async function registerRoutes(app: Express) {
         message: 'Error in bulk generation', 
         error: error.message,
         stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      });
+    }
+  });
+
+  // Endpoint per l'analisi degli allergeni con OpenAI
+  app.post("/api/analyze-allergens", requireRole(["admin", "manager"]), async (req, res) => {
+    try {
+      return analyzeAllergens(req, res);
+    } catch (error) {
+      console.error('Analyze allergens error:', error);
+      res.status(500).json({ 
+        message: error instanceof Error ? error.message : "Errore durante l'analisi degli allergeni" 
       });
     }
   });

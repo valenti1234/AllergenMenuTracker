@@ -16,10 +16,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Phone, Clock, ClipboardList } from "lucide-react";
 import type { Order, OrderStatus } from "@shared/schema";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "@/contexts/SettingsContext";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 export default function Archive() {
   const { t, i18n } = useTranslation();
@@ -201,8 +203,84 @@ export default function Archive() {
                       <Clock className="h-4 w-4" />
                       {new Date(order.createdAt).toLocaleString(i18n.language)}
                     </div>
-                    <div className="font-medium">
-                      {t("menu.total", "Total")}: {formatPrice(order.total)}
+                    <div className="flex items-center gap-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button 
+                            size="sm" 
+                            variant="secondary"
+                            className="flex items-center gap-1"
+                          >
+                            <ClipboardList className="h-4 w-4" />
+                            {t("orders.viewDetails", "View Details")}
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-xl">
+                          <div className="space-y-4">
+                            <h3 className="text-lg font-semibold">
+                              {t("orders.orderDetails", "Order Details")} #{order.id.slice(-6)}
+                            </h3>
+                            
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                              <div>
+                                <span className="font-medium">{t("orders.orderType", "Order Type")}:</span> 
+                                {order.type === "dine-in" 
+                                  ? `${t("orders.dineIn", "Dine-in")} - ${t("orders.table", "Table")} ${order.tableNumber}` 
+                                  : t("menu.orderType.takeaway", "Takeaway")}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("orders.customer", "Customer")}:</span> {order.customerName}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("orders.phone", "Phone")}:</span> {order.phoneNumber}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("orders.date", "Date")}:</span> {new Date(order.createdAt).toLocaleString(i18n.language)}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("orders.status", "Status")}:</span> {t(`orders.status.${order.status}`, order.status)}
+                              </div>
+                              <div>
+                                <span className="font-medium">{t("orders.paymentStatus", "Payment")}:</span> 
+                                {order.paymentStatus === 'paid' 
+                                  ? t("orders.paid", "Paid") 
+                                  : t("orders.pending", "Pending")}
+                              </div>
+                            </div>
+                            
+                            <div className="border-t pt-4 mt-4">
+                              <h4 className="font-medium mb-2">{t("orders.items", "Order Items")}:</h4>
+                              <div className="space-y-2">
+                                {order.items.map((item) => (
+                                  <div key={item.id} className="flex justify-between">
+                                    <div>
+                                      <span className="font-medium">{getLocalizedText(item.name)}</span>
+                                      <span className="text-sm text-muted-foreground ml-2">× {item.quantity}</span>
+                                    </div>
+                                    <span>{formatPrice(item.price * item.quantity)}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            
+                            {order.specialInstructions && (
+                              <div className="border-t pt-4">
+                                <h4 className="font-medium mb-2">{t("orders.specialInstructions", "Special Instructions")}:</h4>
+                                <p className="text-sm">{order.specialInstructions}</p>
+                              </div>
+                            )}
+                            
+                            <div className="border-t pt-4 flex justify-between">
+                              <span className="font-medium">{t("menu.total", "Total")}:</span>
+                              <span className="font-bold">{formatPrice(order.total)}</span>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                      
+                      <div className="font-medium">
+                        {t("menu.total", "Total")}: {formatPrice(order.total)}
+                      </div>
                     </div>
                   </div>
                 </div>
