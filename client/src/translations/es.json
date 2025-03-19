@@ -430,5 +430,29 @@
         "orderCount": "Número Pedidos"
       }
     }
+  },
+  "inventory": {
+    "title": "Gestión de Inventario",
+    "addItem": "Añadir Artículo",
+    "addItemDescription": "Introduce los detalles del nuevo artículo",
+    "totalItems": "Artículos Totales",
+    "lowStock": "Stock Bajo",
+    "categories": "Categorías",
+    "list": "Lista de Inventario",
+    "search": "Buscar artículos...",
+    "filterByCategory": "Filtrar por categoría",
+    "selectCategory": "Seleccionar categoría",
+    "itemName": "Nombre del Artículo",
+    "category": "Categoría",
+    "quantity": "Cantidad",
+    "unit": "Unidad",
+    "minThreshold": "Umbral Mínimo",
+    "status": "Estado",
+    "lastUpdated": "Última Actualización",
+    "status": {
+      "ok": "OK",
+      "low": "Bajo",
+      "critical": "Crítico"
+    }
   }
 } 

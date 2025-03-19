@@ -28,6 +28,8 @@ import SignIn from "@/pages/signin";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { SettingsProvider } from "@/contexts/SettingsContext";
+import Inventory from "@/pages/admin/inventory";
+import RecipeMappings from "@/pages/admin/recipe-mappings";
 
 // Versione semplificata che mostra solo la pagina di signin direttamente
 function HomeRedirect() {
@@ -115,6 +117,12 @@ function App() {
         </Route>
         <Route path="/admin/training">
           <ProtectedRoute component={Training} />
+        </Route>
+        <Route path="/admin/inventory">
+          <ProtectedRoute component={Inventory} />
+        </Route>
+        <Route path="/admin/recipe-mappings">
+          <ProtectedRoute component={RecipeMappings} />
         </Route>
 
         {/* 404 Page */}

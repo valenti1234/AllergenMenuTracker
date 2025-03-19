@@ -1,6 +1,9 @@
 import OpenAI from "openai";
 import { MenuItem, Language, languages } from "@shared/schema";
 import { downloadImage } from "./image-utils";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -272,5 +275,75 @@ export async function analyzeKitchenWorkflow(
   } catch (error) {
     console.error('OpenAI API Error:', error);
     throw new Error('Failed to analyze kitchen workflow');
+  }
+}
+
+interface GeneratedIngredient {
+  name: string;
+  quantity: number;
+  unit: string;
+}
+
+export async function generateRecipeIngredients(menuItem: any): Promise<GeneratedIngredient[]> {
+  try {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OpenAI API key is not configured');
+    }
+
+    const prompt = `
+Analizza questo piatto del menu e genera una lista precisa degli ingredienti necessari per una porzione:
+
+Nome del piatto: ${menuItem.name.it || menuItem.name}
+Descrizione: ${menuItem.description.it || menuItem.description}
+Categoria: ${menuItem.category}
+
+Fornisci la risposta come un oggetto JSON con questa struttura:
+{
+  "ingredients": [
+    { "name": "Nome Ingrediente", "quantity": 0.1, "unit": "kg" }
+  ]
+}
+
+Usa queste unità di misura:
+- kg o g per ingredienti solidi
+- l o ml per liquidi
+- pz per unità intere (uova, ecc.)
+
+Esempio di risposta:
+{
+  "ingredients": [
+    { "name": "Farina 00", "quantity": 0.1, "unit": "kg" },
+    { "name": "Uova", "quantity": 2, "unit": "pz" },
+    { "name": "Olio di oliva", "quantity": 0.02, "unit": "l" }
+  ]
+}
+
+Rispondi SOLO con il JSON, senza altro testo.`;
+
+    console.log('Sending request to OpenAI with prompt:', prompt);
+
+    const completion = await openai.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: "gpt-3.5-turbo",
+      temperature: 0.7,
+      response_format: { type: "json_object" }
+    });
+
+    console.log('Received response from OpenAI:', completion.choices[0]?.message?.content);
+
+    const response = completion.choices[0]?.message?.content;
+    if (!response) {
+      throw new Error('No response from OpenAI');
+    }
+
+    const parsed = JSON.parse(response);
+    if (!parsed.ingredients || !Array.isArray(parsed.ingredients)) {
+      throw new Error('Invalid response format from OpenAI');
+    }
+
+    return parsed.ingredients;
+  } catch (error: any) {
+    console.error('Error generating recipe ingredients:', error);
+    throw new Error(`Failed to generate recipe ingredients: ${error.message || 'Unknown error'}`);
   }
 }

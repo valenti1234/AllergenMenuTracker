@@ -62,18 +62,42 @@ app.use((req, res, next) => {
 (async () => {
   try {
     await connectToDatabase();
-    const server = await registerRoutes(app);
-
-    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-      const status = err.status || err.statusCode || 500;
-      const message = err.message || "Internal Server Error";
-      log(`Error: ${message}`);
-      res.status(status).json({ message });
+    
+    // Create server
+    const server = app.listen({
+      port: PORT,
+      host: HOST,
     });
 
+    // Register API routes before Vite
+    await registerRoutes(app);
+
+    // Error handling middleware for API routes
+    app.use('/api', (err: any, req: Request, res: Response, next: NextFunction) => {
+      if (req.path.startsWith('/api')) {
+        const status = err.status || err.statusCode || 500;
+        const message = err.message || "Internal Server Error";
+        log(`Error: ${message}`);
+        res.status(status).json({ message });
+      } else {
+        next(err);
+      }
+    });
+
+    // Set up Vite or static serving for non-API routes
     if (app.get("env") === "development") {
+      app.use((req, res, next) => {
+        if (!req.path.startsWith('/api')) {
+          next();
+        }
+      });
       await setupVite(app, server);
     } else {
+      app.use((req, res, next) => {
+        if (!req.path.startsWith('/api')) {
+          next();
+        }
+      });
       serveStatic(app);
     }
 
@@ -84,10 +108,6 @@ app.use((req, res, next) => {
     startMetricsCacheService();
     log("Started metrics cache service with improved popular items calculation");
 
-    server.listen({
-      port: PORT,
-      host: HOST,
-    });
     log(`Server running on ${HOST}:${PORT}`);
     log(`API Documentation available at http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}/api-docs`);
 

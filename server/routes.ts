@@ -1,9 +1,9 @@
 import type { Express } from "express";
 import { createServer } from "http";
 import { storage } from "./storage";
-import { insertMenuItemSchema, insertUserSchema, insertOrderSchema, orderStatuses } from "@shared/schema";
+import { insertMenuItemSchema, insertUserSchema, insertOrderSchema, orderStatuses, insertInventoryItemSchema } from "@shared/schema";
 import { requireAuth, requireRole } from "./auth";
-import { generateMenuItem, analyzeDietaryInfo, suggestDietaryModifications, analyzeKitchenWorkflow } from "./services/openai";
+import { generateMenuItem, analyzeDietaryInfo, suggestDietaryModifications, analyzeKitchenWorkflow, generateRecipeIngredients } from "./services/openai";
 import path from "path";
 import express from "express";
 import mongoose from 'mongoose';
@@ -876,6 +876,240 @@ export async function registerRoutes(app: Express) {
     } catch (error) {
       console.error('Create training record error:', error);
       res.status(500).json({ message: "Failed to create training record" });
+    }
+  });
+
+  // Inventory routes - Protected for admin and manager
+  app.get("/api/inventory", requireRole(["admin", "manager"]), async (_req, res) => {
+    try {
+      const items = await storage.getInventoryItems();
+      res.json(items);
+    } catch (error) {
+      console.error('Get inventory items error:', error);
+      res.status(500).json({ message: "Failed to fetch inventory items" });
+    }
+  });
+
+  app.get("/api/inventory/:id", requireRole(["admin", "manager"]), async (req, res) => {
+    try {
+      const item = await storage.getInventoryItem(req.params.id);
+      if (!item) {
+        res.status(404).json({ message: "Inventory item not found" });
+        return;
+      }
+      res.json(item);
+    } catch (error) {
+      console.error('Get inventory item error:', error);
+      res.status(500).json({ message: "Failed to fetch inventory item" });
+    }
+  });
+
+  app.post("/api/inventory", requireRole(["admin", "manager"]), async (req, res) => {
+    try {
+      const result = insertInventoryItemSchema.safeParse(req.body);
+      if (!result.success) {
+        res.status(400).json({ message: "Invalid inventory item data", errors: result.error });
+        return;
+      }
+
+      const item = await storage.createInventoryItem(result.data);
+      res.status(201).json(item);
+    } catch (error) {
+      console.error('Create inventory item error:', error);
+      res.status(500).json({ message: "Failed to create inventory item" });
+    }
+  });
+
+  app.patch("/api/inventory/:id", requireRole(["admin", "manager"]), async (req, res) => {
+    try {
+      const { id } = req.params;
+      const result = insertInventoryItemSchema.partial().safeParse(req.body);
+      
+      if (!result.success) {
+        return res.status(400).json({ 
+          message: "Invalid inventory item data", 
+          errors: result.error.errors 
+        });
+      }
+
+      const item = await storage.updateInventoryItem(id, result.data);
+      if (!item) {
+        return res.status(404).json({ message: "Inventory item not found" });
+      }
+
+      res.json(item);
+    } catch (error) {
+      console.error('Error updating inventory item:', error);
+      res.status(500).json({ message: "Failed to update inventory item" });
+    }
+  });
+
+  app.delete("/api/inventory/:id", requireRole(["admin", "manager"]), async (req, res) => {
+    try {
+      const success = await storage.deleteInventoryItem(req.params.id);
+      if (!success) {
+        res.status(404).json({ message: "Inventory item not found" });
+        return;
+      }
+      res.status(204).send();
+    } catch (error) {
+      console.error('Delete inventory item error:', error);
+      res.status(500).json({ message: "Failed to delete inventory item" });
+    }
+  });
+
+  // Recipe Mappings Routes
+  app.get("/api/recipe-mappings", requireRole(["admin", "manager", "kitchen"]), async (req, res) => {
+    try {
+      console.log('GET /recipe-mappings: Fetching all recipe mappings');
+      const mappings = await storage.getRecipeMappings();
+      console.log(`GET /recipe-mappings: Found ${mappings.length} mappings`);
+      res.json(mappings);
+    } catch (error: any) {
+      console.error('Error fetching recipe mappings:', error);
+      console.error('Stack trace:', error.stack);
+      res.status(500).json({ message: 'Error fetching recipe mappings', error: error.message });
+    }
+  });
+
+  app.get("/api/recipe-mappings/:menuItemId", requireRole(["admin", "manager", "kitchen"]), async (req, res) => {
+    try {
+      const mapping = await storage.getRecipeMapping(req.params.menuItemId);
+      if (!mapping) {
+        return res.status(404).json({ message: 'Recipe mapping not found' });
+      }
+      res.json(mapping);
+    } catch (error: any) {
+      console.error('Error fetching recipe mapping:', error);
+      res.status(500).json({ message: 'Error fetching recipe mapping', error: error.message });
+    }
+  });
+
+  app.put("/api/recipe-mappings/:menuItemId", requireRole(["admin", "manager"]), async (req, res) => {
+    try {
+      const { ingredients } = req.body;
+      const menuItem = await storage.getMenuItem(req.params.menuItemId);
+      
+      if (!menuItem) {
+        return res.status(404).json({ message: 'Menu item not found' });
+      }
+
+      const mapping = await storage.updateRecipeMapping(req.params.menuItemId, ingredients, false);
+      res.json(mapping);
+    } catch (error: any) {
+      console.error('Error updating recipe mapping:', error);
+      res.status(500).json({ message: 'Error updating recipe mapping', error: error.message });
+    }
+  });
+
+  app.post("/api/recipe-mappings/:menuItemId/generate", requireRole(["admin", "manager"]), async (req, res) => {
+    try {
+      console.log('Generating recipe mapping for menuItemId:', req.params.menuItemId);
+      
+      const menuItem = await storage.getMenuItem(req.params.menuItemId);
+      if (!menuItem) {
+        console.log('Menu item not found:', req.params.menuItemId);
+        return res.status(404).json({ message: 'Menu item not found' });
+      }
+
+      console.log('Found menu item:', {
+        name: menuItem.name,
+        description: menuItem.description,
+        category: menuItem.category
+      });
+
+      const generatedIngredients = await generateRecipeIngredients(menuItem);
+      console.log('Generated ingredients:', generatedIngredients);
+
+      if (!Array.isArray(generatedIngredients) || generatedIngredients.length === 0) {
+        console.error('Invalid ingredients generated:', generatedIngredients);
+        return res.status(400).json({ 
+          message: 'Failed to generate valid ingredients',
+          details: 'The AI service did not return a valid list of ingredients'
+        });
+      }
+
+      // Validate ingredient structure
+      const invalidIngredients = generatedIngredients.filter(
+        ing => !ing.name || typeof ing.quantity !== 'number' || !ing.unit
+      );
+      if (invalidIngredients.length > 0) {
+        console.error('Invalid ingredient format:', invalidIngredients);
+        return res.status(400).json({
+          message: 'Invalid ingredient format in generated data',
+          details: 'Some ingredients are missing required fields or have invalid data types',
+          invalidIngredients
+        });
+      }
+
+      const mapping = await storage.updateRecipeMapping(req.params.menuItemId, generatedIngredients, true);
+      console.log('Saved mapping:', mapping);
+      res.json(mapping);
+    } catch (error: any) {
+      console.error('Error generating recipe mapping:', error);
+      res.status(500).json({ 
+        message: 'Error generating recipe mapping', 
+        error: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      });
+    }
+  });
+
+  app.delete("/api/recipe-mappings/:menuItemId", requireRole(["admin", "manager"]), async (req, res) => {
+    try {
+      const result = await storage.deleteRecipeMapping(req.params.menuItemId);
+      if (!result) {
+        return res.status(404).json({ message: 'Recipe mapping not found' });
+      }
+      res.json({ message: 'Recipe mapping deleted successfully' });
+    } catch (error: any) {
+      console.error('Error deleting recipe mapping:', error);
+      res.status(500).json({ message: 'Error deleting recipe mapping', error: error.message });
+    }
+  });
+
+  app.post("/api/recipe-mappings/generate-all", requireRole(["admin"]), async (req, res) => {
+    try {
+      const menuItems = await storage.getMenuItems();
+      const existingMappings = await storage.getRecipeMappings();
+      const existingMappingIds = new Set(existingMappings.map(m => m.menuItemId));
+
+      const unmappedItems = menuItems.filter(item => !existingMappingIds.has(item.id));
+      
+      const results = await Promise.allSettled(
+        unmappedItems.map(async (item) => {
+          try {
+            const generatedIngredients = await generateRecipeIngredients(item);
+            if (!Array.isArray(generatedIngredients) || generatedIngredients.length === 0) {
+              throw new Error('Invalid ingredients generated');
+            }
+            return await storage.createRecipeMapping(item.id, generatedIngredients, true);
+          } catch (error: any) {
+            console.error(`Error generating mapping for item ${item.id}:`, error);
+            return null;
+          }
+        })
+      );
+
+      const successful = results.filter(r => r.status === 'fulfilled').length;
+      const failed = results.filter(r => r.status === 'rejected').length;
+
+      res.json({
+        message: `Generated ${successful} mappings, ${failed} failed`,
+        totalProcessed: unmappedItems.length,
+        details: results.map((r, i) => ({
+          menuItemId: unmappedItems[i].id,
+          status: r.status,
+          error: r.status === 'rejected' ? (r.reason?.message || 'Unknown error') : undefined
+        }))
+      });
+    } catch (error: any) {
+      console.error('Error in bulk generation:', error);
+      res.status(500).json({ 
+        message: 'Error in bulk generation', 
+        error: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      });
     }
   });
 

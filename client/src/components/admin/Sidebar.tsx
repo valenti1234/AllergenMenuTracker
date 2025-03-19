@@ -19,7 +19,9 @@ import {
   Moon,
   Sun,
   Monitor,
-  BarChart
+  BarChart,
+  Package,
+  Wand2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/queryClient";
@@ -137,6 +139,18 @@ export function Sidebar() {
       icon: GraduationCap,
       href: "/admin/training",
       roles: ["admin", "manager"]
+    },
+    {
+      title: t("nav.inventory", "Inventario"),
+      icon: Package,
+      href: "/admin/inventory",
+      roles: ["admin", "manager"]
+    },
+    {
+      title: t("nav.recipeMappings", "Mappature Ricette"),
+      icon: Wand2,
+      href: "/admin/recipe-mappings",
+      roles: ["admin", "manager", "chef"]
     }
   ];
 

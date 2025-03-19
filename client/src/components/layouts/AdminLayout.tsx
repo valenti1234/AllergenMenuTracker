@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { User } from "lucide-react";
+import { User, Wand2 } from "lucide-react";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -15,6 +15,14 @@ interface AdminLayoutProps {
 
 export function AdminLayout({ children }: AdminLayoutProps) {
   const { t } = useTranslation();
+
+  const navigation = [
+    {
+      name: "Mappature Ricette",
+      href: "/admin/recipe-mappings",
+      icon: Wand2,
+    },
+  ];
 
   return (
     <div className="flex h-screen bg-background">

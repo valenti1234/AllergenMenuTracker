@@ -439,10 +439,8 @@ export class MongoStorage implements IStorage {
         const oldOrder = await OrderModel.findById(id);
         const oldStatus = oldOrder?.status;
         
-        // MODIFICATO: Forziamo sempre l'aggiornamento dell'inventario indipendentemente dallo stato precedente
-        console.log('DEBUG INVENTARIO: Forzatura aggiornamento inventario');
-        if (true) { // Condizione originale: oldStatus && !["ready", "served", "completed"].includes(oldStatus)
-          console.log('DEBUG INVENTARIO: Chiamata a updateInventoryForPreparedOrder per ordine', id);
+        // Aggiorniamo l'inventario solo se lo stato precedente non era già "ready", "served" o "completed"
+        if (oldStatus && !["ready", "served", "completed"].includes(oldStatus)) {
           console.log(`Ordine ${id} cambiato da ${oldStatus} a ${update.status}: aggiornamento inventario`);
           await this.updateInventoryForPreparedOrder(id);
         } else {
@@ -1284,8 +1282,7 @@ export class MongoStorage implements IStorage {
 
   async updateInventoryForPreparedOrder(orderId: string): Promise<void> {
     try {
-      console.log('DEBUG INVENTARIO: Inizio aggiornamento per ordine', orderId);
-      console.log(`DEBUG INVENTARIO: Aggiornamento inventario per ordine servito: ${orderId}`);
+      console.log(`Aggiornamento inventario per ordine servito: ${orderId}`);
       const order = await this.getOrder(orderId);
       if (!order) throw new Error("Ordine non trovato");
 
@@ -1312,57 +1309,48 @@ export class MongoStorage implements IStorage {
           let inventoryItem = items[0];
 
           if (!inventoryItem) {
-            try {
-              // Se l'ingrediente non esiste, crealo con quantità iniziale 0 e poi sottraiamo
-              const normalizedName = ingredient.name.charAt(0).toUpperCase() + ingredient.name.slice(1).toLowerCase();
-              console.log(`Ingrediente non trovato. Creazione di ${normalizedName} con quantità iniziale 0`);
-              
-              inventoryItem = await InventoryModel.create({
-                name: normalizedName,
-                category: "Da categorizzare",
-                quantity: 0, // Inizia con quantità 0
-                unit: ingredient.unit,
-                minThreshold: 5, // Valore di default
-                status: "critical",
-                lastUpdated: new Date().toISOString()
-              });
-              
-              console.log(`Ingrediente creato con id: ${inventoryItem._id}, ora sottraiamo ${totalQuantity}`);
-            } catch (ingredientError) {
-              console.error(`Errore nella creazione dell'ingrediente ${ingredient.name}:`, ingredientError);
-              continue; // Passa all'ingrediente successivo
-            }
-          }
-
-          try {
-            // Aggiorna la quantità
-            const newQuantity = (inventoryItem.quantity || 0) - totalQuantity;
-            const status = newQuantity <= 0 ? "critical" : 
-                          newQuantity <= inventoryItem.minThreshold ? "low" : "ok";
-
-            console.log(`Aggiornamento ${inventoryItem.name}: ${inventoryItem.quantity || 0} - ${totalQuantity} = ${newQuantity} (${status})`);
+            // Se l'ingrediente non esiste, crealo con quantità NEGATIVA come richiesto
+            const normalizedName = ingredient.name.charAt(0).toUpperCase() + ingredient.name.slice(1).toLowerCase();
+            console.log(`Ingrediente non trovato. Creazione con quantità negativa: ${normalizedName} (-${totalQuantity}${ingredient.unit})`);
             
-            await InventoryModel.findByIdAndUpdate(
-              inventoryItem._id,
-              { 
-                $set: {
-                  quantity: newQuantity,
-                  status,
-                  lastUpdated: new Date().toISOString()
-                }
-              }
-            );
-          } catch (updateError) {
-            console.error(`Errore nell'aggiornamento dell'ingrediente ${inventoryItem.name}:`, updateError);
-            // Continuiamo con il prossimo ingrediente
+            inventoryItem = await InventoryModel.create({
+              name: normalizedName,
+              category: "Da categorizzare",
+              quantity: -totalQuantity, // Inizia con quantità negativa
+              unit: ingredient.unit,
+              minThreshold: 5, // Valore di default
+              status: "critical",
+              lastUpdated: new Date().toISOString()
+            });
+            
+            console.log(`Ingrediente creato con id: ${inventoryItem._id}`);
+            continue; // Salta il resto poiché l'elemento è già stato creato con la quantità corretta
           }
+
+          // Aggiorna la quantità (può diventare negativa)
+          const newQuantity = (inventoryItem.quantity || 0) - totalQuantity;
+          const status = newQuantity <= 0 ? "critical" : 
+                        newQuantity <= inventoryItem.minThreshold ? "low" : "ok";
+
+          console.log(`Aggiornamento ${inventoryItem.name}: ${inventoryItem.quantity || 0} - ${totalQuantity} = ${newQuantity} (${status})`);
+          
+          await InventoryModel.findByIdAndUpdate(
+            inventoryItem._id,
+            { 
+              $set: {
+                quantity: newQuantity,
+                status,
+                lastUpdated: new Date().toISOString()
+              }
+            }
+          );
         }
       }
       
       console.log(`Inventario aggiornato con successo per l'ordine ${orderId}`);
     } catch (error) {
       console.error(`Errore nell'aggiornamento dell'inventario per l'ordine ${orderId}:`, error);
-      // Non propaghiamo l'errore per evitare di bloccare l'aggiornamento dell'ordine
+      throw error;
     }
   }
 

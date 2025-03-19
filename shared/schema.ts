@@ -287,3 +287,22 @@ export type StaffTrainingRecord = z.infer<typeof staffTrainingRecordSchema> & {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export const inventoryItemSchema = z.object({
+  name: z.string().min(1),
+  category: z.string().min(1),
+  quantity: z.number().min(0),
+  unit: z.string().min(1),
+  minThreshold: z.number().min(0),
+  status: z.enum(["ok", "low", "critical"]),
+  lastUpdated: z.string()
+});
+
+export type InventoryItem = z.infer<typeof inventoryItemSchema>;
+
+export const insertInventoryItemSchema = inventoryItemSchema.omit({ 
+  status: true,
+  lastUpdated: true 
+});
+
+export type InsertInventoryItem = z.infer<typeof insertInventoryItemSchema>;

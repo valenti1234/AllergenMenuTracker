@@ -1,5 +1,10 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Swagger definition
 const swaggerOptions = {
@@ -29,7 +34,7 @@ const swaggerOptions = {
         cookieAuth: {
           type: 'apiKey',
           in: 'cookie',
-          name: 'session'
+          name: 'connect.sid'
         }
       }
     },
@@ -37,12 +42,33 @@ const swaggerOptions = {
       {
         cookieAuth: []
       }
+    ],
+    tags: [
+      {
+        name: 'Recipe Mappings',
+        description: 'Operazioni sulle mappature delle ricette'
+      },
+      {
+        name: 'Menu',
+        description: 'Operazioni sul menu'
+      },
+      {
+        name: 'Orders',
+        description: 'Gestione degli ordini'
+      },
+      {
+        name: 'Inventory',
+        description: 'Gestione dell\'inventario'
+      },
+      {
+        name: 'Admin',
+        description: 'Operazioni amministrative'
+      }
     ]
   },
   apis: [
-    './server/routes-docs.ts',
-    './server/routes.ts',
-    './server/models/*.ts'
+    path.join(__dirname, 'routes-docs.ts'),
+    path.join(__dirname, 'routes', '*.ts')
   ]
 };
 

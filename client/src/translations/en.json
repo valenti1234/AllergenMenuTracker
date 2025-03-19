@@ -439,5 +439,29 @@
         "orderCount": "Order Count"
       }
     }
+  },
+  "inventory": {
+    "title": "Inventory Management",
+    "addItem": "Add Item",
+    "addItemDescription": "Enter the details of the new item",
+    "totalItems": "Total Items",
+    "lowStock": "Low Stock",
+    "categories": "Categories",
+    "list": "Inventory List",
+    "search": "Search items...",
+    "filterByCategory": "Filter by category",
+    "selectCategory": "Select category",
+    "itemName": "Item Name",
+    "category": "Category",
+    "quantity": "Quantity",
+    "unit": "Unit",
+    "minThreshold": "Minimum Threshold",
+    "status": "Status",
+    "lastUpdated": "Last Updated",
+    "status": {
+      "ok": "OK",
+      "low": "Low",
+      "critical": "Critical"
+    }
   }
 } 
